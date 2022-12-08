@@ -1,0 +1,54 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fair-lib-python"
+version = "1.0.33"
+description = "Utilities for AI - Assisted Mapping fAIr"
+readme = "README.md"
+authors = [{ name = "Omdena", email = "project@omdena.com" },{{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }}]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: GNU Affero General Public License v3.0",
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    "preprocessing", "inference", 
+    "postprocessing", "stitching"
+]
+dependencies = [
+    "shapely", "GDAL", "numpy", 
+    "tensorflow", "Pillow", "geopandas", 
+    "rasterio", "mercantile", "tqdm", 
+    "rtree", "opencv-python"
+]
+requires-python = ">=3.7"
+
+    [project.optional-dependencies]
+    build = ["build", "twine"]
+    dev   = ["black", "bumpver", "isort"]
+
+    [project.urls]
+    repository    = "https://github.com/hotosm/fAIr-lib-python"
+
+
+[tool.bumpver]
+current_version = "1.0.33"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message  = "bump version {old_version} -> {new_version}"
+commit          = true
+tag             = true
+push            = false
+
+    [tool.bumpver.file_patterns]
+    "pyproject.toml" = [
+        'current_version = "{version}"',
+        'version = "{version}"',
+    ]
+
+[tool.isort]
+profile                   = "black"
+import_heading_stdlib     = "Standard library imports"
+import_heading_thirdparty = "Third party imports"
+import_heading_firstparty = "Reader imports"
