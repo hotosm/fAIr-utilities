@@ -7,7 +7,7 @@ name = "fair-lib-python"
 version = "1.0.33"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
-authors = [{ name = "Omdena", email = "project@omdena.com" },{{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }}]
+authors = [{ name = "Omdena", email = "project@omdena.com" },{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: GNU Affero General Public License v3.0",

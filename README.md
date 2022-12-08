@@ -51,6 +51,7 @@ Edit in `fAIr-lib-python`. In order to test your edit, take the following steps:
 ```console
 conda create -n fAIr python=3.8
 conda activate fAIr
+conda install -c conda-forge gdal
 conda install -c conda-forge geopandas
 pip install pyogrio rasterio tensorflow
 pip install -e fAIr-lib-python
