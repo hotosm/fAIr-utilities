@@ -39,9 +39,6 @@ Edit in `fAIr-lib-python`. In order to test your edit, take the following steps:
 
     You'll find a path after the version of `fAIr-lib-python`:
 
-    ```console
-    fAIr-lib-python                       1.0.33    C:\Users\Tasin\Documents\repos\hot\fAIr-lib-python
-    ```
 
 3. Make an edit to `fAIr-lib-python`.
 4. Try running `task_1_preprocessing/preprocess.py` now. The updated code will be executed.
