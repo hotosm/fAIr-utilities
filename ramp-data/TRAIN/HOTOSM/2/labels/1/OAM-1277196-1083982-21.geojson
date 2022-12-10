@@ -1,9 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "labels",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "osm_id": 796962196 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 39.2452945, -6.0665758 ], [ 39.2453001, -6.0665493 ], [ 39.2452975, -6.0665488 ], [ 39.2453077, -6.0665006 ], [ 39.2453485, -6.0665091 ], [ 39.2453326, -6.0665838 ], [ 39.2452945, -6.0665758 ] ] ] } },
-{ "type": "Feature", "properties": { "osm_id": 796962195 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 39.2453548, -6.0665639 ], [ 39.2453556, -6.066507 ], [ 39.2453837, -6.0665074 ], [ 39.2453829, -6.0665643 ], [ 39.2453548, -6.0665639 ] ] ] } }
-]
-}
