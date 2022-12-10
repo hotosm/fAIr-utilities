@@ -1,14 +1,5 @@
-geopandas 
-shapely 
-gdal
-tensorflow 
-Pillow
-tqdm
-opencv-python
+
 mercantile
-rtree
-pyproj
-rasterio
 tensorflow == 2.8.0
 bumpver
 black

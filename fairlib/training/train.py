@@ -1,7 +1,9 @@
 # Standard library imports
 import os
-from .prepare_data split_training_2_validation
-from .run_training import manage_fine_tuning_config,run_main_train_code
+
+from .prepare_data import split_training_2_validation
+from .run_training import manage_fine_tuning_config, run_main_train_code
+
 
 def train(
     input_path: str,
@@ -9,6 +11,7 @@ def train(
     batch_size: int,
     model: str,
     model_home: str,
+    t_id: int,
 ) -> None:
     """Trains the input image with base model
 
@@ -43,12 +46,10 @@ def train(
 
     # Export the environment variables from the operating system
     os.environ.update(os.environ)
-    if model.lower() == 'ramp': 
+    if model.lower() == "ramp":
         # Add a new environment variable to the operating system
         os.environ["RAMP_HOME"] = model_home
         # Print the environment variables to verify that the new variable was added
-        print(os.environ)
-        uid=split_training_2_validation(input_path)
-        cfg=manage_fine_tuning_config(uid,epoch_size,batch_size)
+        uid = split_training_2_validation(t_id, input_path)
+        cfg = manage_fine_tuning_config(uid, epoch_size, batch_size)
         run_main_train_code(cfg)
-

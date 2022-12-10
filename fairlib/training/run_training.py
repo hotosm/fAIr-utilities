@@ -28,8 +28,6 @@ from tensorflow import keras
 # Comment this out if you are having mysterious problems, so you can see all messages.
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-# this variable must be defined. It is the parent of the 'ramp-code' directory.
-RAMP_HOME = os.environ["RAMP_HOME"]
 
 # Third party imports
 import ramp.utils.log_fields as lf
@@ -56,12 +54,19 @@ from ramp.utils.model_utils import get_best_model_value_and_epoch
 sm.set_framework("tf.keras")
 
 
+# this variable must be defined. It is the parent of the 'ramp-code' directory.
+working_ramp_home = os.environ["RAMP_HOME"]
+print(working_ramp_home)
+
+
 def manage_fine_tuning_config(uid, num_epochs, batch_size):
 
     # Define the paths to the source and destination JSON files
     working_dir = os.path.realpath(os.path.dirname(__file__))
     config_base_path = os.path.join(working_dir, "data/ramp_config_base.json")
-    dst_path = Path(RAMP_HOME) / f"ramp-code/data/ramp_fair_config_finetune_{uid}.json"
+    dst_path = (
+        Path(working_ramp_home) / f"ramp-code/data/ramp_fair_config_finetune_{uid}.json"
+    )
 
     # Read the content of the source JSON file
     with open(config_base_path, "r") as f:
@@ -140,7 +145,7 @@ def run_main_train_code(cfg):
     if cfg["saved_model"]["use_saved_model"]:
 
         # load (construct) the model
-        model_path = Path(RAMP_HOME) / cfg["saved_model"]["saved_model_path"]
+        model_path = Path(working_ramp_home) / cfg["saved_model"]["saved_model_path"]
         print(f"Model: importing saved model {str(model_path)}")
         the_model = tf.keras.models.load_model(model_path)
         assert (
@@ -168,10 +173,10 @@ def run_main_train_code(cfg):
     cfg["datasets"]
 
     #### define data directories ####
-    train_img_dir = Path(RAMP_HOME) / cfg["datasets"]["train_img_dir"]
-    train_mask_dir = Path(RAMP_HOME) / cfg["datasets"]["train_mask_dir"]
-    val_img_dir = Path(RAMP_HOME) / cfg["datasets"]["val_img_dir"]
-    val_mask_dir = Path(RAMP_HOME) / cfg["datasets"]["val_mask_dir"]
+    train_img_dir = Path(working_ramp_home) / cfg["datasets"]["train_img_dir"]
+    train_mask_dir = Path(working_ramp_home) / cfg["datasets"]["train_mask_dir"]
+    val_img_dir = Path(working_ramp_home) / cfg["datasets"]["val_img_dir"]
+    val_mask_dir = Path(working_ramp_home) / cfg["datasets"]["val_mask_dir"]
 
     #### get the augmentation transform ####
     # aug = None
