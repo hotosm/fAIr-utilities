@@ -9,3 +9,4 @@ mercantile
 rtree
 pyproj
 rasterio
+tensorflow == 2.8.0

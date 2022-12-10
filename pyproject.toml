@@ -17,12 +17,9 @@ keywords = [
     "preprocessing", "inference", 
     "postprocessing", "stitching"
 ]
-dependencies = [
-    "shapely", "GDAL", "numpy", 
-    "tensorflow", "Pillow", "geopandas", 
-    "rasterio", "mercantile", "tqdm", 
-    "rtree", "opencv-python"
-]
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 requires-python = ">=3.7"
 
     [project.optional-dependencies]
