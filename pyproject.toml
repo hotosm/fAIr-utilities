@@ -3,8 +3,8 @@ requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fair-lib-python"
-version = "1.0.33"
+name = "fairlib"
+version = "1.0.34"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Omdena", email = "project@omdena.com" },{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
@@ -20,18 +20,9 @@ keywords = [
 dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-requires-python = ">=3.7"
-
-    [project.optional-dependencies]
-    build = ["build", "twine"]
-    dev   = ["black", "bumpver", "isort"]
-
-    [project.urls]
-    repository    = "https://github.com/hotosm/fAIr-lib-python"
-
 
 [tool.bumpver]
-current_version = "1.0.33"
+current_version = "1.0.34"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true

@@ -10,3 +10,9 @@ rtree
 pyproj
 rasterio
 tensorflow == 2.8.0
+bumpver
+black
+isort
+build
+twine
+ramp-fair==0.1.1
