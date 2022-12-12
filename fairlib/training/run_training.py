@@ -53,7 +53,6 @@ sm.set_framework("tf.keras")
 
 # this variable must be defined. It is the parent of the 'ramp-code' directory.
 working_ramp_home = os.environ["RAMP_HOME"]
-print(working_ramp_home)
 
 
 def manage_fine_tuning_config(uid, num_epochs, batch_size):
@@ -108,11 +107,9 @@ def run_main_train_code(cfg):
     # specify a function that will construct the loss function
     get_loss_fn_name = cfg["loss"]["get_loss_fn_name"]
     get_loss_fn = getattr(loss_constructors, get_loss_fn_name)
-    print(f"Loss function constructor: {get_loss_fn.__name__}")
 
     # Construct the loss function
     loss_fn = get_loss_fn(cfg)
-    print(f"Loss function: {loss_fn.__name__}")
 
     the_metrics = []
     if cfg["metrics"]["use_metrics"]:
@@ -126,18 +123,12 @@ def run_main_train_code(cfg):
             metric_fn = get_metric_fn(mf_parms)
             the_metrics.append(metric_fn)
 
-    # Print the list of accuracy metrics
-    print(f"Accuracy metrics: {[fn.name for fn in the_metrics]}")
-
     #### construct optimizer ####
 
     get_optimizer_fn_name = cfg["optimizer"]["get_optimizer_fn_name"]
     get_optimizer_fn = getattr(optimizer_constructors, get_optimizer_fn_name)
-    print(f"Optimizer constructor: {get_optimizer_fn.__name__}")
 
     optimizer = get_optimizer_fn(cfg)
-    print(optimizer)
-    print(float(optimizer.learning_rate))
 
     the_model = None
 
@@ -162,7 +153,6 @@ def run_main_train_code(cfg):
     if not cfg["saved_model"]["use_saved_model"]:
         get_model_fn_name = cfg["model"]["get_model_fn_name"]
         get_model_fn = getattr(model_constructors, get_model_fn_name)
-        print(f"Model constructor: {get_model_fn.__name__}")
         the_model = get_model_fn(cfg)
 
         assert the_model is not None, f"the model was not constructed: {model_path}"
@@ -181,7 +171,6 @@ def run_main_train_code(cfg):
     # aug = None
     if cfg["augmentation"]["use_aug"]:
         aug = get_augmentation_fn(cfg)
-        print(aug)
 
     ## RUNTIME Parameters
     batch_size = cfg["batch_size"]
@@ -239,16 +228,12 @@ def run_main_train_code(cfg):
                 callback_constructors, get_model_checkpt_callback_fn_name
             )
             callbacks_list.append(get_model_checkpt_callback_fn(cfg))
-            print(
-                f"model checkpoint callback constructor:{get_model_checkpt_callback_fn.__name__}"
-            )
 
         # get tensorboard callback
         if cfg["tensorboard"]["use_tb"]:
             get_tb_callback_fn_name = cfg["tensorboard"]["get_tb_callback_fn_name"]
             get_tb_callback_fn = getattr(callback_constructors, get_tb_callback_fn_name)
             callbacks_list.append(get_tb_callback_fn(cfg))
-            print(f"tensorboard callback constructor: {get_tb_callback_fn.__name__}")
 
         # get tensorboard model prediction logging callback
         if cfg["prediction_logging"]["use_prediction_logging"]:
@@ -262,15 +247,12 @@ def run_main_train_code(cfg):
                 callback_constructors, get_prediction_logging_fn_name
             )
             callbacks_list.append(get_prediction_logging_fn(the_model, cfg))
-            print(
-                f"prediction logging callback constructor: {get_prediction_logging_fn.__name__}"
-            )
 
     # free up RAM
     keras.backend.clear_session()
 
     if cfg["early_stopping"]["use_early_stopping"]:
-        print("Using early stopping")
+
         callbacks_list.append(callback_constructors.get_early_stopping_callback_fn(cfg))
 
         # get cyclic learning scheduler callback
@@ -283,11 +265,12 @@ def run_main_train_code(cfg):
         ]
         get_clr_callback_fn = getattr(callback_constructors, get_clr_callback_fn_name)
         callbacks_list.append(get_clr_callback_fn(cfg))
-        print(f"CLR callback constructor: {get_clr_callback_fn.__name__}")
 
     ## Main training block ##
     n_epochs = cfg["num_epochs"]
-    print(n_epochs)
+    print(
+        f"Starting Training with {n_epochs} epochs , {batch_size} batch size , {steps_per_epoch} steps per epoch , {validation_steps} validation steps......"
+    )
     # FIXME : Make checkpoint
     start = perf_counter()
     history = the_model.fit(
@@ -299,10 +282,10 @@ def run_main_train_code(cfg):
         callbacks=callbacks_list,
     )
     end = perf_counter()
-    print(f"Time taken to train code : {end-start} seconds")
+    print(f"Training Finished , Time taken to train : {end-start} seconds")
 
     # plot the training and validation accuracy and loss at each epoch
-    print("Generating graphs")
+    print("Generating graphs ....")
     if not os.path.exists(cfg["graph_location"]):
         os.mkdir(cfg["graph_location"])
 
