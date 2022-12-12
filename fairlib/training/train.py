@@ -50,6 +50,8 @@ def train(
         # Add a new environment variable to the operating system
         os.environ["RAMP_HOME"] = model_home
         # Print the environment variables to verify that the new variable was added
+        print("Starting to prepare data for training")
         uid = split_training_2_validation(t_id, input_path)
         cfg = manage_fine_tuning_config(uid, epoch_size, batch_size)
+        print("Data is ready for training")
         run_main_train_code(cfg)
