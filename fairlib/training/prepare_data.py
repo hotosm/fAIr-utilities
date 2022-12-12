@@ -10,7 +10,7 @@ from pathlib import Path
 from shutil import copytree, rmtree
 
 
-def split_training_2_validation(t_id, input_path):
+def split_training_2_validation(input_path, output_path):
     """Converts training 2 validation
 
     Currently supported for ramp , It converts training dataset provided by preprocessing script to validation datastes reuqired by ramp
@@ -21,14 +21,10 @@ def split_training_2_validation(t_id, input_path):
     sys.path.append("..")
     os.chdir(Path(RAMP_HOME))
     # output current working directory.
-    # Note: the current working directory for this script should be 'RAMP_HOME.'
-    print(os.getcwd())
 
-    # Generate a random unique UUID , used as temp id for operation
-    uid = t_id
     # Define the source and destination paths
     src_path = input_path
-    dst_path = f"ramp-data/TRAIN/{uid}"
+    dst_path = output_path
 
     # Check if the path exists
     if os.path.exists(dst_path):
@@ -48,7 +44,7 @@ def split_training_2_validation(t_id, input_path):
             "-src",
             f"{dst_path}/chips",
             "-pfx",
-            f"{dst_path}/{uid}_fair_split",
+            f"{dst_path}/fair_split",
             "-trn",
             "0.85",
             "-val",
@@ -66,7 +62,7 @@ def split_training_2_validation(t_id, input_path):
             "-td",
             f"{dst_path}/val-chips",
             "-csv",
-            f"{dst_path}/{uid}_fair_split_val.csv",
+            f"{dst_path}/fair_split_val.csv",
             "-mv",
         ]
     )
@@ -79,7 +75,7 @@ def split_training_2_validation(t_id, input_path):
             "-td",
             f"{dst_path}/val-labels",
             "-csv",
-            f"{dst_path}/{uid}_fair_split_val.csv",
+            f"{dst_path}/fair_split_val.csv",
             "-mv",
         ]
     )
@@ -92,8 +88,7 @@ def split_training_2_validation(t_id, input_path):
             "-td",
             f"{dst_path}/val-binarymasks",
             "-csv",
-            f"{dst_path}/{uid}_fair_split_val.csv",
+            f"{dst_path}/fair_split_val.csv",
             "-mv",
         ]
     )
-    return uid

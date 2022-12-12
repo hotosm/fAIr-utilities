@@ -55,39 +55,35 @@ sm.set_framework("tf.keras")
 working_ramp_home = os.environ["RAMP_HOME"]
 
 
-def manage_fine_tuning_config(uid, num_epochs, batch_size):
+def manage_fine_tuning_config(output_path, num_epochs, batch_size):
 
     # Define the paths to the source and destination JSON files
     working_dir = os.path.realpath(os.path.dirname(__file__))
     config_base_path = os.path.join(working_dir, "data/ramp_config_base.json")
-    dst_path = (
-        Path(working_ramp_home) / f"ramp-code/data/ramp_fair_config_finetune_{uid}.json"
-    )
+    dst_path = os.path.join(output_path, "ramp_fair_config_finetune.json")
 
     # Read the content of the source JSON file
     with open(config_base_path, "r") as f:
         data = json.load(f)
 
     # Modify the content of the data dictionary datasets
-    data["datasets"]["train_img_dir"] = f"ramp-data/TRAIN/{uid}/chips"
-    data["datasets"]["train_mask_dir"] = f"ramp-data/TRAIN/{uid}/binarymasks"
-    data["datasets"]["val_img_dir"] = f"ramp-data/TRAIN/{uid}/val-chips"
-    data["datasets"]["val_mask_dir"] = f"ramp-data/TRAIN/{uid}/val-binarymasks"
+    data["datasets"]["train_img_dir"] = f"{output_path}/chips"
+    data["datasets"]["train_mask_dir"] = f"{output_path}/binarymasks"
+    data["datasets"]["val_img_dir"] = f"{output_path}/val-chips"
+    data["datasets"]["val_mask_dir"] = f"{output_path}/val-binarymasks"
 
     # epoch batchconfig
     data["num_epochs"] = num_epochs
     data["batch_size"] = batch_size
 
     # clr plot
-    data["cyclic_learning_scheduler"]["clr_plot_dir"] = f"ramp-data/TRAIN/{uid}/plots"
+    data["cyclic_learning_scheduler"]["clr_plot_dir"] = f"{output_path}/plots"
     # logs
-    data["tensorboard"]["tb_logs_dir"] = f"ramp-data/TRAIN/{uid}/logs"
+    data["tensorboard"]["tb_logs_dir"] = f"{output_path}/logs"
     # output images
-    data["graph_location"] = f"ramp-data/TRAIN/{uid}/graphs"
+    data["graph_location"] = f"{output_path}/graphs"
     # model_checkpts
-    data["model_checkpts"][
-        "model_checkpts_dir"
-    ] = f"ramp-data/TRAIN/{uid}/model-checkpts"
+    data["model_checkpts"]["model_checkpts_dir"] = f"{output_path}/model-checkpts"
     # save best models only
     data["model_checkpts"]["model_checkpt_callback_parms"]["save_best_only"] = True
     # Open the destination file and write the modified data

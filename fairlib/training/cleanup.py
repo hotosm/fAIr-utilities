@@ -2,13 +2,9 @@
 import os
 import shutil
 
-working_ramp_home = os.environ["RAMP_HOME"]
 
-
-def extract_highest_accuracy_model(uid):
-    model_checkpoints = os.path.join(
-        working_ramp_home, "ramp-data", "TRAIN", str(uid), "model-checkpts"
-    )
+def extract_highest_accuracy_model(output_path):
+    model_checkpoints = os.path.join(output_path, "model-checkpts")
     assert os.path.exists(model_checkpoints), "Model Checkpoints Doesn't Exist"
     entries = os.listdir(model_checkpoints)
     assert len(entries) > 0, "Couldn't find any models"

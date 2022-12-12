@@ -8,33 +8,30 @@ from .run_training import manage_fine_tuning_config, run_main_train_code
 
 def train(
     input_path: str,
+    output_path: str,
     epoch_size: int,
     batch_size: int,
     model: str,
     model_home: str,
-    t_id: int,
 ):
     """Trains the input image with base model
 
-    The preprocessed images and labels are in the EPSG:3857 projected
-    coordinate system ('WGS 84 / Pseudo-Mercator', coordinates
-    in meters).
 
     Args:
         input_path: Path of the directory output by preprocess
+        output_path: Path of the working dir for training
         epoch_size: Epoch size to be used for training
         batch_size: Batch size to be used for training
         model : Choose Model, Options supported are , ramp
         model_home : Model Home directory which contains necessary file in order to run model
-        t_id : Training id
     Example::
 
-        train(
-            "data/region1_preprocessed",
-            2,
-            2,
-            ramp,
-            ../ramp-home
+        final_accuracy, final_model_path = train(
+            input_path=preprocess_output,
+            epoch_size=2,
+            batch_size=2,
+            model="ramp",
+            model_home=os.environ["RAMP_HOME"],
         )
     """
     assert os.path.exists(input_path), "Input Path Doesn't Exist"
@@ -53,10 +50,10 @@ def train(
         os.environ["RAMP_HOME"] = model_home
         # Print the environment variables to verify that the new variable was added
         print("Starting to prepare data for training")
-        uid = split_training_2_validation(t_id, input_path)
-        cfg = manage_fine_tuning_config(uid, epoch_size, batch_size)
+        split_training_2_validation(input_path, output_path)
+        cfg = manage_fine_tuning_config(output_path, epoch_size, batch_size)
         print("Data is ready for training")
         run_main_train_code(cfg)
         print("extracting highest accuracy model")
-        final_accuracy, final_model_path = extract_highest_accuracy_model(uid)
+        final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
         return (final_accuracy, final_model_path)
