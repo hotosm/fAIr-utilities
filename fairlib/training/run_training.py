@@ -76,7 +76,7 @@ def manage_fine_tuning_config(uid, num_epochs, batch_size):
     data["datasets"]["train_img_dir"] = f"ramp-data/TRAIN/{uid}/chips"
     data["datasets"]["train_mask_dir"] = f"ramp-data/TRAIN/{uid}/binarymasks"
     data["datasets"]["val_img_dir"] = f"ramp-data/TRAIN/{uid}/val-chips"
-    data["datasets"]["val_mask_dir"] = f"ramp-data/TRAIN/{uid}/val=binarymasks"
+    data["datasets"]["val_mask_dir"] = f"ramp-data/TRAIN/{uid}/val-binarymasks"
 
     # epoch batchconfig
     data["num_epochs"] = num_epochs
@@ -300,4 +300,4 @@ def run_main_train_code(cfg):
         callbacks=callbacks_list,
     )
     end = perf_counter()
-    print(f"Time taken to execute code : {end-start} seconds")
+    print(f"Time taken to train code : {end-start} seconds")

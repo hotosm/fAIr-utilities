@@ -1,6 +1,6 @@
 
 mercantile
-tensorflow == 2.8.0
+tensorflow == 2.9.2
 bumpver
 black
 isort
