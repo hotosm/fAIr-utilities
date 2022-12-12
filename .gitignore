@@ -20,8 +20,8 @@ venv.bak/
 
 ramp-code/
 .ipynb_checkpoints
-ramp-data/sample_1/preprocessed
-ramp-data/sample_1/prediction/output
-ramp-data/sample_1/train
+ramp-data/sample_2/preprocessed
+ramp-data/sample_2/prediction/output
+ramp-data/sample_2/train
 
 
