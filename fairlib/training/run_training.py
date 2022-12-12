@@ -8,19 +8,17 @@ import tensorflow as tf
 assert tf.__version__ <= "2.9.2"  # tested up to 2.9.2
 
 # Standard library imports
-import argparse
+
+# Standard library imports
 import datetime
 import json
 import os
-import random
-import sys
 from pathlib import Path
 from time import perf_counter
 
 # Third party imports
-import keras.backend as K
-import numpy as np
 import tensorflow as tf
+from matplotlib import pyplot as plt
 from tensorflow import keras
 
 # Note: this suppresses warning and other less urgent messages,
@@ -30,13 +28,13 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 # Third party imports
-import ramp.utils.log_fields as lf
+
+# Third party imports
 import segmentation_models as sm
 from ramp.data_mgmt.data_generator import (
     test_batches_from_gtiff_dirs,
     training_batches_from_gtiff_dirs,
 )
-from ramp.models.effunet_1 import get_effunet
 from ramp.training import (
     callback_constructors,
     loss_constructors,
@@ -47,8 +45,7 @@ from ramp.training import (
 
 # import ramp dependencies.
 from ramp.training.augmentation_constructors import get_augmentation_fn
-from ramp.utils.misc_ramp_utils import get_num_files, log_experiment_to_file
-from ramp.utils.model_utils import get_best_model_value_and_epoch
+from ramp.utils.misc_ramp_utils import get_num_files
 
 # Segmentation Models: using `keras` framework.
 sm.set_framework("tf.keras")
@@ -86,6 +83,8 @@ def manage_fine_tuning_config(uid, num_epochs, batch_size):
     data["cyclic_learning_scheduler"]["clr_plot_dir"] = f"ramp-data/TRAIN/{uid}/plots"
     # logs
     data["tensorboard"]["tb_logs_dir"] = f"ramp-data/TRAIN/{uid}/logs"
+    # output images
+    data["graph_location"] = f"ramp-data/TRAIN/{uid}/graphs"
     # model_checkpts
     data["model_checkpts"][
         "model_checkpts_dir"
@@ -301,3 +300,32 @@ def run_main_train_code(cfg):
     )
     end = perf_counter()
     print(f"Time taken to train code : {end-start} seconds")
+
+    # plot the training and validation accuracy and loss at each epoch
+    print("Generating graphs")
+    if not os.path.exists(cfg["graph_location"]):
+        os.mkdir(cfg["graph_location"])
+
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+    epochs = range(1, len(loss) + 1)
+    plt.plot(epochs, loss, "y", label="Training loss")
+    plt.plot(epochs, val_loss, "r", label="Validation loss")
+    plt.title("Training and validation loss")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig(f"{cfg['graph_location']}/training_validation_loss.png")
+
+    acc = history.history["sparse_categorical_accuracy"]
+    val_acc = history.history["val_sparse_categorical_accuracy"]
+    plt.plot(epochs, acc, "y", label="Training acc")
+    plt.plot(epochs, val_acc, "r", label="Validation sparse categorical acc")
+    plt.title("Training and validation sparse categorical accuracy")
+    plt.xlabel("Epochs")
+    plt.ylabel("Sparse Categorical Accuracy")
+    plt.legend()
+    plt.savefig(
+        f"{cfg['graph_location']}/training_validation_sparse_categorical_accuracy.png"
+    )
+    print(f"Graph generated at : {cfg['graph_location']}")

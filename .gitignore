@@ -18,7 +18,7 @@ ENV/
 env.bak/
 venv.bak/
 
-ramp-code
+ramp-code/
 .ipynb_checkpoints
 ramp-data/output
 ramp-data/TRAIN

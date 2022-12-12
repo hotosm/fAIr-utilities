@@ -1,6 +1,7 @@
 # Standard library imports
 import os
 
+from .cleanup import extract_highest_accuracy_model
 from .prepare_data import split_training_2_validation
 from .run_training import manage_fine_tuning_config, run_main_train_code
 
@@ -12,7 +13,7 @@ def train(
     model: str,
     model_home: str,
     t_id: int,
-) -> None:
+):
     """Trains the input image with base model
 
     The preprocessed images and labels are in the EPSG:3857 projected
@@ -25,6 +26,7 @@ def train(
         batch_size: Batch size to be used for training
         model : Choose Model, Options supported are , ramp
         model_home : Model Home directory which contains necessary file in order to run model
+        t_id : Training id
     Example::
 
         train(
@@ -55,3 +57,6 @@ def train(
         cfg = manage_fine_tuning_config(uid, epoch_size, batch_size)
         print("Data is ready for training")
         run_main_train_code(cfg)
+        print("extracting highest accuracy model")
+        final_accuracy, final_model_path = extract_highest_accuracy_model(uid)
+        return (final_accuracy, final_model_path)
