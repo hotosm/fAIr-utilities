@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "labels",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "osm_id": 796960330 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 39.2440911, -6.0666775 ], [ 39.2441359, -6.0666774 ], [ 39.2441443, -6.0667421 ], [ 39.2440965, -6.0667475 ], [ 39.2440911, -6.0666775 ] ] ] } }
-]
-}

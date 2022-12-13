@@ -1,0 +1,47 @@
+name: Check Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Add ubuntugis ppa & Update
+        run:
+          sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
+      - name : Install numpy
+        run:
+          pip install numpy==1.23.5
+      - name: Install gdal 
+        run: |
+          sudo apt-get install gdal-bin
+          sudo apt-get install libgdal-dev
+          export CPLUS_INCLUDE_PATH=/usr/include/gdal
+          export C_INCLUDE_PATH=/usr/include/gdal
+          pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
+      - name : Clone Ramp 
+        run : 
+          git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code    
+      - name: Install ramp dependecies
+        run: |
+          cd ramp-code && cd colab && make install 
+      - name: Navigate to home dir
+        run: |
+          cd ../.. 
+          ls
+      - name : Install fair lib 
+        run:
+          pip install -e .
+
+      - name: Run test workflow
+        run: |
+          python test_app.py

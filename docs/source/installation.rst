@@ -1,7 +1,7 @@
 Installation
 =========================
 
-For local installation of the `fAIr-lib-python` package, follow the steps below: 
+For local installation of the `fairlib` package, follow the steps below: 
 
 .. code-block:: 
 
@@ -9,4 +9,4 @@ For local installation of the `fAIr-lib-python` package, follow the steps below:
     conda activate hot
     conda install -c conda-forge geopandas
     pip install pyogrio rasterio tensorflow
-    pip install fAIr-lib-python
+    pip install fairlib

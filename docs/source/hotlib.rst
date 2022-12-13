@@ -1,27 +1,27 @@
-fAIr-lib-python package
+fairlib package
 =========================
 
-fAIr-lib-python.preprocess function
+fairlib.preprocess function
 --------------------------
 
-.. autofunction:: fAIr-lib-python.preprocess
+.. autofunction:: fairlib.preprocess
 
-fAIr-lib-python.georeference function
+fairlib.georeference function
 ----------------------------
 
-.. autofunction:: fAIr-lib-python.georeference
+.. autofunction:: fairlib.georeference
 
-fAIr-lib-python.predict function
+fairlib.predict function
 -----------------------
 
-.. autofunction:: fAIr-lib-python.predict
+.. autofunction:: fairlib.predict
 
-fAIr-lib-python.polygonize function
+fairlib.polygonize function
 --------------------------
 
-.. autofunction:: fAIr-lib-python.polygonize
+.. autofunction:: fairlib.polygonize
 
-fAIr-lib-python.vectorize function
+fairlib.vectorize function
 -------------------------
 
-.. autofunction:: fAIr-lib-python.vectorize
+.. autofunction:: fairlib.vectorize
