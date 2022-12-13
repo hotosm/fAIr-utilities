@@ -13,7 +13,7 @@ fairlib is collection of utilities which contains core logic for model data prep
 2. Clone ramp working dir 
 
     ```
-    git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git
+    git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
     ```
 
 3. Install native bindings 
