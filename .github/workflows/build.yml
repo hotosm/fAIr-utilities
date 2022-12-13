@@ -18,7 +18,9 @@ jobs:
       - name: Add ubuntugis ppa & Update
         run:
           sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-
+      - name : Install numpy
+        run:
+          pip install numpy==1.23.5
       - name: Install gdal 
         run: |
           sudo apt-get install gdal-bin
@@ -39,9 +41,7 @@ jobs:
       - name : Install fair lib 
         run:
           pip install -e .
-      - name : Install numpy
-        run:
-          pip install numpy
+
       - name: Run test workflow
         run: |
           python test_app.py
