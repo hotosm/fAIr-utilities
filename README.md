@@ -52,7 +52,13 @@ fairlib is collection of utilities which contains core logic for model data prep
         ```
 
 
-## Custom Virtual Environment
+## Conda Virtual Environment
+Create from env fle 
+
+    ```
+    conda env create -f environment.yml
+    ```
+Create your own
 
     ```
     conda create -n fAIr python=3.8
