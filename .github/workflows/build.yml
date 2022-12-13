@@ -39,6 +39,7 @@ jobs:
       - name : Install fair lib 
         run:
           pip install -e .
+          pip install numpy
       - name: Run workflow
         run: |
           python test_app.py
