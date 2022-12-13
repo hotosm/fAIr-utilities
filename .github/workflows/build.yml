@@ -37,6 +37,7 @@ jobs:
           cd ../.. 
           ls
       - name : Install fair lib 
+        run:
           pip install -e .
       - name: Run workflow
         run: |
