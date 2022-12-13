@@ -18,7 +18,7 @@ fairlib is collection of utilities which contains core logic for model data prep
 
 3. Install native bindings 
     - Install [gdal](https://gdal.org/index.html) .
-    
+
         for eg : on Ubuntu 
         ```
         sudo apt-get update && sudo apt-get -y install gdal-bin python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
@@ -62,3 +62,7 @@ fairlib is collection of utilities which contains core logic for model data prep
     pip install pyogrio rasterio tensorflow
     pip install -e fairlib
     ```
+
+## Test Installation and workflow 
+
+You can run ```package_test.ipynb``` to your pc to test the installation and workflow with sample data provided 
