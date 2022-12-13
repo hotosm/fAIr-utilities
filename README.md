@@ -16,8 +16,9 @@ fairlib is collection of utilities which contains core logic for model data prep
     git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git
     ```
 
-3. Instal native bindings 
+3. Install native bindings 
     - Install [gdal](https://gdal.org/index.html) .
+    
         for eg : on Ubuntu 
         ```
         sudo apt-get update && sudo apt-get -y install gdal-bin python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
@@ -27,7 +28,8 @@ fairlib is collection of utilities which contains core logic for model data prep
         conda install -c conda-forge gdal
         ```
     - Install rasterio 
-        for eg on ubuntu : 
+
+        for eg: on ubuntu : 
         ```
         sudo apt-get install -y python3-rasterio
         ```
@@ -39,24 +41,24 @@ fairlib is collection of utilities which contains core logic for model data prep
 3. Install ramp requirements 
 
     Install necessary requirements for ramp 
-    ```
-    cd colab && make install 
-    ```
+        ```
+        cd colab && make install 
+        ```
 
 4. Install fairlib 
 
-    ```
-    pip intall fairlib==1.0.35
-    ```
+        ```
+        pip intall fairlib==1.0.35
+        ```
 
 
 ## Custom Virtual Environment
 
-```console
-conda create -n fAIr python=3.8
-conda activate fAIr
-conda install -c conda-forge gdal
-conda install -c conda-forge geopandas
-pip install pyogrio rasterio tensorflow
-pip install -e fairlib
-```
+    ```
+    conda create -n fAIr python=3.8
+    conda activate fAIr
+    conda install -c conda-forge gdal
+    conda install -c conda-forge geopandas
+    pip install pyogrio rasterio tensorflow
+    pip install -e fairlib
+    ```
