@@ -15,26 +15,28 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: Add ubuntugis ppa & Install gdal dev
+      - name: Add ubuntugis ppa & Update
         run:
           sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
 
-      - name: Install gdal python
+      - name: Install gdal 
         run: |
           sudo apt-get install gdal-bin
           sudo apt-get install libgdal-dev
           export CPLUS_INCLUDE_PATH=/usr/include/gdal
           export C_INCLUDE_PATH=/usr/include/gdal
           pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
-      - name : Clone Ramp 
+      - name : Clone Ramp Code
         run : 
           git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code    
       - name: Install ramp dependecies
         run: |
           cd ramp-code && cd colab && make install 
-      - name: Install fair-lib 
+      - name: Navigate to home dir
         run: |
           cd ../.. 
+          ls
+      - name : Install fair lib 
           pip install -e .
       - name: Run workflow
         run: |
