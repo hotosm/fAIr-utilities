@@ -3,43 +3,52 @@ Initially lib was developed during Open AI Challenge with [Omdeena](https://omde
 
 ## `fairlib` Installation
 
-1. Set up a Conda virtual environment for installing `fairlib` using `environment.yml`:
+fairlib is collection of utilities which contains core logic for model data prepration , training and postprocessing . It can support multiple models , Currently ramp is supported. 
 
-    ```console
-    conda env create -f environment.yml
+
+1. Install tensorflow ```2.9.2``` from [here] (https://www.tensorflow.org/install/pip) According to your os
+
+### Setup Ramp : 
+
+2. Clone ramp working dir 
+
+    ```
+    git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git
     ```
 
-2. Activate the virtual environment.
+3. Instal native bindings 
+    - Install [gdal](https://gdal.org/index.html) .
+        for eg : on Ubuntu 
+        ```
+        sudo apt-get update && sudo apt-get -y install gdal-bin python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
+        ```
+        on conda : 
+        ```
+        conda install -c conda-forge gdal
+        ```
+    - Install rasterio 
+        for eg on ubuntu : 
+        ```
+        sudo apt-get install -y python3-rasterio
+        ```
+        on conda : 
+        ```
+        conda install -c conda-forge rasterio
+        ```
 
-    ```console
-    conda activate fAIr
+3. Install ramp requirements 
+
+    Install necessary requirements for ramp 
+    ```
+    cd colab && make install 
     ```
 
-3. Install `fairlib` from PyPI:
+4. Install fairlib 
 
-    ```console
-    pip install fairlib
+    ```
+    pip intall fairlib==1.0.35
     ```
 
-## Making Edits to Preprocessing/Inference
-
-Edit in `fairlib`. In order to test your edit, take the following steps:
-
-1. Install `fairlib` package in editable mode:
-
-    ```console
-    python -m pip install -e fairlib
-    ```
-
-2. Test it by running:
-
-    ```console
-    pip list | grep fairlib
-    ```
-
-
-3. Make an edit to `fairlib`.
-4. Try running `task_1_preprocessing/preprocess.py` now. The updated code will be executed.
 
 ## Custom Virtual Environment
 
@@ -50,10 +59,4 @@ conda install -c conda-forge gdal
 conda install -c conda-forge geopandas
 pip install pyogrio rasterio tensorflow
 pip install -e fairlib
-```
-
-## Sort Imports
-
-```console
-isort . --profile black -s env
 ```
