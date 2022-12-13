@@ -7,4 +7,3 @@ black
 isort
 build
 twine
-numpy
