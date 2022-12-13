@@ -40,6 +40,6 @@ jobs:
         run:
           pip install -e .
           pip install numpy
-      - name: Run workflow
+      - name: Run test workflow
         run: |
           python test_app.py
