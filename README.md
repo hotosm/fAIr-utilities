@@ -17,11 +17,20 @@ fairlib is collection of utilities which contains core logic for model data prep
     ```
 
 3. Install native bindings 
+    - Install Numpy 
+        ```
+        pip install numpy==1.23.5
+        ```
     - Install [gdal](https://gdal.org/index.html) .
 
         for eg : on Ubuntu 
         ```
-        sudo apt-get update && sudo apt-get -y install gdal-bin python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
+        sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
+        sudo apt-get install gdal-bin
+        sudo apt-get install libgdal-dev
+        export CPLUS_INCLUDE_PATH=/usr/include/gdal
+        export C_INCLUDE_PATH=/usr/include/gdal
+        pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`        
         ```
         on conda : 
         ```
@@ -42,13 +51,13 @@ fairlib is collection of utilities which contains core logic for model data prep
 
     Install necessary requirements for ramp 
         ```
-        cd colab && make install 
+        cd colab && make install  && cd ../..
         ```
 
 4. Install fairlib 
 
         ```
-        pip intall fairlib==1.0.35
+        pip install -e .
         ```
 
 
