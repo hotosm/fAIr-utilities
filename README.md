@@ -1,9 +1,9 @@
-# fairlib ( Utilities for AI Assisted Mapping fAIr )
+# hot_fair_utilities ( Utilities for AI Assisted Mapping fAIr )
 Initially lib was developed during Open AI Challenge with [Omdeena](https://omdena.com/). Learn more about challenge from [here](https://www.hotosm.org/tech-blog/hot-tech-talk-open-ai-challenge/)  
 
-## `fairlib` Installation
+## `hot_fair_utilities` Installation
 
-fairlib is collection of utilities which contains core logic for model data prepration , training and postprocessing . It can support multiple models , Currently ramp is supported. 
+hot_fair_utilities is collection of utilities which contains core logic for model data prepration , training and postprocessing . It can support multiple models , Currently ramp is supported. 
 
 
 1. Install tensorflow ```2.9.2``` from [here] (https://www.tensorflow.org/install/pip) According to your os
@@ -54,7 +54,7 @@ fairlib is collection of utilities which contains core logic for model data prep
         cd colab && make install  && cd ../..
         ```
 
-4. Install fairlib 
+4. Install hot_fair_utilities 
 
         ```
         pip install -e .
@@ -75,7 +75,7 @@ Create your own
     conda install -c conda-forge gdal
     conda install -c conda-forge geopandas
     pip install pyogrio rasterio tensorflow
-    pip install -e fairlib
+    pip install -e hot_fair_utilities
     ```
 
 ## Test Installation and workflow 

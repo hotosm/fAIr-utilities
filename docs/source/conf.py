@@ -19,7 +19,7 @@ print(f"path: {os.path.abspath('../../')}")
 
 # -- Project information -----------------------------------------------------
 
-project = "fairlib"
+project = "hot_fair_utilities"
 copyright = "2022, Omdena HOT-Challenge"
 author = "Omdena"
 

@@ -14,13 +14,13 @@ print(os.environ["RAMP_HOME"])
 import ramp.utils
 
 # Reader imports
-import fairlib
+import hot_fair_utilities
 
 base_path = f"{os.getcwd()}/ramp-data/sample_2"
 
 # Reader imports
 # %%
-from fairlib import preprocess
+from hot_fair_utilities import preprocess
 
 model_input_image_path = f"{base_path}/input"
 preprocess_output = f"/{base_path}/preprocessed"
@@ -34,7 +34,7 @@ preprocess(
 
 # Reader imports
 # %%
-from fairlib import train
+from hot_fair_utilities import train
 
 # %%
 train_output = f"{base_path}/train"
@@ -52,7 +52,7 @@ print(final_accuracy, final_model_path)
 
 # Reader imports
 # %%
-from fairlib import predict
+from hot_fair_utilities import predict
 
 prediction_output = f"{base_path}/prediction/output"
 predict(
@@ -63,7 +63,7 @@ predict(
 
 # Reader imports
 # %%
-from fairlib import polygonize
+from hot_fair_utilities import polygonize
 
 geojson_output = f"{prediction_output}/prediction.geojson"
 polygonize(

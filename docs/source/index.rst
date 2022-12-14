@@ -1,11 +1,11 @@
-Welcome to the fairlib documentation!
+Welcome to the hot_fair_utilities documentation!
 ====================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Table of Contents
 
-   fairlib
+   hot_fair_utilities
    installation
 
 Indices

@@ -1,4 +1,4 @@
-# Documentation of fairlib with Sphinx
+# Documentation of hot_fair_utilities with Sphinx
 
 [Sphinx](https://www.sphinx-doc.org/) is a python library for generating documentation based on docstrings.
 
@@ -10,16 +10,16 @@
    pip install sphinx_rtd_theme
 ```
 
-## Generation of HTML documentation for the fairlib library
+## Generation of HTML documentation for the hot_fair_utilities library
 
 ```console
-   cd fairlib/docs
+   cd hot_fair_utilities/docs
    sphinx-build -b html source build
 ```
 
-## Generation of LaTeX/PDF documentation for the fairlib library
+## Generation of LaTeX/PDF documentation for the hot_fair_utilities library
 
 ```console
-   cd fairlib/docs
+   cd hot_fair_utilities/docs
    sphinx-build -M latexpdf source build
 ```

@@ -1,27 +1,27 @@
-fairlib package
+hot_fair_utilities package
 =========================
 
-fairlib.preprocess function
+hot_fair_utilities.preprocess function
 --------------------------
 
-.. autofunction:: fairlib.preprocess
+.. autofunction:: hot_fair_utilities.preprocess
 
-fairlib.georeference function
+hot_fair_utilities.georeference function
 ----------------------------
 
-.. autofunction:: fairlib.georeference
+.. autofunction:: hot_fair_utilities.georeference
 
-fairlib.predict function
+hot_fair_utilities.predict function
 -----------------------
 
-.. autofunction:: fairlib.predict
+.. autofunction:: hot_fair_utilities.predict
 
-fairlib.polygonize function
+hot_fair_utilities.polygonize function
 --------------------------
 
-.. autofunction:: fairlib.polygonize
+.. autofunction:: hot_fair_utilities.polygonize
 
-fairlib.vectorize function
+hot_fair_utilities.vectorize function
 -------------------------
 
-.. autofunction:: fairlib.vectorize
+.. autofunction:: hot_fair_utilities.vectorize
