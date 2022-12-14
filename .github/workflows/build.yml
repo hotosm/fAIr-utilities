@@ -40,7 +40,7 @@ jobs:
           ls
       - name : Install fair utilities 
         run:
-          pip install hot-fair-utilities==1.0.39
+          pip install -e . 
 
       - name: Run test workflow
         run: |
