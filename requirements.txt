@@ -1,7 +1,7 @@
 
 mercantile == 1.2.1
 tensorflow == 2.9.2
-ramp-fair==0.1.1
+ramp-fair==0.1.2
 Shapely==1.8.0
 numpy
 gdal

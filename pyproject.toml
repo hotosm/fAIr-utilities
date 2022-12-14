@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hot-fair-utilities"
-version = "1.0.38"
+version = "1.0.39"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Omdena", email = "project@omdena.com" },{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
@@ -22,7 +22,7 @@ dynamic = ["dependencies"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.bumpver]
-current_version = "1.0.38"
+current_version = "1.0.39"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true

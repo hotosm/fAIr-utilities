@@ -38,9 +38,9 @@ jobs:
         run: |
           cd ../.. 
           ls
-      - name : Install fair lib 
+      - name : Install fair utilities 
         run:
-          pip install -e .
+          pip install hot-fair-utilities==1.0.39
 
       - name: Run test workflow
         run: |
