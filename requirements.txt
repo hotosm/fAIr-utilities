@@ -2,6 +2,15 @@
 mercantile == 1.2.1
 tensorflow == 2.9.2
 ramp-fair==0.1.1
+Shapely==1.8.0
+numpy
+gdal
+Pillow==9.0.1
+geopandas==0.10.2
+rasterio 
+tqdm==4.62.3
+Rtree==0.9.7
+opencv-python==4.5.5.64
 bumpver
 black
 isort
