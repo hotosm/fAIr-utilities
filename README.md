@@ -49,35 +49,30 @@ hot_fair_utilities is collection of utilities which contains core logic for mode
 
 3. Install ramp requirements 
 
-    Install necessary requirements for ramp 
-    
-        ```
-        cd ramp-code && cd colab && make install  && cd ../..
-        ```
+    Install necessary requirements for ramp  and hot_fair_utilites
+         
+    ```
+    cd ramp-code && cd colab && make install  && cd ../.. && pip install -e .
+    ```
 
-4. Install hot_fair_utilities 
-
-        ```
-        pip install -e .
-        ```
 
 
 ## Conda Virtual Environment
 Create from env fle 
 
-    ```
-    conda env create -f environment.yml
-    ```
+```
+conda env create -f environment.yml
+```
 Create your own
 
-    ```
-    conda create -n fAIr python=3.8
-    conda activate fAIr
-    conda install -c conda-forge gdal
-    conda install -c conda-forge geopandas
-    pip install pyogrio rasterio tensorflow
-    pip install -e hot_fair_utilities
-    ```
+```
+conda create -n fAIr python=3.8
+conda activate fAIr
+conda install -c conda-forge gdal
+conda install -c conda-forge geopandas
+pip install pyogrio rasterio tensorflow
+pip install -e hot_fair_utilities
+```
 
 ## Test Installation and workflow 
 
