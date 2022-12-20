@@ -50,6 +50,7 @@ hot_fair_utilities is collection of utilities which contains core logic for mode
 3. Install ramp requirements 
 
     Install necessary requirements for ramp 
+    
         ```
         cd ramp-home && cd colab && make install  && cd ../..
         ```
