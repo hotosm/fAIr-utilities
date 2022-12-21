@@ -28,9 +28,20 @@ jobs:
           export CPLUS_INCLUDE_PATH=/usr/include/gdal
           export C_INCLUDE_PATH=/usr/include/gdal
           pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
+      - name : Install git-lfs
+        run :
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+          sudo apt install git-lfs
+      - name : Clone Basemodel
+        run :
+          git clone https://github.com/radiantearth/model_ramp_baseline.git
       - name : Clone Ramp 
         run : 
-          git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code    
+          git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code   
+      - name : Copy Basemodel 
+        run : 
+          cp -r model_ramp_baseline/data/input/checkpoint.tf ramp-code/ramp/checkpoint.tf
+          rm -rf model_ramp_baseline
       - name: Install ramp dependecies
         run: |
           cd ramp-code && cd colab && make install 
