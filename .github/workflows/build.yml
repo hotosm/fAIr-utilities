@@ -28,10 +28,7 @@ jobs:
           export CPLUS_INCLUDE_PATH=/usr/include/gdal
           export C_INCLUDE_PATH=/usr/include/gdal
           pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
-      - name : Install git-lfs
-        run :
-          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-          apt install git-lfs
+
       - name : Clone Basemodel
         run :
           git clone https://github.com/radiantearth/model_ramp_baseline.git
