@@ -14,29 +14,24 @@ hot_fair_utilities is collection of utilities which contains core logic for mode
 3. Install tensorflow ```2.9.2``` from [here] (https://www.tensorflow.org/install/pip) According to your os
 
 #### Setup Ramp : 
-4. Install [git-lfs](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) on your system 
-    ```
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-    sudo apt install git-lfs
-    ```
 
-5. Copy your basemodel : Basemodel is derived from ramp basemodel 
+4. Copy your basemodel : Basemodel is derived from ramp basemodel 
     ```
     git clone https://github.com/radiantearth/model_ramp_baseline.git
     ```
 
-6. Clone ramp working dir 
+5. Clone ramp working dir 
 
     ```
     git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
     ```
 
-7. Copy base model to ramp-code 
+6. Copy base model to ramp-code 
     ```
     cp -r model_ramp_baseline/data/input/checkpoint.tf ramp-code/ramp/checkpoint.tf
     ```
 
-8. Install native bindings 
+7. Install native bindings 
     - Install Numpy 
         ```
         pip install numpy==1.23.5
@@ -67,7 +62,7 @@ hot_fair_utilities is collection of utilities which contains core logic for mode
         conda install -c conda-forge rasterio
         ```
 
-9. Install ramp requirements 
+8. Install ramp requirements 
 
     Install necessary requirements for ramp  and hot_fair_utilites
          
