@@ -38,7 +38,6 @@ jobs:
       - name : Copy Basemodel 
         run : 
           cp -r model_ramp_baseline/data/input/checkpoint.tf ramp-code/ramp/checkpoint.tf
-          rm -rf model_ramp_baseline
       - name: Install ramp dependecies
         run: |
           cd ramp-code && cd colab && make install 
