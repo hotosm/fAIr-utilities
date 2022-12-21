@@ -5,18 +5,39 @@ Initially lib was developed during Open AI Challenge with [Omdeena](https://omde
 
 hot_fair_utilities is collection of utilities which contains core logic for model data prepration , training and postprocessing . It can support multiple models , Currently ramp is supported. 
 
+1. To get started clone this repo first : 
+    ```
+    git clone https://github.com/hotosm/fAIr-utilities.git
+    ```
+2. Setup your virtualenv with ```python 3.8``` ( Ramp is tested with python 3.8 )
 
-1. Install tensorflow ```2.9.2``` from [here] (https://www.tensorflow.org/install/pip) According to your os
+3. Install tensorflow ```2.9.2``` from [here] (https://www.tensorflow.org/install/pip) According to your os
 
-### Setup Ramp : 
+#### Setup Ramp : 
+4. Install [git-lfs](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) on your system 
+    ```
+    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+    sudo apt install git-lfs
+    ```
 
-2. Clone ramp working dir 
+5. Copy your basemodel : Basemodel is derived from ramp basemodel 
+    ```
+    git clone https://github.com/radiantearth/model_ramp_baseline.git
+    ```
+
+6. Clone ramp working dir 
 
     ```
     git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
     ```
 
-3. Install native bindings 
+7. Copy base model to ramp-code 
+    ```
+    cp -r model_ramp_baseline/data/input/checkpoint.tf ramp-code/ramp/checkpoint.tf
+    rm -rf model_ramp_baseline
+    ```
+
+8. Install native bindings 
     - Install Numpy 
         ```
         pip install numpy==1.23.5
@@ -47,7 +68,7 @@ hot_fair_utilities is collection of utilities which contains core logic for mode
         conda install -c conda-forge rasterio
         ```
 
-3. Install ramp requirements 
+9. Install ramp requirements 
 
     Install necessary requirements for ramp  and hot_fair_utilites
          
