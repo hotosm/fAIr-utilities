@@ -34,7 +34,6 @@ hot_fair_utilities is collection of utilities which contains core logic for mode
 7. Copy base model to ramp-code 
     ```
     cp -r model_ramp_baseline/data/input/checkpoint.tf ramp-code/ramp/checkpoint.tf
-    rm -rf model_ramp_baseline
     ```
 
 8. Install native bindings 
