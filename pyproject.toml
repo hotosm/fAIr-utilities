@@ -21,7 +21,7 @@ dependencies = [
     "shapely==1.8.0", "GDAL", "numpy", 
     "tensorflow", "Pillow==9.0.1", "geopandas==0.10.2", 
     "rasterio", "mercantile==1.2.1", "tqdm==4.62.3", 
-    "rtree==0.9.7", "opencv-python==4.5.5.64","ramp-fair==0.1.2"
+    "rtree", "opencv-python==4.5.5.64","ramp-fair==0.1.2"
 ]
 requires-python = ">=3.7"
 
