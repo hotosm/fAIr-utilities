@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hot-fair-utilities"
-version = "1.0.41"
+version = "1.0.42"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Omdena", email = "project@omdena.com" },{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
@@ -19,7 +19,7 @@ keywords = [
 ]
 dependencies = [
     "shapely==1.8.0", "GDAL", "numpy", 
-    "tensorflow==2.9.2", "Pillow==9.0.1", "geopandas==0.10.2", 
+    "tensorflow", "Pillow==9.0.1", "geopandas==0.10.2", 
     "rasterio", "mercantile==1.2.1", "tqdm==4.62.3", 
     "rtree==0.9.7", "opencv-python==4.5.5.64","ramp-fair==0.1.2"
 ]
@@ -33,7 +33,7 @@ requires-python = ">=3.7"
     repository    = "https://github.com/hotosm/fAIr-utilities"
 
 [tool.bumpver]
-current_version = "1.0.41"
+current_version = "1.0.42"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true
