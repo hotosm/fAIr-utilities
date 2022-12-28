@@ -1,6 +1,7 @@
 # %%
 # Standard library imports
 import os
+import time
 
 # Third party imports
 import tensorflow as tf
@@ -15,6 +16,7 @@ os.environ["RAMP_HOME"] = os.getcwd()
 # Print the environment variables to verify that the new variable was added
 print(os.environ["RAMP_HOME"])
 
+start_time = time.time()
 # Third party imports
 # %%
 import ramp.utils
@@ -77,3 +79,5 @@ polygonize(
     output_path=geojson_output,
     remove_inputs=True,
 )
+
+print(f"\n Total Process Completed in : {time.time()-start_time} sec")
