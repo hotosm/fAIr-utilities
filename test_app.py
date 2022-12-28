@@ -6,7 +6,7 @@ import os
 import tensorflow as tf
 
 print(
-    f"Using tensorflow version {tf. __version__} with no of gpu : {len(tf.config.experimental.list_physical_devices('GPU'))}"
+    f"\nUsing tensorflow version {tf. __version__} with no of gpu : {len(tf.config.experimental.list_physical_devices('GPU'))}\n"
 )
 print(os.getcwd())
 os.environ.update(os.environ)
