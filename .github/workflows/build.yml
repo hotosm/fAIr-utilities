@@ -52,8 +52,8 @@ jobs:
           ls
       - name : Install tensorflow 
         run :
-          pip install tensorflow==2.8.0
-          
+          pip install tensorflow==2.9.2
+
       - name : Install fair utilities 
         run:
           pip install -e . 
