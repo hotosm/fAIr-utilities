@@ -50,6 +50,10 @@ jobs:
         run: |
           cd ../.. 
           ls
+      - name : Install tensorflow 
+        run :
+          pip install tensorflow==2.8.0
+          
       - name : Install fair utilities 
         run:
           pip install -e . 
