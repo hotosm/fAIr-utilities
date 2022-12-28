@@ -2,6 +2,12 @@
 # Standard library imports
 import os
 
+# Third party imports
+import tensorflow as tf
+
+print(
+    f"Using tensorflow version {tf. __version__} with no of gpu : {len(tf.config.experimental.list_physical_devices('GPU'))}"
+)
 print(os.getcwd())
 os.environ.update(os.environ)
 # Add a new environment variable to the operating system
