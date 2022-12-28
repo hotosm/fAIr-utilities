@@ -16,13 +16,10 @@ jobs:
         with:
           python-version: 3.8
 
-      - name : Clone Basemodel
-        run :
-          git clone https://github.com/radiantearth/model_ramp_baseline.git
       - name : Clone Ramp 
         run : 
           git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code   
-          
+
       - name : Install gdown
         run : pip install gdown
 
