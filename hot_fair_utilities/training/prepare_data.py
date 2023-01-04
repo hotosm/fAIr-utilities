@@ -37,58 +37,81 @@ def split_training_2_validation(input_path, output_path):
     # SPLIT INTO TRAINING AND VALIDATION
     # script = f"""%run ramp-code/scripts/make_train_val_split_lists.py -src {dst_path}/chips -pfx {uid}_fair_split -trn 0.85 -val 0.15"""
 
-    subprocess.check_call(
-        [
-            "python",
-            "ramp-code/scripts/make_train_val_split_lists.py",
-            "-src",
-            f"{dst_path}/chips",
-            "-pfx",
-            f"{dst_path}/fair_split",
-            "-trn",
-            "0.85",
-            "-val",
-            "0.15",
-        ]
-    )
+    try:
+        subprocess.run(
+            [
+                "python",
+                "ramp-code/scripts/make_train_val_split_lists.py",
+                "-src",
+                f"{dst_path}/chips",
+                "-pfx",
+                f"{dst_path}/fair_split",
+                "-trn",
+                "0.85",
+                "-val",
+                "0.15",
+            ],
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as e:
+        print(e.stderr.decode())
+        raise e
 
     # move all the VALIDATION chips, labels and masks to their new locations
-    subprocess.check_call(
-        [
-            "python",
-            "ramp-code/scripts/move_chips_from_csv.py",
-            "-sd",
-            f"{dst_path}/chips",
-            "-td",
-            f"{dst_path}/val-chips",
-            "-csv",
-            f"{dst_path}/fair_split_val.csv",
-            "-mv",
-        ]
-    )
-    subprocess.check_call(
-        [
-            "python",
-            "ramp-code/scripts/move_chips_from_csv.py",
-            "-sd",
-            f"{dst_path}/labels",
-            "-td",
-            f"{dst_path}/val-labels",
-            "-csv",
-            f"{dst_path}/fair_split_val.csv",
-            "-mv",
-        ]
-    )
-    subprocess.check_call(
-        [
-            "python",
-            "ramp-code/scripts/move_chips_from_csv.py",
-            "-sd",
-            f"{dst_path}/binarymasks",
-            "-td",
-            f"{dst_path}/val-binarymasks",
-            "-csv",
-            f"{dst_path}/fair_split_val.csv",
-            "-mv",
-        ]
-    )
+
+    try:
+        subprocess.run(
+            [
+                "python",
+                "ramp-code/scripts/move_chips_from_csv.py",
+                "-sd",
+                f"{dst_path}/chips",
+                "-td",
+                f"{dst_path}/val-chips",
+                "-csv",
+                f"{dst_path}/fair_split_val.csv",
+                "-mv",
+            ],
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as e:
+        print(e.stderr.decode())
+        raise e
+
+    try:
+        subprocess.run(
+            [
+                "python",
+                "ramp-code/scripts/move_chips_from_csv.py",
+                "-sd",
+                f"{dst_path}/labels",
+                "-td",
+                f"{dst_path}/val-labels",
+                "-csv",
+                f"{dst_path}/fair_split_val.csv",
+                "-mv",
+            ],
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as e:
+        print(e.stderr.decode())
+        raise e
+
+    try:
+        subprocess.run(
+            [
+                "python",
+                "ramp-code/scripts/move_chips_from_csv.py",
+                "-sd",
+                f"{dst_path}/binarymasks",
+                "-td",
+                f"{dst_path}/val-binarymasks",
+                "-csv",
+                f"{dst_path}/fair_split_val.csv",
+                "-mv",
+            ],
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as e:
+        print(e.stderr.decode())
+        raise e
