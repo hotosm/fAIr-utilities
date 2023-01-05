@@ -21,6 +21,10 @@ def split_training_2_validation(input_path, output_path):
     """
 
     RAMP_HOME = os.environ["RAMP_HOME"]
+    PYTHON_HOME = os.environ["PYTHON_HOME"]
+    python_exec = "python"
+    if PYTHON_HOME:
+        python_exec = PYTHON_HOME
 
     sys.path.append("..")
     os.chdir(Path(RAMP_HOME))
@@ -43,7 +47,7 @@ def split_training_2_validation(input_path, output_path):
     try:
         subprocess.check_call(
             [
-                "python",
+                python_exec,
                 f"{RAMP_HOME}/ramp-code/scripts/make_train_val_split_lists.py",
                 "-src",
                 f"{dst_path}/chips",
@@ -64,7 +68,7 @@ def split_training_2_validation(input_path, output_path):
     try:
         subprocess.check_call(
             [
-                "python",
+                python_exec,
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
                 "-sd",
                 f"{dst_path}/chips",
@@ -82,7 +86,7 @@ def split_training_2_validation(input_path, output_path):
     try:
         subprocess.check_call(
             [
-                "python",
+                python_exec,
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
                 "-sd",
                 f"{dst_path}/labels",
@@ -101,7 +105,7 @@ def split_training_2_validation(input_path, output_path):
     try:
         subprocess.check_call(
             [
-                "python",
+                python_exec,
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
                 "-sd",
                 f"{dst_path}/binarymasks",
