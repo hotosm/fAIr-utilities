@@ -5,9 +5,13 @@ from __future__ import print_function
 import os
 import subprocess
 import sys
-import uuid
 from pathlib import Path
 from shutil import copytree, rmtree
+
+
+class RaiseError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 def split_training_2_validation(input_path, output_path):
@@ -54,7 +58,7 @@ def split_training_2_validation(input_path, output_path):
         )
     except subprocess.CalledProcessError as ex:
         error = ex.stderr
-        raise error from ex
+        raise RaiseError(error)
 
     # move all the VALIDATION chips, labels and masks to their new locations
     try:
@@ -74,7 +78,7 @@ def split_training_2_validation(input_path, output_path):
         )
     except subprocess.CalledProcessError as ex:
         error = ex.stderr
-        raise error from ex
+        raise RaiseError(error)
     try:
         subprocess.check_call(
             [
@@ -92,7 +96,7 @@ def split_training_2_validation(input_path, output_path):
         )
     except subprocess.CalledProcessError as ex:
         error = ex.stderr
-        raise error from ex
+        raise RaiseError(error)
 
     try:
         subprocess.check_call(
@@ -111,4 +115,4 @@ def split_training_2_validation(input_path, output_path):
         )
     except subprocess.CalledProcessError as ex:
         error = ex.stderr
-        raise error from ex
+        raise RaiseError(error)
