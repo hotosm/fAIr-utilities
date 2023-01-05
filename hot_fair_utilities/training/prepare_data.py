@@ -21,7 +21,7 @@ def split_training_2_validation(input_path, output_path):
     """
 
     RAMP_HOME = os.environ["RAMP_HOME"]
-    PYTHON_HOME = os.environ["PYTHON_HOME"]
+    PYTHON_HOME = os.environ.get("PYTHON_HOME")
     python_exec = "python"
     if PYTHON_HOME:
         python_exec = PYTHON_HOME
