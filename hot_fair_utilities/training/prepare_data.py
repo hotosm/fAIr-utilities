@@ -37,7 +37,7 @@ def split_training_2_validation(input_path, output_path):
     # SPLIT INTO TRAINING AND VALIDATION
     # script = f"""%run ramp-code/scripts/make_train_val_split_lists.py -src {dst_path}/chips -pfx {uid}_fair_split -trn 0.85 -val 0.15"""
     try:
-        subprocess.run(
+        subprocess.check_call(
             [
                 "python",
                 f"{RAMP_HOME}/ramp-code/scripts/make_train_val_split_lists.py",
@@ -52,13 +52,13 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except Exception as e:
-        print(e.stderr.decode())
-        raise e
+    except subprocess.CalledProcessError as ex:
+        error = ex.stderr
+        raise error from ex
 
     # move all the VALIDATION chips, labels and masks to their new locations
     try:
-        subprocess.run(
+        subprocess.check_call(
             [
                 "python",
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
@@ -72,11 +72,11 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except Exception as e:
-        print(e.stderr.decode())
-        raise e
+    except subprocess.CalledProcessError as ex:
+        error = ex.stderr
+        raise error from ex
     try:
-        subprocess.run(
+        subprocess.check_call(
             [
                 "python",
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
@@ -90,12 +90,12 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except Exception as e:
-        print(e.stderr.decode())
-        raise e
+    except subprocess.CalledProcessError as ex:
+        error = ex.stderr
+        raise error from ex
 
     try:
-        subprocess.run(
+        subprocess.check_call(
             [
                 "python",
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
@@ -109,6 +109,6 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except Exception as e:
-        print(e.stderr.decode())
-        raise e
+    except subprocess.CalledProcessError as ex:
+        error = ex.stderr
+        raise error from ex
