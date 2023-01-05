@@ -52,7 +52,7 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(e.stderr.decode())
         raise e
 
@@ -72,7 +72,7 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(e.stderr.decode())
         raise e
     try:
@@ -90,7 +90,7 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(e.stderr.decode())
         raise e
 
@@ -109,6 +109,6 @@ def split_training_2_validation(input_path, output_path):
             ],
             stderr=subprocess.PIPE,
         )
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(e.stderr.decode())
         raise e
