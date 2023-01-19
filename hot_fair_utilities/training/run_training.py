@@ -27,6 +27,11 @@ from tensorflow import keras
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
+class RaiseError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 # Third party imports
 
 # Third party imports
@@ -267,6 +272,8 @@ def run_main_train_code(cfg):
     print(
         f"Starting Training with {n_epochs} epochs , {batch_size} batch size , {steps_per_epoch} steps per epoch , {validation_steps} validation steps......"
     )
+    if validation_steps <= 0:
+        raise RaiseError("Not enough data for training")
     # FIXME : Make checkpoint
     start = perf_counter()
     history = the_model.fit(
@@ -286,15 +293,16 @@ def run_main_train_code(cfg):
         os.mkdir(cfg["graph_location"])
 
     loss = history.history["loss"]
-    val_loss = history.history["val_loss"]
+    # val_loss = history.history["val_loss"]
     epochs = range(1, len(loss) + 1)
-    plt.plot(epochs, loss, "y", label="Training loss")
-    plt.plot(epochs, val_loss, "r", label="Validation loss")
-    plt.title("Training and validation loss")
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.savefig(f"{cfg['graph_location']}/training_validation_loss.png")
+
+    # plt.plot(epochs, loss, "y", label="Training loss")
+    # plt.plot(epochs, val_loss, "r", label="Validation loss")
+    # plt.title("Training and validation loss")
+    # plt.xlabel("Epochs")
+    # plt.ylabel("Loss")
+    # plt.legend()
+    # plt.savefig(f"{cfg['graph_location']}/training_validation_loss.png")
 
     acc = history.history["sparse_categorical_accuracy"]
     val_acc = history.history["val_sparse_categorical_accuracy"]
