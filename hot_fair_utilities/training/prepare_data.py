@@ -61,7 +61,7 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output)
+        raise RaiseError(ex.output.decode())
 
     # move all the VALIDATION chips, labels and masks to their new locations
     try:
@@ -80,7 +80,7 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output)
+        raise RaiseError(ex.output.decode())
     try:
         subprocess.check_output(
             [
@@ -97,7 +97,7 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output)
+        raise RaiseError(ex.output.decode())
 
     try:
         subprocess.check_output(
@@ -115,4 +115,4 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output)
+        raise RaiseError(ex.output.decode())
