@@ -44,7 +44,6 @@ def split_training_2_validation(input_path, output_path):
     # Define the script as a string
     # SPLIT INTO TRAINING AND VALIDATION
     # script = f"""%run ramp-code/scripts/make_train_val_split_lists.py -src {dst_path}/chips -pfx {uid}_fair_split -trn 0.85 -val 0.15"""
-    print("this is test")
     try:
         subprocess.check_output(
             [
