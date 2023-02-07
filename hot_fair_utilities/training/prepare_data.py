@@ -44,6 +44,7 @@ def split_training_2_validation(input_path, output_path):
     # Define the script as a string
     # SPLIT INTO TRAINING AND VALIDATION
     # script = f"""%run ramp-code/scripts/make_train_val_split_lists.py -src {dst_path}/chips -pfx {uid}_fair_split -trn 0.85 -val 0.15"""
+    print("this is test")
     try:
         subprocess.check_output(
             [
@@ -61,7 +62,7 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output.decode())
+        raise RaiseError(ex.stderr.decode())
 
     # move all the VALIDATION chips, labels and masks to their new locations
     try:
@@ -80,7 +81,8 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output.decode())
+        raise RaiseError(ex.stderr.decode())
+
     try:
         subprocess.check_output(
             [
@@ -97,7 +99,7 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output.decode())
+        raise RaiseError(ex.stderr.decode())
 
     try:
         subprocess.check_output(
@@ -115,4 +117,4 @@ def split_training_2_validation(input_path, output_path):
             stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.output.decode())
+        raise RaiseError(ex.stderr.decode())
