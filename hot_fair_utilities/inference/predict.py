@@ -1,7 +1,9 @@
+# Standard library imports
 import os
 from glob import glob
 from pathlib import Path
 
+# Third party imports
 import numpy as np
 from tensorflow import keras
 
@@ -55,6 +57,9 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
                 preds[idx],
                 str(f"{prediction_path}/{Path(path).stem}.png"),
             )
+        del images
+        del preds
+        keras.backend.clear_session()
 
     georeference(prediction_path, prediction_path, is_mask=True)
     remove_files(f"{prediction_path}/*.xml")
