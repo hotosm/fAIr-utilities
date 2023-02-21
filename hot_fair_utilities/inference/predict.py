@@ -59,7 +59,8 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
             )
         del images
         del preds
-        keras.backend.clear_session()
+    keras.backend.clear_session()
+    del model
 
     georeference(prediction_path, prediction_path, is_mask=True)
     remove_files(f"{prediction_path}/*.xml")
