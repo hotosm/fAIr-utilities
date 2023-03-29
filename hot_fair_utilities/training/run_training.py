@@ -273,7 +273,9 @@ def run_main_train_code(cfg):
         f"Starting Training with {n_epochs} epochs , {batch_size} batch size , {steps_per_epoch} steps per epoch , {validation_steps} validation steps......"
     )
     if validation_steps <= 0:
-        raise RaiseError("Not enough data for training")
+        raise RaiseError(
+            "Not enough data for training, Increase image or Try reducing batchsize/ephochs"
+        )
     # FIXME : Make checkpoint
     start = perf_counter()
     history = the_model.fit(
