@@ -1,9 +1,18 @@
+# Standard library imports
+from concurrent.futures import ThreadPoolExecutor
+
+# Third party imports
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
 from .building_footprint import BuildingExtract
 from .utils import tiles_from_directory
+
+
+def extract_polygons(bldg_extract, tile, path):
+    mask = np.array(Image.open(path).convert("P"), dtype=np.uint8)
+    bldg_extract.extract(tile, mask)
 
 
 def get_polygons(
@@ -21,8 +30,9 @@ def get_polygons(
     bldg_extract = BuildingExtract(kernel_opening, simplify_threshold)
     tiles = list(tiles_from_directory(pred_masks_path))
 
-    for tile, path in tqdm(tiles, unit="mask"):
-        mask = np.array(Image.open(path).convert("P"), dtype=np.uint8)
-        bldg_extract.extract(tile, mask)
+    with ThreadPoolExecutor() as executor:
+        executor.map(
+            lambda tile_path: extract_polygons(bldg_extract, *tile_path), tiles
+        )
 
     bldg_extract.save(polygons_path)
