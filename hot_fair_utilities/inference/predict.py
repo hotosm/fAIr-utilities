@@ -64,7 +64,7 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
     start = time.time()
 
     model = keras.models.load_model(checkpoint_path)
-    print(f"It took {time.time()-start} sec to load model")
+    print(f"It took {round(time.time()-start)} sec to load model")
     start = time.time()
 
     os.makedirs(prediction_path, exist_ok=True)
@@ -80,12 +80,13 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
             )
 
         concurrent.futures.wait(futures)
-    print(f"It took {time.time()-start} sec for prediction")
+    print(f"It took {round(time.time()-start)} sec for prediction")
     start = time.time()
 
     georeference(prediction_path, prediction_path, is_mask=True)
-    print(f"It took {time.time()-start} sec for Georeference")
+    print(f"It took {round(time.time()-start)} sec for Georeference")
     start = time.time()
 
     remove_files(f"{prediction_path}/*.xml")
     remove_files(f"{prediction_path}/*.png")
+    print(f"It took {round(time.time()-start)} sec for Removing leftovers")
