@@ -1,5 +1,6 @@
 # Standard library imports
 import os
+import time
 from glob import glob
 from pathlib import Path
 
@@ -37,7 +38,10 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
             "data/predictions/4"
         )
     """
+    start = time.time()
     model = keras.models.load_model(checkpoint_path)
+    print(f"It took {round(time.time()-start)} sec to load model")
+    start = time.time()
 
     os.makedirs(prediction_path, exist_ok=True)
     image_paths = glob(f"{input_path}/*.png")
@@ -61,7 +65,11 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
         del preds
     keras.backend.clear_session()
     del model
+    print(f"It took {round(time.time()-start)} sec to predict")
+    start = time.time()
 
     georeference(prediction_path, prediction_path, is_mask=True)
+    print(f"It took {round(time.time()-start)} sec to georeference")
+
     remove_files(f"{prediction_path}/*.xml")
     remove_files(f"{prediction_path}/*.png")
