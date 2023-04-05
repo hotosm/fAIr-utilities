@@ -11,7 +11,7 @@ from rasterio.merge import merge
 from shapely.geometry import Polygon, shape
 from tqdm import tqdm
 
-TOLERANCE = 1e-3
+TOLERANCE = 0.5
 AREA_THRESHOLD = 0.1
 MAX_RATIO = 10
 
