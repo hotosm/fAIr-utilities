@@ -1,9 +1,11 @@
+# Standard library imports
 from glob import glob
 from pathlib import Path
 
+# Third party imports
+import geopandas as gpd
 import numpy as np
 import rasterio as rio
-from geopandas import GeoSeries
 from rasterio.features import shapes
 from rasterio.merge import merge
 from shapely.geometry import Polygon, shape
@@ -31,12 +33,17 @@ def vectorize(input_path: str, output_path: str) -> None:
     base_path = Path(output_path).parents[0]
     base_path.mkdir(exist_ok=True, parents=True)
 
-    rasters = []
-    for path in glob(f"{input_path}/*.tif"):
-        raster = rio.open(path)
-        rasters.append(raster)
+    raster_paths = glob(f"{input_path}/*.tif")
+    with rio.open(raster_paths[0]) as src:
+        kwargs = src.meta.copy()
 
+    rasters = [rio.open(path) for path in raster_paths]
     mosaic, output = merge(rasters)
+
+    # Close raster files after merging
+    for raster in rasters:
+        raster.close()
+
     polygons = [shape(s) for s, _ in shapes(mosaic, transform=output)]
 
     areas = [poly.area for poly in polygons]
@@ -47,23 +54,22 @@ def vectorize(input_path: str, output_path: str) -> None:
         if poly.area != max_area and poly.area / median_area > AREA_THRESHOLD
     ]
 
-    gs = GeoSeries(polygons).set_crs("EPSG:3857").simplify(TOLERANCE)
+    gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(TOLERANCE)
     gs = remove_overlapping_polygons(gs)
     gs.to_crs("EPSG:4326").to_file(output_path)
 
 
-def remove_overlapping_polygons(gs: GeoSeries) -> GeoSeries:
-    """Remove overlapping polygons.
-
-    Args:
-        gs: List of polygons to be fixed.
-    """
+def remove_overlapping_polygons(gs: gpd.GeoSeries) -> gpd.GeoSeries:
     to_remove = set()
-    for i in tqdm(range(len(gs))):
-        for j in range(i + 1, len(gs)):
-            p, q = gs.iloc[i], gs.iloc[j]
+    gs_sindex = gs.sindex
 
-            if GeoSeries(p).overlaps(q).bool():
+    for i, p in tqdm(gs.items()):
+        possible_matches_index = list(gs_sindex.intersection(p.bounds))
+        possible_matches = gs.iloc[possible_matches_index]
+        precise_matches = possible_matches[possible_matches.overlaps(p)]
+
+        for j, q in precise_matches.items():
+            if i != j:
                 ratio = max(p.area, q.area) / min(p.area, q.area)
                 if ratio > MAX_RATIO:
                     to_remove.add(i if p.area < q.area else j)
