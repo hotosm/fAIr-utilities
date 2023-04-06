@@ -31,5 +31,4 @@ def fix_labels(input_path: str, output_path: str) -> None:
     """
     gdf = geopandas.read_file(input_path)
     gdf["geometry"] = gdf.apply(remove_self_intersection, axis=1)
-    gdf.index = geopandas.RangeIndex(len(gdf))
     gdf.to_file(output_path)
