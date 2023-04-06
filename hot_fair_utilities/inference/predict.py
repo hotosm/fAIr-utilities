@@ -61,11 +61,9 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
                 preds[idx],
                 str(f"{prediction_path}/{Path(path).stem}.png"),
             )
-        del images
-        del preds
+    print(f"It took {round(time.time()-start)} sec to predict")
     keras.backend.clear_session()
     del model
-    print(f"It took {round(time.time()-start)} sec to predict")
     start = time.time()
 
     georeference(prediction_path, prediction_path, is_mask=True)
