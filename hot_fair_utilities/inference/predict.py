@@ -39,6 +39,7 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
         )
     """
     start = time.time()
+    print(f"Using : {checkpoint_path}")
     model = keras.models.load_model(checkpoint_path)
     print(f"It took {round(time.time()-start)} sec to load model")
     start = time.time()
