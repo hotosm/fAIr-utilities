@@ -1,3 +1,4 @@
+# Third party imports
 import geopandas
 from shapely.validation import explain_validity, make_valid
 

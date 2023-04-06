@@ -19,7 +19,7 @@ keywords = [
 ]
 dependencies = [
     "shapely==1.8.0", "GDAL", "numpy", 
-    "Pillow==9.0.1", "geopandas==0.10.2", 
+    "Pillow==9.0.1", "geopandas==0.10.2","pandas==1.5.3", 
     "rasterio", "mercantile==1.2.1", "tqdm==4.62.3", 
     "rtree", "opencv-python==4.5.5.64","ramp-fair==0.1.2"
 ]

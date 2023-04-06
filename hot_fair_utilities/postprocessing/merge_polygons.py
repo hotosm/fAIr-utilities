@@ -1,3 +1,4 @@
+# Third party imports
 from geopandas import GeoSeries, read_file
 from shapely.geometry import MultiPolygon, Polygon
 from shapely.validation import make_valid
