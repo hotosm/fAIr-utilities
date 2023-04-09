@@ -30,5 +30,7 @@ def fix_labels(input_path: str, output_path: str) -> None:
         output_path: Path to the GeoJSON file where the output data will go.
     """
     gdf = geopandas.read_file(input_path)
+    if gdf.empty:
+        raise ValueError("Error: gdf is empty, No Labels found : Check your labels")
     gdf["geometry"] = gdf.apply(remove_self_intersection, axis=1)
     gdf.to_file(output_path)
