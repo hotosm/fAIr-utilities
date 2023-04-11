@@ -11,7 +11,7 @@ from rasterio.merge import merge
 from shapely.geometry import Polygon, shape
 from tqdm import tqdm
 
-TOLERANCE = 0.5
+TOLERANCE = 0.6
 AREA_THRESHOLD = 0.1
 MAX_RATIO = 10
 
@@ -51,11 +51,15 @@ def vectorize(input_path: str, output_path: str) -> None:
     polygons = [
         Polygon(poly.exterior.coords)
         for poly in polygons
-        if poly.area != max_area and poly.area / median_area > AREA_THRESHOLD
+        if poly.area != max_area
+        and poly.area / median_area > AREA_THRESHOLD
+        and poly.area > 1
     ]
 
     gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(TOLERANCE)
     gs = remove_overlapping_polygons(gs)
+    if gs.empty:
+        raise ValueError("No Features Found")
     gs.to_crs("EPSG:4326").to_file(output_path)
 
 
