@@ -53,7 +53,7 @@ def vectorize(input_path: str, output_path: str) -> None:
         for poly in polygons
         if poly.area != max_area
         and poly.area / median_area > AREA_THRESHOLD
-        and poly.area > 1
+        and poly.area > 3
     ]
 
     gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(TOLERANCE)
