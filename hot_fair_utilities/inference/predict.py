@@ -17,7 +17,9 @@ IMAGE_SIZE = 256
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
-def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None:
+def predict(
+    checkpoint_path: str, input_path: str, prediction_path: str, confidence: float = 0.5
+) -> None:
     """Predict building footprints for aerial images given a model checkpoint.
 
     This function reads the model weights from the checkpoint path and outputs
@@ -29,6 +31,7 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
         checkpoint_path: Path where the weights of the model can be found.
         input_path: Path of the directory where the images are stored.
         prediction_path: Path of the directory where the predicted images will go.
+        confidence: Threshold probability for filtering out low-confidence predictions.
 
     Example::
 
@@ -55,14 +58,18 @@ def predict(checkpoint_path: str, input_path: str, prediction_path: str) -> None
         preds = model.predict(images)
         preds = np.argmax(preds, axis=-1)
         preds = np.expand_dims(preds, axis=-1)
-        preds = np.where(preds > 0.5, 1, 0)
+        preds = np.where(
+            preds > confidence, 1, 0
+        )  # Filter out low confidence predictions
 
         for idx, path in enumerate(image_batch):
             save_mask(
                 preds[idx],
                 str(f"{prediction_path}/{Path(path).stem}.png"),
             )
-    print(f"It took {round(time.time()-start)} sec to predict")
+    print(
+        f"It took {round(time.time()-start)} sec to predict with {confidence} Confidence Threshold"
+    )
     keras.backend.clear_session()
     del model
     start = time.time()
