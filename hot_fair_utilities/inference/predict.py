@@ -18,7 +18,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def predict(
-    checkpoint_path: str, input_path: str, prediction_path: str, confidence: float = 0.5
+    model, input_path: str, prediction_path: str, confidence: float = 0.5
 ) -> None:
     """Predict building footprints for aerial images given a model checkpoint.
 
@@ -28,7 +28,7 @@ def predict(
     The predicted masks will be georeferenced with EPSG:3857 as CRS.
 
     Args:
-        checkpoint_path: Path where the weights of the model can be found.
+        model: model object
         input_path: Path of the directory where the images are stored.
         prediction_path: Path of the directory where the predicted images will go.
         confidence: Threshold probability for filtering out low-confidence predictions.
@@ -41,10 +41,6 @@ def predict(
             "data/predictions/4"
         )
     """
-    start = time.time()
-    print(f"Using : {checkpoint_path}")
-    model = keras.models.load_model(checkpoint_path)
-    print(f"It took {round(time.time()-start)} sec to load model")
     start = time.time()
 
     os.makedirs(prediction_path, exist_ok=True)
@@ -71,7 +67,6 @@ def predict(
         f"It took {round(time.time()-start)} sec to predict with {confidence} Confidence Threshold"
     )
     keras.backend.clear_session()
-    del model
     start = time.time()
 
     georeference(prediction_path, prediction_path, is_mask=True)
