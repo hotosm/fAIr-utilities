@@ -66,7 +66,7 @@ def predict(
     print(
         f"It took {round(time.time()-start)} sec to predict with {confidence} Confidence Threshold"
     )
-    keras.backend.clear_session()
+
     start = time.time()
 
     georeference(prediction_path, prediction_path, is_mask=True)
