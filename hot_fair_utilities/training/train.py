@@ -3,7 +3,7 @@ import os
 
 from .cleanup import extract_highest_accuracy_model
 from .prepare_data import split_training_2_validation
-from .run_training import manage_fine_tuning_config, run_main_train_code
+from .run_training import apply_feedback, manage_fine_tuning_config, run_main_train_code
 
 
 def train(
@@ -57,3 +57,20 @@ def train(
         print("extracting highest accuracy model")
         final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
         return (final_accuracy, final_model_path)
+
+
+def run_feedback(
+    input_path,
+    output_path,
+    feedback_base_model,
+    model_home: str,
+):
+    assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
+    assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
+    os.environ.update(os.environ)
+    os.environ["RAMP_HOME"] = model_home
+
+    split_training_2_validation(input_path, output_path)
+    apply_feedback(feedback_base_model, output_path, 1, 1)
+    final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
+    return (final_accuracy, final_model_path)

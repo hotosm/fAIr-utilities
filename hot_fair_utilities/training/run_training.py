@@ -60,8 +60,26 @@ sm.set_framework("tf.keras")
 working_ramp_home = os.environ["RAMP_HOME"]
 
 
-def manage_fine_tuning_config(output_path, num_epochs, batch_size):
+def apply_feedback(
+    pretrained_model_path,
+    output_path,
+    num_epochs,
+    batch_size,
+):
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
+    # Update the fine-tuning configuration
+    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size)
+
+    # Set the path of the pre-trained model in the configuration
+    fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
+    fine_tuning_cfg["saved_model"]["use_saved_model"] = True
+
+    run_main_train_code(fine_tuning_cfg)
+
+
+def manage_fine_tuning_config(output_path, num_epochs, batch_size):
     # Define the paths to the source and destination JSON files
     working_dir = os.path.realpath(os.path.dirname(__file__))
     config_base_path = os.path.join(working_dir, "ramp_config_base.json")
@@ -114,7 +132,6 @@ def run_main_train_code(cfg):
 
     the_metrics = []
     if cfg["metrics"]["use_metrics"]:
-
         get_metrics_fn_names = cfg["metrics"]["get_metrics_fn_names"]
         get_metrics_fn_parms = cfg["metrics"]["metrics_fn_parms"]
 
@@ -134,7 +151,6 @@ def run_main_train_code(cfg):
     the_model = None
 
     if cfg["saved_model"]["use_saved_model"]:
-
         # load (construct) the model
         model_path = Path(working_ramp_home) / cfg["saved_model"]["saved_model_path"]
         print(f"Model: importing saved model {str(model_path)}")
@@ -219,7 +235,6 @@ def run_main_train_code(cfg):
     callbacks_list = []
 
     if not discard_experiment:
-
         # get model checkpoint callback
         if cfg["model_checkpts"]["use_model_checkpts"]:
             get_model_checkpt_callback_fn_name = cfg["model_checkpts"][
@@ -253,7 +268,6 @@ def run_main_train_code(cfg):
     keras.backend.clear_session()
 
     if cfg["early_stopping"]["use_early_stopping"]:
-
         callbacks_list.append(callback_constructors.get_early_stopping_callback_fn(cfg))
 
         # get cyclic learning scheduler callback
@@ -297,14 +311,6 @@ def run_main_train_code(cfg):
     loss = history.history["loss"]
     # val_loss = history.history["val_loss"]
     epochs = range(1, len(loss) + 1)
-
-    # plt.plot(epochs, loss, "y", label="Training loss")
-    # plt.plot(epochs, val_loss, "r", label="Validation loss")
-    # plt.title("Training and validation loss")
-    # plt.xlabel("Epochs")
-    # plt.ylabel("Loss")
-    # plt.legend()
-    # plt.savefig(f"{cfg['graph_location']}/training_validation_loss.png")
 
     acc = history.history["sparse_categorical_accuracy"]
     val_acc = history.history["val_sparse_categorical_accuracy"]
