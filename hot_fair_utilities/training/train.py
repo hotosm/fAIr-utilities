@@ -69,8 +69,10 @@ def run_feedback(
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
     os.environ.update(os.environ)
     os.environ["RAMP_HOME"] = model_home
-
+    print("Starting to prepare data for training")
     split_training_2_validation(input_path, output_path)
-    apply_feedback(feedback_base_model, output_path, 1, 1)
+    print("Data is ready for training")
+
+    apply_feedback(feedback_base_model, output_path, 2, 8)
     final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
     return (final_accuracy, final_model_path)

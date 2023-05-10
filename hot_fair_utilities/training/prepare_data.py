@@ -58,10 +58,10 @@ def split_training_2_validation(input_path, output_path):
                 "-val",
                 "0.15",
             ],
-            stderr=subprocess.PIPE,
+            env=os.environ,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.stderr.decode())
+        raise ex
 
     # move all the VALIDATION chips, labels and masks to their new locations
     try:
@@ -77,10 +77,10 @@ def split_training_2_validation(input_path, output_path):
                 f"{dst_path}/fair_split_val.csv",
                 "-mv",
             ],
-            stderr=subprocess.PIPE,
+            env=os.environ,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.stderr.decode())
+        raise ex
 
     try:
         subprocess.check_output(
@@ -95,10 +95,10 @@ def split_training_2_validation(input_path, output_path):
                 f"{dst_path}/fair_split_val.csv",
                 "-mv",
             ],
-            stderr=subprocess.PIPE,
+            env=os.environ,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.stderr.decode())
+        raise ex
 
     try:
         subprocess.check_output(
@@ -113,7 +113,7 @@ def split_training_2_validation(input_path, output_path):
                 f"{dst_path}/fair_split_val.csv",
                 "-mv",
             ],
-            stderr=subprocess.PIPE,
+            env=os.environ,
         )
     except subprocess.CalledProcessError as ex:
-        raise RaiseError(ex.stderr.decode())
+        raise ex
