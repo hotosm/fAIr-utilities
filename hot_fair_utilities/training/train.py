@@ -73,6 +73,6 @@ def run_feedback(
     split_training_2_validation(input_path, output_path)
     print("Data is ready for training")
 
-    apply_feedback(feedback_base_model, output_path, 2, 4)
+    apply_feedback(feedback_base_model, output_path, 1, 4)
     final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
     return (final_accuracy, final_model_path)
