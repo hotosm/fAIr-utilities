@@ -64,6 +64,8 @@ def run_feedback(
     output_path,
     feedback_base_model,
     model_home: str,
+    epoch_size=20,
+    batch_size=8
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
@@ -73,6 +75,6 @@ def run_feedback(
     split_training_2_validation(input_path, output_path)
     print("Data is ready for training")
 
-    apply_feedback(feedback_base_model, output_path, 1, 1)
+    apply_feedback(feedback_base_model, output_path, epoch_size, batch_size)
     final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
     return (final_accuracy, final_model_path)
