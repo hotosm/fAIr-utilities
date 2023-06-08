@@ -130,5 +130,8 @@
             "save_best_only":false
         }
     },
+    "feedback":{
+        "freeze_layers" : false
+    },
     "random_seed":20220523
 }
