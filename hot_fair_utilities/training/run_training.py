@@ -161,7 +161,7 @@ def run_main_train_code(cfg):
         ), f"the saved model was not constructed: {model_path}"
 
         if fine_tuning_cfg["feedback"]["freeze_layers"] :
-            for layer in model.layers:
+            for layer in the_model.layers:
                 layer.trainable = False # freeze previous layers only update feedback layers
 
         if not cfg["saved_model"]["save_optimizer_state"]:
