@@ -64,8 +64,8 @@ def run_feedback(
     output_path,
     feedback_base_model,
     model_home: str,
-    epoch_size=20,
-    batch_size=8
+    epoch_size: int,
+    batch_size: int,
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
