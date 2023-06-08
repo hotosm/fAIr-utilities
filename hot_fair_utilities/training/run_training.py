@@ -203,6 +203,9 @@ def run_main_train_code(cfg):
     n_val = get_num_files(val_img_dir, "*.tif")
     steps_per_epoch = n_training // batch_size
     validation_steps = n_val // batch_size
+    # Testing step , not recommended 
+    if validation_steps <=0 :
+        validation_steps = 1
 
     # add these back to the config
     # in case they are needed by callbacks
@@ -293,7 +296,7 @@ def run_main_train_code(cfg):
     )
     if validation_steps <= 0:
         raise RaiseError(
-            "Not enough data for training, Increase image or Try reducing batchsize/ephochs"
+            "Not enough data for training, Increase image or Try reducing batchsize/epochs"
         )
     # FIXME : Make checkpoint
     start = perf_counter()
