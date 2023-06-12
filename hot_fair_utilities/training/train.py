@@ -13,6 +13,7 @@ def train(
     batch_size: int,
     model: str,
     model_home: str,
+    freeze_layers: bool = False,
 ):
     """Trains the input image with base model
 
@@ -51,7 +52,9 @@ def train(
         # Print the environment variables to verify that the new variable was added
         print("Starting to prepare data for training")
         split_training_2_validation(input_path, output_path)
-        cfg = manage_fine_tuning_config(output_path, epoch_size, batch_size)
+        cfg = manage_fine_tuning_config(
+            output_path, epoch_size, batch_size, freeze_layers
+        )
         print("Data is ready for training")
         run_main_train_code(cfg)
         print("extracting highest accuracy model")
@@ -66,6 +69,7 @@ def run_feedback(
     model_home: str,
     epoch_size: int,
     batch_size: int,
+    freeze_layers: bool = False,
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
@@ -75,6 +79,8 @@ def run_feedback(
     split_training_2_validation(input_path, output_path)
     print("Data is ready for training")
 
-    apply_feedback(feedback_base_model, output_path, epoch_size, batch_size)
+    apply_feedback(
+        feedback_base_model, output_path, epoch_size, batch_size, freeze_layers
+    )
     final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
     return (final_accuracy, final_model_path)

@@ -61,10 +61,7 @@ working_ramp_home = os.environ["RAMP_HOME"]
 
 
 def apply_feedback(
-    pretrained_model_path,
-    output_path,
-    num_epochs,
-    batch_size,
+    pretrained_model_path, output_path, num_epochs, batch_size, freeze_layers
 ):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -75,12 +72,12 @@ def apply_feedback(
     # Set the path of the pre-trained model in the configuration
     fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
     fine_tuning_cfg["saved_model"]["use_saved_model"] = True
-    fine_tuning_cfg["feedback"]["freeze_layers"] = True
+    fine_tuning_cfg["freeze_layers"] = freeze_layers
 
     run_main_train_code(fine_tuning_cfg)
 
 
-def manage_fine_tuning_config(output_path, num_epochs, batch_size):
+def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers):
     # Define the paths to the source and destination JSON files
     working_dir = os.path.realpath(os.path.dirname(__file__))
     config_base_path = os.path.join(working_dir, "ramp_config_base.json")
@@ -99,6 +96,7 @@ def manage_fine_tuning_config(output_path, num_epochs, batch_size):
     # epoch batchconfig
     data["num_epochs"] = num_epochs
     data["batch_size"] = batch_size
+    data["freeze_layers"] = freeze_layers
 
     # clr plot
     data["cyclic_learning_scheduler"]["clr_plot_dir"] = f"{output_path}/plots"
@@ -160,9 +158,9 @@ def run_main_train_code(cfg):
             the_model is not None
         ), f"the saved model was not constructed: {model_path}"
 
-        if cfg["feedback"]["freeze_layers"] :
+        if cfg["freeze_layers"]:
             for layer in the_model.layers:
-                layer.trainable = False # freeze previous layers only update feedback layers
+                layer.trainable = False  # freeze previous layers only update new layers
 
         if not cfg["saved_model"]["save_optimizer_state"]:
             # If you don't want to save the original state of training, recompile the model.
@@ -203,8 +201,8 @@ def run_main_train_code(cfg):
     n_val = get_num_files(val_img_dir, "*.tif")
     steps_per_epoch = n_training // batch_size
     validation_steps = n_val // batch_size
-    # Testing step , not recommended 
-    if validation_steps <=0 :
+    # Testing step , not recommended
+    if validation_steps <= 0:
         validation_steps = 1
 
     # add these back to the config
