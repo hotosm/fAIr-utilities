@@ -322,11 +322,16 @@ def run_main_train_code(cfg):
 
     acc = history.history["sparse_categorical_accuracy"]
     val_acc = history.history["val_sparse_categorical_accuracy"]
-    plt.plot(epochs, acc, "y", label="Training acc")
-    plt.plot(epochs, val_acc, "r", label="Validation sparse categorical acc")
-    plt.title("Training and validation sparse categorical accuracy")
+
+    # Plot training and validation accuracy
+    plt.plot(epochs, acc, "y", label="Training Accuracy")
+    plt.plot(epochs, val_acc, "r", label="Validation Accuracy")
+
+    # Set labels and title
     plt.xlabel("Epochs")
-    plt.ylabel("Sparse Categorical Accuracy")
+    plt.ylabel("Accuracy")
+    plt.title("Training and Validation Accuracy")
+
     plt.legend()
     plt.savefig(
         f"{cfg['graph_location']}/training_validation_sparse_categorical_accuracy.png"
