@@ -161,7 +161,7 @@ def run_main_train_code(cfg):
         if cfg["freeze_layers"]:
             for layer in the_model.layers:
                 layer.trainable = False  # freeze previous layers only update new layers
-                print("Setting previous model layers traininable : False")
+                # print("Setting previous model layers traininable : False")
 
         if not cfg["saved_model"]["save_optimizer_state"]:
             # If you don't want to save the original state of training, recompile the model.
