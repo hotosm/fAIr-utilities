@@ -30,9 +30,10 @@ jobs:
 
       - name: Add ubuntugis ppa & Update
         run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-      # - name : Install numpy
-      #   run:
-      #     pip install numpy==1.23.5
+
+      - name: Install numpy
+        run: pip install numpy
+
       - name: Install gdal
         run: |
           sudo apt-get install gdal-bin
