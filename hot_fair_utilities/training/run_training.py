@@ -60,8 +60,24 @@ sm.set_framework("tf.keras")
 working_ramp_home = os.environ["RAMP_HOME"]
 
 
-def manage_fine_tuning_config(output_path, num_epochs, batch_size):
+def apply_feedback(
+    pretrained_model_path, output_path, num_epochs, batch_size, freeze_layers
+):
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
+    # Update the fine-tuning configuration
+    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size)
+
+    # Set the path of the pre-trained model in the configuration
+    fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
+    fine_tuning_cfg["saved_model"]["use_saved_model"] = True
+    fine_tuning_cfg["freeze_layers"] = freeze_layers
+
+    run_main_train_code(fine_tuning_cfg)
+
+
+def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers):
     # Define the paths to the source and destination JSON files
     working_dir = os.path.realpath(os.path.dirname(__file__))
     config_base_path = os.path.join(working_dir, "ramp_config_base.json")
@@ -80,6 +96,7 @@ def manage_fine_tuning_config(output_path, num_epochs, batch_size):
     # epoch batchconfig
     data["num_epochs"] = num_epochs
     data["batch_size"] = batch_size
+    data["freeze_layers"] = freeze_layers
 
     # clr plot
     data["cyclic_learning_scheduler"]["clr_plot_dir"] = f"{output_path}/plots"
@@ -114,7 +131,6 @@ def run_main_train_code(cfg):
 
     the_metrics = []
     if cfg["metrics"]["use_metrics"]:
-
         get_metrics_fn_names = cfg["metrics"]["get_metrics_fn_names"]
         get_metrics_fn_parms = cfg["metrics"]["metrics_fn_parms"]
 
@@ -134,7 +150,6 @@ def run_main_train_code(cfg):
     the_model = None
 
     if cfg["saved_model"]["use_saved_model"]:
-
         # load (construct) the model
         model_path = Path(working_ramp_home) / cfg["saved_model"]["saved_model_path"]
         print(f"Model: importing saved model {str(model_path)}")
@@ -142,6 +157,11 @@ def run_main_train_code(cfg):
         assert (
             the_model is not None
         ), f"the saved model was not constructed: {model_path}"
+
+        if cfg["freeze_layers"]:
+            for layer in the_model.layers:
+                layer.trainable = False  # freeze previous layers only update new layers
+                # print("Setting previous model layers traininable : False")
 
         if not cfg["saved_model"]["save_optimizer_state"]:
             # If you don't want to save the original state of training, recompile the model.
@@ -182,6 +202,9 @@ def run_main_train_code(cfg):
     n_val = get_num_files(val_img_dir, "*.tif")
     steps_per_epoch = n_training // batch_size
     validation_steps = n_val // batch_size
+    # Testing step , not recommended
+    if validation_steps <= 0:
+        validation_steps = 1
 
     # add these back to the config
     # in case they are needed by callbacks
@@ -219,7 +242,6 @@ def run_main_train_code(cfg):
     callbacks_list = []
 
     if not discard_experiment:
-
         # get model checkpoint callback
         if cfg["model_checkpts"]["use_model_checkpts"]:
             get_model_checkpt_callback_fn_name = cfg["model_checkpts"][
@@ -253,7 +275,6 @@ def run_main_train_code(cfg):
     keras.backend.clear_session()
 
     if cfg["early_stopping"]["use_early_stopping"]:
-
         callbacks_list.append(callback_constructors.get_early_stopping_callback_fn(cfg))
 
         # get cyclic learning scheduler callback
@@ -274,7 +295,7 @@ def run_main_train_code(cfg):
     )
     if validation_steps <= 0:
         raise RaiseError(
-            "Not enough data for training, Increase image or Try reducing batchsize/ephochs"
+            "Not enough data for training, Increase image or Try reducing batchsize/epochs"
         )
     # FIXME : Make checkpoint
     start = perf_counter()
@@ -298,21 +319,18 @@ def run_main_train_code(cfg):
     # val_loss = history.history["val_loss"]
     epochs = range(1, len(loss) + 1)
 
-    # plt.plot(epochs, loss, "y", label="Training loss")
-    # plt.plot(epochs, val_loss, "r", label="Validation loss")
-    # plt.title("Training and validation loss")
-    # plt.xlabel("Epochs")
-    # plt.ylabel("Loss")
-    # plt.legend()
-    # plt.savefig(f"{cfg['graph_location']}/training_validation_loss.png")
-
     acc = history.history["sparse_categorical_accuracy"]
     val_acc = history.history["val_sparse_categorical_accuracy"]
-    plt.plot(epochs, acc, "y", label="Training acc")
-    plt.plot(epochs, val_acc, "r", label="Validation sparse categorical acc")
-    plt.title("Training and validation sparse categorical accuracy")
+
+    # Plot training and validation accuracy
+    plt.plot(epochs, acc, "y", label="Training Accuracy")
+    plt.plot(epochs, val_acc, "r", label="Validation Accuracy")
+
+    # Set labels and title
     plt.xlabel("Epochs")
-    plt.ylabel("Sparse Categorical Accuracy")
+    plt.ylabel("Accuracy")
+    plt.title("Training and Validation Accuracy")
+
     plt.legend()
     plt.savefig(
         f"{cfg['graph_location']}/training_validation_sparse_categorical_accuracy.png"

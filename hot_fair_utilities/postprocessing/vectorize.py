@@ -14,6 +14,7 @@ from tqdm import tqdm
 TOLERANCE = 0.5
 AREA_THRESHOLD = 0.1
 MAX_RATIO = 10
+MIN_AREA = 3  # sqm
 
 
 def vectorize(input_path: str, output_path: str) -> None:
@@ -53,7 +54,7 @@ def vectorize(input_path: str, output_path: str) -> None:
         for poly in polygons
         if poly.area != max_area
         and poly.area / median_area > AREA_THRESHOLD
-        and poly.area > 3
+        and poly.area > MIN_AREA
     ]
 
     gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(TOLERANCE)
