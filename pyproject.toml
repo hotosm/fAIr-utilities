@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hot-fair-utilities"
-version = "1.0.50"
+version = "1.0.51"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Omdena", email = "project@omdena.com" },{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
@@ -33,7 +33,7 @@ requires-python = ">=3.7"
     repository    = "https://github.com/hotosm/fAIr-utilities"
 
 [tool.bumpver]
-current_version = "1.0.44"
+current_version = "1.0.51"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true
