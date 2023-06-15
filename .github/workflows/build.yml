@@ -48,7 +48,7 @@ jobs:
 
       - name: Run test workflow
         run: |
-          pip uninstall gdal
+          pip uninstall -y gdal
           pip install numpy
           pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
           python test_app.py
