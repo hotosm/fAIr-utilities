@@ -31,7 +31,8 @@ jobs:
       - name: Install gdal
         run: |
           sudo apt-get -y install gdal-bin libgdal-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
-          pip install gdal==3.0.2
+          pip install numpy
+          pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
 
       - name: Install ramp dependecies
         run: |
