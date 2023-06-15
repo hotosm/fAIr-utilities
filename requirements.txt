@@ -6,7 +6,7 @@ numpy
 gdal
 Pillow==9.0.1
 geopandas==0.10.2
-pandas==2.0.2
+pandas==1.5.3
 rasterio 
 tqdm==4.62.3
 Rtree
