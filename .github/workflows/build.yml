@@ -28,18 +28,9 @@ jobs:
       - name: Unzip and Move Basemodel
         run: unzip checkpoint.tf.zip -d ramp-code/ramp
 
-      - name: Add ubuntugis ppa & Update
-        run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-
-      - name: Install numpy
-        run: pip install numpy
-
       - name: Install gdal
         run: |
-          sudo apt-get install gdal-bin
-          sudo apt-get install libgdal-dev
-          export CPLUS_INCLUDE_PATH=/usr/include/gdal
-          export C_INCLUDE_PATH=/usr/include/gdal
+          sudo apt-get -y install gdal-bin python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
           pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
 
       - name: Install ramp dependecies
