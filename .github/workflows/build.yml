@@ -16,48 +16,39 @@ jobs:
         with:
           python-version: 3.8
 
-      - name : Clone Ramp 
-        run : 
-          git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code   
+      - name: Clone Ramp
+        run: git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
 
-      - name : Install gdown
-        run : pip install gdown
+      - name: Install gdown
+        run: pip install gdown
 
       - name: Download Basemodel
         run: gdown --fuzzy https://drive.google.com/file/d/1wvJhkiOrSlHmmvJ0avkAdu9sslFf5_I0/view?usp=sharing
 
       - name: Unzip and Move Basemodel
         run: unzip checkpoint.tf.zip -d ramp-code/ramp
-          
-      - name: Add ubuntugis ppa & Update
-        run:
-          sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-      - name : Install numpy
-        run:
-          pip install numpy==1.23.5
-      - name: Install gdal 
+
+      - name: Install gdal
         run: |
-          sudo apt-get install gdal-bin
-          sudo apt-get install libgdal-dev
-          export CPLUS_INCLUDE_PATH=/usr/include/gdal
-          export C_INCLUDE_PATH=/usr/include/gdal
-          pip install --global-option=build_ext --global-option="-I/usr/include/gdal" GDAL==`gdal-config --version`
+          sudo apt-get -y install gdal-bin libgdal-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
+          pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
 
       - name: Install ramp dependecies
         run: |
-          cd ramp-code && cd colab && make install 
+          cd ramp-code && cd colab && make install
       - name: Navigate to home dir
         run: |
           cd ../.. 
           ls
-      - name : Install tensorflow 
-        run :
-          pip install tensorflow==2.9.2
+      - name: Install tensorflow
+        run: pip install tensorflow==2.9.2
 
-      - name : Install fair utilities 
-        run:
-          pip install -e . 
+      - name: Install fair utilities
+        run: pip install -e .
 
       - name: Run test workflow
         run: |
+          pip uninstall -y gdal
+          pip install numpy
+          pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
           python test_app.py
