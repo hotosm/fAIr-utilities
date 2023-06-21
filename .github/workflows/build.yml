@@ -44,7 +44,7 @@ jobs:
         run: pip install tensorflow==2.9.2
 
       - name: Install fair utilities
-        run: pip install -e .
+        run: pip install -e .[hot_fair_utilities]
 
       - name: Run test workflow
         run: |
