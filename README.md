@@ -12,6 +12,11 @@ Clone repo
 git clone https://github.com/hotosm/fAIr-utilities.git
 ```
 
+Navigate to fAIr-utilities
+
+```
+cd fAIr-utilities
+```
 Build Docker
 
 ```
