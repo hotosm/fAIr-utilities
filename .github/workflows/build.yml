@@ -43,8 +43,11 @@ jobs:
       - name: Install tensorflow
         run: pip install tensorflow==2.9.2
 
+      - name: Remove solaris
+        run: sudo rm -rf docker/solaris
+
       - name: Install fair utilities
-        run: pip install -e hot_fair_utilities
+        run: pip install -e .
 
       - name: Run test workflow
         run: |
