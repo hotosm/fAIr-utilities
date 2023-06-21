@@ -16,6 +16,9 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Remove solaris
+        run: sudo rm -rf ./docker
+
       - name: Clone Ramp
         run: git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
 
@@ -42,9 +45,6 @@ jobs:
           ls
       - name: Install tensorflow
         run: pip install tensorflow==2.9.2
-
-      - name: Remove solaris
-        run: sudo rm -rf docker/solaris
 
       - name: Install fair utilities
         run: pip install -e .
