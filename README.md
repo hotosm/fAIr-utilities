@@ -29,7 +29,8 @@ Run Container with default Jupyter Notebook , Or add `bash` at end to see termin
 docker run -it --rm --gpus=all  -p 8888:8888 fairutils
 ```
 
-By Default tf is set as Ramp_Home , You can change that attaching your volume to container as tf
+[Optional] If you have downloaded RAMP already , By Default tf is set as Ramp_Home , You can change that by attaching your ramp-home volume to container as tf
+if not you can skip this step , Ramp code will be downloaded on package_test.ipynb
 
 ```
 -v /home/hotosm/fAIr-utilities:/tf
