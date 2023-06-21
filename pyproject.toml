@@ -7,7 +7,7 @@ name = "hot-fair-utilities"
 version = "1.0.52"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
-authors = [{ name = "Omdena", email = "project@omdena.com" },{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
+authors = [{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: BSD License",

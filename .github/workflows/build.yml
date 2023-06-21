@@ -16,6 +16,9 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Remove solaris
+        run: sudo rm -rf ./docker
+
       - name: Clone Ramp
         run: git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
 
