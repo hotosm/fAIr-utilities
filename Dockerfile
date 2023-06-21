@@ -34,4 +34,10 @@ ENV RAMP_HOME=/tf
 # Install the package in development mode
 COPY setup.py ./setup.py 
 COPY hot_fair_utilities ./hot_fair_utilities
-RUN pip install -e . 
+RUN pip install -e .
+
+# install ramp-fair
+RUN pip install ramp-fair mercantile pandas==1.5.3
+
+## Copy Sample data
+COPY ramp-data ./ramp-data
