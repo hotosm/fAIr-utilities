@@ -320,31 +320,14 @@ def run_main_train_code(cfg):
     acc = history.history["sparse_categorical_accuracy"]
     val_acc = history.history["val_sparse_categorical_accuracy"]
 
-    # # Plot training and validation accuracy
-    # plt.plot(epochs, acc, "y", label="Training Accuracy")
-    # plt.plot(epochs, val_acc, "r", label="Validation Accuracy")
+    # Plot training and validation accuracy
+    plt.plot(epochs, acc, "y", label="Training Accuracy")
+    plt.plot(epochs, val_acc, "r", label="Validation Accuracy")
 
     # Set labels and title
     plt.xlabel("Epochs")
     plt.ylabel("Accuracy")
     plt.title("Training and Validation Accuracy")
-
-    # Plot only the latest training and validation accuracy curve
-    latest_epoch = len(loss)
-    latest_acc = acc[latest_epoch - 1]
-    latest_val_acc = val_acc[latest_epoch - 1]
-    plt.plot(
-        latest_epoch,
-        latest_acc,
-        "y",
-        label=f"Training Accuracy",
-    )
-    plt.plot(
-        latest_epoch,
-        latest_val_acc,
-        "r",
-        label=f"Validation Accuracy",
-    )
 
     # Update the legend
     plt.legend()
