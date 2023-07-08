@@ -37,6 +37,16 @@ if not you can skip this step , Ramp code will be downloaded on package_test.ipy
 -v /home/hotosm/fAIr-utilities:/tf
 ```
 
+## Test inside Docker Container
+
+```
+docker run -it --rm --gpus=all  -p 8888:8888 fairutils bash
+```
+
+```
+python test_app.py
+```
+
 ## Test Installation and workflow
 
 You can run [`package_test.ipynb`](./Package_Test.ipynb) on your notebook from docker to test the installation and workflow with sample data provided , Or open with [collab and connect your runtime locally](https://research.google.com/colaboratory/local-runtimes.html#:~:text=In%20Colab%2C%20click%20the%20%22Connect,connected%20to%20your%20local%20runtime.)

@@ -41,3 +41,18 @@ RUN pip install ramp-fair mercantile pandas==1.5.3
 
 ## Copy Sample data
 COPY ramp-data ./ramp-data
+
+# Prepare ramp-code
+RUN git clone --depth 1 https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
+
+# install gdown
+RUN pip install gdown
+
+# Download Basemodel
+RUN gdown --fuzzy https://drive.google.com/file/d/1wvJhkiOrSlHmmvJ0avkAdu9sslFf5_I0/view?usp=sharing
+
+# Unzip and Move Basemodel
+RUN unzip checkpoint.tf.zip -d ramp-code/ramp
+
+# Copy test_app.py
+COPY test_app.py ./test_app.py
