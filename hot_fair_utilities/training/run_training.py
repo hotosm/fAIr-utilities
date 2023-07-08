@@ -158,10 +158,11 @@ def run_main_train_code(cfg):
             the_model is not None
         ), f"the saved model was not constructed: {model_path}"
 
+        # Freeze lower layers
         if cfg["freeze_layers"]:
-            for layer in the_model.layers:
-                layer.trainable = False  # freeze previous layers only update new layers
-                # print("Setting previous model layers traininable : False")
+            num_layers_to_freeze = 4  # Specify the number of lower layers to freeze
+            for layer in the_model.layers[:num_layers_to_freeze]:
+                layer.trainable = False
 
         if not cfg["saved_model"]["save_optimizer_state"]:
             # If you don't want to save the original state of training, recompile the model.
