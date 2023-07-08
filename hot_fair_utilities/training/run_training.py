@@ -294,7 +294,7 @@ def run_main_train_code(cfg):
     ## Main training block ##
     n_epochs = cfg["num_epochs"]
     print(
-        f"Starting Training with {n_epochs} epochs , {batch_size} batch size , {steps_per_epoch} steps per epoch , {validation_steps} validation steps......"
+        f"Starting Training with {n_epochs} epochs , {batch_size} batch size , {steps_per_epoch} steps per epoch , {validation_steps} validation steps & Freeze Layers : {cfg["freeze_layers"]}......"
     )
     if validation_steps <= 0:
         raise RaiseError(
