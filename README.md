@@ -44,3 +44,6 @@ You can run [`package_test.ipynb`](./Package_Test.ipynb) on your notebook from d
 ## Get started with development
 
 Now you can play with your data , use your own data , use different models for testing and also Help me Improve me !
+
+### Version Control
+Follow [Version Control Docs](./docs/Version_control.md)
