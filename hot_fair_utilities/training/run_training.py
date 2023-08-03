@@ -322,6 +322,8 @@ def run_main_train_code(cfg):
     acc = history.history["sparse_categorical_accuracy"]
     val_acc = history.history["val_sparse_categorical_accuracy"]
 
+    plt.figure()
+
     # Plot training and validation accuracy
     plt.plot(epochs, acc, "y", label="Training Accuracy")
     plt.plot(epochs, val_acc, "r", label="Validation Accuracy")
@@ -335,4 +337,5 @@ def run_main_train_code(cfg):
     plt.savefig(
         f"{cfg['graph_location']}/training_validation_sparse_categorical_accuracy.png"
     )
+    plt.clf()
     print(f"Graph generated at : {cfg['graph_location']}")
