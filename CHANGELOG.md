@@ -1,3 +1,9 @@
+## v1.1.2 (2023-08-03)
+
+### Fix
+
+- Fixed bug on Training Charts Repettion figures
+
 ## v1.1.1 (2023-07-24)
 
 ### Fix
