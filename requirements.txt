@@ -16,3 +16,4 @@ black
 isort
 build
 twine
+ultralytics

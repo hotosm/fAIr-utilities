@@ -6,11 +6,13 @@ from pathlib import Path
 
 # Third party imports
 import numpy as np
+import torch
 from tensorflow import keras
+from ultralytics import YOLO, FastSAM
 
 from ..georeferencing import georeference
 from ..utils import remove_files
-from .utils import open_images, save_mask
+from .utils import open_images, save_mask, initialize_model
 
 BATCH_SIZE = 8
 IMAGE_SIZE = 256
@@ -43,34 +45,50 @@ def predict(
     """
     start = time.time()
     print(f"Using : {checkpoint_path}")
-    model = keras.models.load_model(checkpoint_path)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = initialize_model(checkpoint_path, device=device)
     print(f"It took {round(time.time()-start)} sec to load model")
     start = time.time()
 
     os.makedirs(prediction_path, exist_ok=True)
     image_paths = glob(f"{input_path}/*.png")
 
-    for i in range((len(image_paths) + BATCH_SIZE - 1) // BATCH_SIZE):
-        image_batch = image_paths[BATCH_SIZE * i : BATCH_SIZE * (i + 1)]
-        images = open_images(image_batch)
-        images = images.reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 3)
+    if isinstance(model, keras.Model):
+        for i in range((len(image_paths) + BATCH_SIZE - 1) // BATCH_SIZE):
+            image_batch = image_paths[BATCH_SIZE * i : BATCH_SIZE * (i + 1)]
+            images = open_images(image_batch)
+            images = images.reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 3)
 
-        preds = model.predict(images)
-        preds = np.argmax(preds, axis=-1)
-        preds = np.expand_dims(preds, axis=-1)
-        preds = np.where(
-            preds > confidence, 1, 0
-        )  # Filter out low confidence predictions
+            preds = model.predict(images)
+            preds = np.argmax(preds, axis=-1)
+            preds = np.expand_dims(preds, axis=-1)
+            preds = np.where(
+                preds > confidence, 1, 0
+            )  # Filter out low confidence predictions
 
-        for idx, path in enumerate(image_batch):
-            save_mask(
-                preds[idx],
-                str(f"{prediction_path}/{Path(path).stem}.png"),
-            )
+            for idx, path in enumerate(image_batch):
+                save_mask(
+                    preds[idx],
+                    str(f"{prediction_path}/{Path(path).stem}.png"),
+                )
+    elif isinstance(model, YOLO):
+        raise NotImplementedError
+    elif isinstance(model, FastSAM):
+        results = model(image_paths, stream=True, imgsz=IMAGE_SIZE,
+                        prompts=["building" for _ in range(len(image_paths))])
+        for i, r in enumerate(results):
+            preds = r.masks.data.max(dim=0)[0]
+            preds = torch.where(preds > confidence, torch.tensor(1), torch.tensor(0))
+            preds = preds.detach().cpu().numpy()
+            save_mask(preds, str(f"{prediction_path}/{Path(image_paths[i]).stem}.png"))
+    else:
+        raise RuntimeError("Loaded model is not supported")
+
     print(
         f"It took {round(time.time()-start)} sec to predict with {confidence} Confidence Threshold"
     )
-    keras.backend.clear_session()
+    if isinstance(model, keras.Model):
+        keras.backend.clear_session()
     del model
     start = time.time()
 
