@@ -67,12 +67,11 @@ def apply_feedback(
         os.makedirs(output_path)
 
     # Update the fine-tuning configuration
-    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size)
+    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size,freeze_layers)
 
     # Set the path of the pre-trained model in the configuration
     fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
     fine_tuning_cfg["saved_model"]["use_saved_model"] = True
-    fine_tuning_cfg["freeze_layers"] = freeze_layers
 
     run_main_train_code(fine_tuning_cfg)
 

@@ -69,7 +69,7 @@ def run_feedback(
     model_home: str,
     epoch_size: int,
     batch_size: int,
-    freeze_layers: bool = False,
+    freeze_layers: bool = True,
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
