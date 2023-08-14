@@ -1,3 +1,9 @@
+## v1.2.0 (2023-08-14)
+
+### Feat
+
+- Lower Layers Freeze on Feedback
+
 ## v1.1.3 (2023-08-14)
 
 ### Fix
