@@ -1,3 +1,9 @@
+## v1.1.3 (2023-08-14)
+
+### Fix
+
+- Typo fix on manage config
+
 ## v1.1.2 (2023-08-03)
 
 ### Fix
