@@ -42,7 +42,7 @@ def train(
     # Use the assert keyword to raise an AssertionError if the input model string is not in the list of supported models
     assert any(
         model.lower() in supported_model for supported_model in supported_models
-    ), "Model is not in the list of supported models"
+    ), "Model is not in the list of supported models "
 
     # Export the environment variables from the operating system
     os.environ.update(os.environ)
