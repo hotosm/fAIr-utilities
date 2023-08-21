@@ -36,6 +36,7 @@ def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
     Returns:
         A tuple, (x_min, y_min, x_max, y_max), with coordinates in meters.
     """
+    filename = re.sub(r'\.(png|jpeg)$', '', filename)
     _, *tile_info = re.split("-", filename)
     x_tile, y_tile, zoom = map(int, tile_info)
 
