@@ -12,12 +12,10 @@ from shapely.geometry import Polygon, shape
 from tqdm import tqdm
 
 TOLERANCE = 0.5
-AREA_THRESHOLD = 0.1
-MAX_RATIO = 10
-MIN_AREA = 3  # sqm
+AREA_THRESHOLD = 5
 
 
-def vectorize(input_path: str, output_path: str) -> None:
+def vectorize(input_path: str, output_path: str , tolerance: float = 0.5, area_threshold: float = 5) -> None:
     """Polygonize raster tiles from the input path.
 
     Note that as input, we are expecting GeoTIF images with EPSG:3857 as
@@ -26,10 +24,12 @@ def vectorize(input_path: str, output_path: str) -> None:
     Args:
         input_path: Path of the directory where the TIF files are stored.
         output_path: Path of the output file.
+        tolerance (float, optional): Tolerance parameter for simplifying polygons. Defaults to 0.5 m.
+        area_threshold (float, optional): Threshold for filtering polygon areas. Defaults to 5 sqm.
 
     Example::
 
-        vectorize("data/masks_v2/4", "labels.geojson")
+        vectorize("data/masks_v2/4", "labels.geojson", tolerance=0.5, area_threshold=5)
     """
     base_path = Path(output_path).parents[0]
     base_path.mkdir(exist_ok=True, parents=True)
@@ -53,11 +53,10 @@ def vectorize(input_path: str, output_path: str) -> None:
         Polygon(poly.exterior.coords)
         for poly in polygons
         if poly.area != max_area
-        and poly.area / median_area > AREA_THRESHOLD
-        and poly.area > MIN_AREA
+        and poly.area / median_area > area_threshold
     ]
 
-    gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(TOLERANCE)
+    gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(tolerance)
     gs = remove_overlapping_polygons(gs)
     if gs.empty:
         raise ValueError("No Features Found")
@@ -75,8 +74,9 @@ def remove_overlapping_polygons(gs: gpd.GeoSeries) -> gpd.GeoSeries:
 
         for j, q in precise_matches.items():
             if i != j:
-                ratio = max(p.area, q.area) / min(p.area, q.area)
-                if ratio > MAX_RATIO:
-                    to_remove.add(i if p.area < q.area else j)
+                if p.area < q.area:  # Compare the areas of the polygons
+                    to_remove.add(i)
+                else:
+                    to_remove.add(j)
 
     return gs.drop(list(to_remove))
