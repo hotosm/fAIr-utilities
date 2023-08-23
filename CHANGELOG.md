@@ -1,3 +1,9 @@
+## v1.2.2 (2023-08-23)
+
+### Fix
+
+- Made vectorize to accept options in parameters
+
 ## v1.2.1 (2023-08-21)
 
 ### Fix
