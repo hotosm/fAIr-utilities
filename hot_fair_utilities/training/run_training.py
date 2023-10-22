@@ -67,12 +67,11 @@ def apply_feedback(
         os.makedirs(output_path)
 
     # Update the fine-tuning configuration
-    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size)
+    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size,freeze_layers)
 
     # Set the path of the pre-trained model in the configuration
     fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
     fine_tuning_cfg["saved_model"]["use_saved_model"] = True
-    fine_tuning_cfg["freeze_layers"] = freeze_layers
 
     run_main_train_code(fine_tuning_cfg)
 
@@ -159,9 +158,13 @@ def run_main_train_code(cfg):
         ), f"the saved model was not constructed: {model_path}"
 
         if cfg["freeze_layers"]:
-            for layer in the_model.layers:
-                layer.trainable = False  # freeze previous layers only update new layers
-                # print("Setting previous model layers traininable : False")
+            num_layers_to_freeze = 4 # freeze lower layers 
+            for index, layer in enumerate(the_model.layers):
+                if index < num_layers_to_freeze:
+                    layer.trainable = False
+                else:
+                    layer.trainable = True
+
 
         if not cfg["saved_model"]["save_optimizer_state"]:
             # If you don't want to save the original state of training, recompile the model.

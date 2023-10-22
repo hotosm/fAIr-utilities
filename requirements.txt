@@ -10,7 +10,8 @@ pandas==1.5.3
 rasterio 
 tqdm==4.62.3
 Rtree
-opencv-python==4.5.5.64
+opencv-python<=4.5.5.64
+opencv-python-headless<=4.7.0.68
 bumpver
 black
 isort

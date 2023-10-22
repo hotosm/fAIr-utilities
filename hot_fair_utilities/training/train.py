@@ -42,7 +42,7 @@ def train(
     # Use the assert keyword to raise an AssertionError if the input model string is not in the list of supported models
     assert any(
         model.lower() in supported_model for supported_model in supported_models
-    ), "Model is not in the list of supported models"
+    ), "Model is not in the list of supported models "
 
     # Export the environment variables from the operating system
     os.environ.update(os.environ)
@@ -69,7 +69,7 @@ def run_feedback(
     model_home: str,
     epoch_size: int,
     batch_size: int,
-    freeze_layers: bool = False,
+    freeze_layers: bool = True,
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
