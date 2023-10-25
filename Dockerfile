@@ -49,7 +49,7 @@ RUN git clone --depth 1 https://github.com/kshitijrajsharma/ramp-code-fAIr.git r
 RUN pip install gdown
 
 # Download Basemodel
-RUN gdown --fuzzy https://drive.google.com/file/d/1wvJhkiOrSlHmmvJ0avkAdu9sslFf5_I0/view?usp=sharing
+RUN gdown --fuzzy https://drive.google.com/file/d/1YQsY61S_rGfJ_f6kLQq4ouYE2l3iRe1k/view?usp=sharing
 
 # Unzip and Move Basemodel
 RUN unzip checkpoint.tf.zip -d ramp-code/ramp
