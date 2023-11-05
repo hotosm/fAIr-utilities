@@ -20,7 +20,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def predict(
-    checkpoint_path: str, input_path: str, prediction_path: str, confidence: float = 0.5
+    checkpoint_path: str, input_path: str, prediction_path: str, confidence: float = 0.5, remove_images=True
 ) -> None:
     """Predict building footprints for aerial images given a model checkpoint.
 
@@ -34,6 +34,7 @@ def predict(
         input_path: Path of the directory where the images are stored.
         prediction_path: Path of the directory where the predicted images will go.
         confidence: Threshold probability for filtering out low-confidence predictions.
+        remove_images: Bool indicating whether delete prediction images after they were georeferenced.
 
     Example::
 
@@ -95,5 +96,6 @@ def predict(
     georeference(prediction_path, prediction_path, is_mask=True)
     print(f"It took {round(time.time()-start)} sec to georeference")
 
-    remove_files(f"{prediction_path}/*.xml")
-    remove_files(f"{prediction_path}/*.png")
+    if remove_images:
+        remove_files(f"{prediction_path}/*.xml")
+        remove_files(f"{prediction_path}/*.png")

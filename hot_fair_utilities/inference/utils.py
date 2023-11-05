@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from PIL import Image
 from tensorflow import keras
-from ultralytics import YOLO, FastSAM
+
 
 IMAGE_SIZE = 256
 
@@ -31,18 +31,13 @@ def save_mask(mask: np.ndarray, filename: str) -> None:
 
 def initialize_model(path, device=None):
     """Loads either keras or pytorch model."""
-    if not device:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if not isinstance(path, str):  # probably loaded model
+        return path
 
-    if path.lower() == "yolo":  # Ultralytics pretrained YOLOv8
-        model = YOLO('yolov8n-seg.pt')
-    elif path.lower() == "fastsam":  # Ultralytics pretrained FastSAM
-        model = FastSAM('FastSAM-s.pt')
-    elif path.endswith('.pth') or path.endswith('.pt'):  # Pytorch saved checkpoint
+    if path.endswith('.pth') or path.endswith('.pt'):  # Pytorch saved checkpoint
+        if not device:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model = torch.load(path, map_location=device)
-    elif path.endswith('.pb') or path.endswith('.tf'):  # Tensorflow saved checkpoint
-        model = keras.models.load_model(path)
     else:
-        raise ValueError("Unsupported model format or path")
-
+        model = keras.models.load_model(path)
     return model

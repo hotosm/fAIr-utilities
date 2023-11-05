@@ -8,6 +8,9 @@ RUN apt-get install -y libgdal-dev
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
+# Install ultralytics for YOLO, FastSAM, etc. together with pytorch and other dependencies
+RUN pip install ultralytics==8.0.203
+
 #install numpy before gdal 
 RUN pip install numpy==1.23.5
 

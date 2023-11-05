@@ -17,4 +17,4 @@ black
 isort
 build
 twine
-ultralytics
+ultralytics==8.0.203
