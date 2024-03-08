@@ -17,4 +17,6 @@ black
 isort
 build
 twine
-ultralytics==8.0.203
+torch==1.12.1
+torchvision==0.13.1
+ultralytics==8.1.6

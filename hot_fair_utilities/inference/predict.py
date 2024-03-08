@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from tensorflow import keras
-from ultralytics import YOLO, FastSAM
+from ultralytics import YOLO
 
 from ..georeferencing import georeference
 from ..utils import remove_files
@@ -73,15 +73,16 @@ def predict(
                     str(f"{prediction_path}/{Path(path).stem}.png"),
                 )
     elif isinstance(model, YOLO):
-        raise NotImplementedError
-    elif isinstance(model, FastSAM):
-        results = model(image_paths, stream=True, imgsz=IMAGE_SIZE,
-                        prompts=["building" for _ in range(len(image_paths))])
-        for i, r in enumerate(results):
-            preds = r.masks.data.max(dim=0)[0]
-            preds = torch.where(preds > confidence, torch.tensor(1), torch.tensor(0))
-            preds = preds.detach().cpu().numpy()
-            save_mask(preds, str(f"{prediction_path}/{Path(image_paths[i]).stem}.png"))
+        for idx in range(0, len(image_paths), BATCH_SIZE):
+            batch = image_paths[idx:idx + BATCH_SIZE]
+            for i, r in enumerate(model(batch, stream=True, conf=confidence, verbose=False)):
+                if r.masks is None:
+                    preds = np.zeros((IMAGE_SIZE, IMAGE_SIZE,), dtype=np.float32)
+                else:
+                    preds = r.masks.data.max(dim=0)[0]  # dim=0 means to take only footprint
+                    preds = torch.where(preds > confidence, torch.tensor(1), torch.tensor(0))
+                    preds = preds.detach().cpu().numpy()
+                save_mask(preds, str(f"{prediction_path}/{Path(batch[i]).stem}.png"))
     else:
         raise RuntimeError("Loaded model is not supported")
 

@@ -8,9 +8,6 @@ RUN apt-get install -y libgdal-dev
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Install ultralytics for YOLO, FastSAM, etc. together with pytorch and other dependencies
-RUN pip install ultralytics==8.0.203
-
 #install numpy before gdal 
 RUN pip install numpy==1.23.5
 
@@ -19,6 +16,11 @@ RUN pip install --global-option=build_ext --global-option="-I/usr/include/gdal" 
 
 COPY docker/ramp/docker-requirements.txt docker-requirements.txt
 RUN pip install -r docker-requirements.txt
+
+# Install ultralytics for YOLO, FastSAM, etc. together with pytorch and other dependencies
+# For exact pytorch+cuda versions, see https://pytorch.org/get-started/previous-versions/
+RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+RUN pip install ultralytics==8.1.6
 
 # pip install solaris -- try with tmp-free build
 # COPY docker/ramp/solaris /tmp/solaris
@@ -59,3 +61,5 @@ RUN unzip checkpoint.tf.zip -d ramp-code/ramp
 
 # Copy test_app.py
 COPY test_app.py ./test_app.py
+COPY test_yolo.py ./test_yolo.py
+COPY Package_Test.ipynb ./Package_Test.ipynb

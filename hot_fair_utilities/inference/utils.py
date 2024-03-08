@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from PIL import Image
 from tensorflow import keras
+from ultralytics import YOLO
 
 
 IMAGE_SIZE = 256
@@ -30,14 +31,14 @@ def save_mask(mask: np.ndarray, filename: str) -> None:
 
 
 def initialize_model(path, device=None):
-    """Loads either keras or pytorch model."""
+    """Loads either keras or yolo model."""
     if not isinstance(path, str):  # probably loaded model
         return path
 
-    if path.endswith('.pth') or path.endswith('.pt'):  # Pytorch saved checkpoint
+    if path.endswith('.pt'):  # YOLO
         if not device:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model = torch.load(path, map_location=device)
+        model = YOLO(path).to(device)
     else:
         model = keras.models.load_model(path)
     return model
