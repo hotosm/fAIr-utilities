@@ -52,7 +52,7 @@ def predict(
     start = time.time()
 
     os.makedirs(prediction_path, exist_ok=True)
-    image_paths = glob(f"{input_path}/*.png")
+    image_paths = glob(f"{input_path}/*.png") + glob(f"{input_path}/*.tif")
 
     if isinstance(model, keras.Model):
         for i in range((len(image_paths) + BATCH_SIZE - 1) // BATCH_SIZE):
