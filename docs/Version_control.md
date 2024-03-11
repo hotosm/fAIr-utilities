@@ -58,4 +58,4 @@ This will:
 4. Set the `Release title` to v`x.x.x`, replacing with your version number.
 5. Add a description if possible, then release.
 
-This should trigger the PyPi publishing workflow, and your version will be available on [PyPi](https://pypi.org/project/osmsg/).
+This should trigger the PyPi publishing workflow, and your version will be available on [PyPi](#)
