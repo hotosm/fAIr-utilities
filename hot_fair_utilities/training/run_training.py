@@ -88,9 +88,9 @@ def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers
 
     # Modify the content of the data dictionary datasets
     data["datasets"]["train_img_dir"] = f"{output_path}/chips"
-    data["datasets"]["train_mask_dir"] = f"{output_path}/binarymasks"
+    data["datasets"]["train_mask_dir"] = f"{output_path}/multimasks"
     data["datasets"]["val_img_dir"] = f"{output_path}/val-chips"
-    data["datasets"]["val_mask_dir"] = f"{output_path}/val-binarymasks"
+    data["datasets"]["val_mask_dir"] = f"{output_path}/val-multimasks"
 
     # epoch batchconfig
     data["num_epochs"] = num_epochs
