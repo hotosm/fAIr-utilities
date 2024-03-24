@@ -5,6 +5,7 @@ from ..georeferencing import georeference
 from .clip_labels import clip_labels
 from .fix_labels import fix_labels
 from .reproject_labels import reproject_labels_to_epsg3857
+from .multimasks_from_polygons import multimasks_from_polygons
 
 
 def preprocess(
@@ -13,6 +14,7 @@ def preprocess(
     rasterize=False,
     rasterize_options=None,
     georeference_images=False,
+    multimasks=False
 ) -> None:
     """Fully preprocess the input data.
 
@@ -29,6 +31,7 @@ def preprocess(
             (if georeference_images=True), and the directories
             "binarymasks" and "grayscale_labels" if the corresponding
             rasterizing options are chosen.
+            "multimasks" - for the multimasks labels (if multimasks=True)
         rasterize: Whether to create the raster labels.
         rasterize_options: A list with options how to rasterize the
             label, if rasterize=True. Possible options: "grayscale"
@@ -37,6 +40,7 @@ def preprocess(
             for the ramp model).
             If rasterize=False, rasterize_options will be ignored.
         georeference_images: Whether to georeference the OAM images.
+        multimasks: Whether to additionally output multimask labels.
 
     Example::
 
@@ -82,3 +86,7 @@ def preprocess(
 
     os.remove(f"{output_path}/corrected_labels.geojson")
     os.remove(f"{output_path}/labels_epsg3857.geojson")
+
+    if multimasks:
+        assert os.path.isdir(f"{output_path}/chips"), "Chips do not exist. Set georeference_images=True."
+        multimasks_from_polygons(f"{output_path}/labels", f"{output_path}/chips", f"{output_path}/multimasks")

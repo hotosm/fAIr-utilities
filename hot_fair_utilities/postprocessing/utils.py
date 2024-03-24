@@ -24,6 +24,7 @@ def tiles_from_directory(dir_path):
     """
     for path in glob(f"{dir_path}/*"):
         _, *tile_info = re.split("-", Path(path).stem)
+        tile_info[-1] = tile_info[-1].replace(".mask", "")  # resolve OAM-x-y-z.mask.tif
         x, y, z = map(int, tile_info)
         tile = mercantile.Tile(x=x, y=y, z=z)
         yield tile, path
