@@ -38,6 +38,7 @@ preprocess(
     rasterize=True,
     rasterize_options=["binary"],
     georeference_images=True,
+    multimasks=True,
 )
 
 # Reader imports
