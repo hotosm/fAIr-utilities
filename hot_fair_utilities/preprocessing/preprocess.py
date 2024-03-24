@@ -4,8 +4,8 @@ import os
 from ..georeferencing import georeference
 from .clip_labels import clip_labels
 from .fix_labels import fix_labels
-from .reproject_labels import reproject_labels_to_epsg3857
 from .multimasks_from_polygons import multimasks_from_polygons
+from .reproject_labels import reproject_labels_to_epsg3857
 
 
 def preprocess(
@@ -14,7 +14,9 @@ def preprocess(
     rasterize=False,
     rasterize_options=None,
     georeference_images=False,
-    multimasks=False
+    multimasks=False,
+    input_contact_spacing=4,  # only required if multimasks is set to true
+    input_boundary_width=2,  # only required if mulltimasks is set to true
 ) -> None:
     """Fully preprocess the input data.
 
@@ -41,6 +43,14 @@ def preprocess(
             If rasterize=False, rasterize_options will be ignored.
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
+        input_contact_spacing (int, optional): Width in pixel units of boundary class around building footprints,
+            in pixels. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
+        input_boundary_width (int, optional): Pixels that are closer to two different polygons than contact_spacing
+            (in pixel units) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
+
+        Unit of input_contact_spacing and input_boundary_width is in pixel width which is :
+
+        Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
     Example::
 
@@ -88,5 +98,13 @@ def preprocess(
     os.remove(f"{output_path}/labels_epsg3857.geojson")
 
     if multimasks:
-        assert os.path.isdir(f"{output_path}/chips"), "Chips do not exist. Set georeference_images=True."
-        multimasks_from_polygons(f"{output_path}/labels", f"{output_path}/chips", f"{output_path}/multimasks")
+        assert os.path.isdir(
+            f"{output_path}/chips"
+        ), "Chips do not exist. Set georeference_images=True."
+        multimasks_from_polygons(
+            f"{output_path}/labels",
+            f"{output_path}/chips",
+            f"{output_path}/multimasks",
+            input_contact_spacing=input_contact_spacing,
+            input_boundary_width=input_boundary_width,
+        )

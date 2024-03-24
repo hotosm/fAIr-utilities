@@ -1,15 +1,21 @@
 # Patched from ramp-code.scripts.multi_masks_from_polygons created for ramp project by carolyn.johnston@dev.global
 
+# Standard library imports
 from pathlib import Path
-from tqdm import tqdm
-from ramp.data_mgmt.chip_label_pairs import get_tq_chip_label_pairs, construct_mask_filepath
-from solaris.vector.mask import crs_is_metric
-from solaris.utils.geo import get_crs
-from solaris.utils.core import _check_rasterio_im_load
-from ramp.utils.multimask_utils import df_to_px_mask, multimask_to_sparse_multimask
-import rasterio as rio
-from ramp.utils.img_utils import to_channels_first
+
+# Third party imports
 import geopandas as gpd
+import rasterio as rio
+from ramp.data_mgmt.chip_label_pairs import (
+    construct_mask_filepath,
+    get_tq_chip_label_pairs,
+)
+from ramp.utils.img_utils import to_channels_first
+from ramp.utils.multimask_utils import df_to_px_mask, multimask_to_sparse_multimask
+from solaris.utils.core import _check_rasterio_im_load
+from solaris.utils.geo import get_crs
+from solaris.vector.mask import crs_is_metric
+from tqdm import tqdm
 
 
 def get_rasterio_shape_and_transform(image_path):
@@ -20,19 +26,27 @@ def get_rasterio_shape_and_transform(image_path):
     return shape, transform
 
 
-def multimasks_from_polygons(in_poly_dir, in_chip_dir, out_mask_dir, input_contact_spacing=4, input_boundary_width=2):
+def multimasks_from_polygons(
+    in_poly_dir,
+    in_chip_dir,
+    out_mask_dir,
+    input_contact_spacing=4,
+    input_boundary_width=2,
+):
     """
     Create multichannel building footprint masks from a folder of geojson files.
-    This also requires the path to the matching image chips directory.
+    This also requires the path to the matching image chips directory.Unit of input_contact_spacing and input_boundary_width is in pixel width which is :
+
+    Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
     Args:
         in_poly_dir (str): Path to directory containing geojson files.
         in_chip_dir (str): Path to directory containing image chip files with names matching geojson files.
         out_mask_dir (str): Path to directory containing output SDT masks.
         input_contact_spacing (int, optional): Width in pixel units of boundary class around building footprints,
-            in pixels.
+            in pixels. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
         input_boundary_width (int, optional): Pixels that are closer to two different polygons than contact_spacing
-            (in pixel units) will be labeled with the contact mask.
+            (in pixel units) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
 
     Example:
         multimasks_from_polygons(
@@ -52,12 +66,16 @@ def multimasks_from_polygons(in_poly_dir, in_chip_dir, out_mask_dir, input_conta
     # construct the output mask file names from the chip file names.
     # these will have the same base filenames as the chip files,
     # with a mask.tif extension in place of the .tif extension.
-    mask_paths = [construct_mask_filepath(out_mask_dir, chip_path) for chip_path in chip_paths]
+    mask_paths = [
+        construct_mask_filepath(out_mask_dir, chip_path) for chip_path in chip_paths
+    ]
 
     # construct a list of full paths to the mask files
     json_chip_mask_zips = zip(label_paths, chip_paths, mask_paths)
 
-    for json_path, chip_path, mask_path in tqdm(json_chip_mask_zips, desc="Multimasks for input"):
+    for json_path, chip_path, mask_path in tqdm(
+        json_chip_mask_zips, desc="Multimasks for input"
+    ):
 
         # We will run this on very large directories, and some label files might fail to process.
         # We want to be able to resume mask creation from where we left off.
@@ -85,10 +103,14 @@ def multimasks_from_polygons(in_poly_dir, in_chip_dir, out_mask_dir, input_conta
             # CJ 20220824: convert pixels to meters for call to df_to_pix_mask
             boundary_width = min(reference_im.res) * input_boundary_width
             contact_spacing = min(reference_im.res) * input_contact_spacing
+            print("Min resolution of chip :", min(reference_im.res))
         else:
             meters = False
             boundary_width = input_boundary_width
             contact_spacing = input_contact_spacing
+
+        print("Multimasks labels , Input boundary_width in meters :", boundary_width)
+        print("Multimasks labels , Input contact_spacing in meters :", contact_spacing)
 
         # NOTE: solaris does not support multipolygon geodataframes
         # So first we call explode() to turn multipolygons into polygon dataframes
@@ -96,17 +118,19 @@ def multimasks_from_polygons(in_poly_dir, in_chip_dir, out_mask_dir, input_conta
         gdf_poly = gdf.explode(ignore_index=True)
 
         # multi_mask is a one-hot, channels-last encoded mask
-        onehot_multi_mask = df_to_px_mask(df=gdf_poly,
-                                          out_file=mask_path,
-                                          shape=mask_shape,
-                                          do_transform=True,
-                                          affine_obj=None,
-                                          channels=['footprint', 'boundary', 'contact'],
-                                          reference_im=reference_im,
-                                          boundary_width=boundary_width,
-                                          contact_spacing=contact_spacing,
-                                          out_type="uint8",
-                                          meters=meters)
+        onehot_multi_mask = df_to_px_mask(
+            df=gdf_poly,
+            out_file=mask_path,
+            shape=mask_shape,
+            do_transform=True,
+            affine_obj=None,
+            channels=["footprint", "boundary", "contact"],
+            reference_im=reference_im,
+            boundary_width=boundary_width,
+            contact_spacing=contact_spacing,
+            out_type="uint8",
+            meters=meters,
+        )
 
         # convert onehot_multi_mask to a sparse encoded mask
         # of shape (1,H,W) for compatibility with rasterio writer
@@ -117,7 +141,7 @@ def multimasks_from_polygons(in_poly_dir, in_chip_dir, out_mask_dir, input_conta
         with rio.open(chip_path, "r") as src:
             meta = src.meta.copy()
             meta.update(count=sparse_multi_mask.shape[0])
-            meta.update(dtype='uint8')
+            meta.update(dtype="uint8")
             meta.update(nodata=None)
-            with rio.open(mask_path, 'w', **meta) as dst:
+            with rio.open(mask_path, "w", **meta) as dst:
                 dst.write(sparse_multi_mask)
