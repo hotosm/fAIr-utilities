@@ -72,7 +72,7 @@ def multimasks_from_polygons(
 
     # construct a list of full paths to the mask files
     json_chip_mask_zips = zip(label_paths, chip_paths, mask_paths)
-
+    first_iteration = True
     for json_path, chip_path, mask_path in tqdm(
         json_chip_mask_zips, desc="Multimasks for input"
     ):
@@ -103,15 +103,24 @@ def multimasks_from_polygons(
             # CJ 20220824: convert pixels to meters for call to df_to_pix_mask
             boundary_width = min(reference_im.res) * input_boundary_width
             contact_spacing = min(reference_im.res) * input_contact_spacing
-            print("Min resolution of chip :", min(reference_im.res))
+            if first_iteration:
+                print(
+                    "Resolution (pixel width) & crs of chip :",
+                    min(reference_im.res),
+                    get_crs(reference_im),
+                )
         else:
             meters = False
             boundary_width = input_boundary_width
             contact_spacing = input_contact_spacing
-
-        print("Multimasks labels , Input boundary_width in meters :", boundary_width)
-        print("Multimasks labels , Input contact_spacing in meters :", contact_spacing)
-
+        if first_iteration:
+            print(
+                "Multimasks labels , Input boundary_width in meters :", boundary_width
+            )
+            print(
+                "Multimasks labels , Input contact_spacing in meters :", contact_spacing
+            )
+            first_iteration = False
         # NOTE: solaris does not support multipolygon geodataframes
         # So first we call explode() to turn multipolygons into polygon dataframes
         # ignore_index=True prevents polygons from the same multipolygon from being grouped into a series. -+
