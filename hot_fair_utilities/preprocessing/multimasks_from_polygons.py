@@ -105,9 +105,8 @@ def multimasks_from_polygons(
             contact_spacing = min(reference_im.res) * input_contact_spacing
             if first_iteration:
                 print(
-                    "Resolution (pixel width) & crs of chip :",
+                    "Resolution (pixel width) in meter :",
                     min(reference_im.res),
-                    get_crs(reference_im),
                 )
         else:
             meters = False
