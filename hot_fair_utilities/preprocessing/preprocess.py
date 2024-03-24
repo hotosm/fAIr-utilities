@@ -15,8 +15,8 @@ def preprocess(
     rasterize_options=None,
     georeference_images=False,
     multimasks=False,
-    input_contact_spacing=4,  # only required if multimasks is set to true
-    input_boundary_width=2,  # only required if mulltimasks is set to true
+    input_contact_spacing=0.75,  # only required if multimasks is set to true
+    input_boundary_width=0.5,  # only required if mulltimasks is set to true
 ) -> None:
     """Fully preprocess the input data.
 
@@ -44,11 +44,11 @@ def preprocess(
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
         input_contact_spacing (int, optional): Width in pixel units of boundary class around building footprints,
-            in pixels. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
+            in meters. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
         input_boundary_width (int, optional): Pixels that are closer to two different polygons than contact_spacing
-            (in pixel units) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
+            (in meters) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
 
-        Unit of input_contact_spacing and input_boundary_width is in pixel width which is :
+        Unit of input_contact_spacing and input_boundary_width is in meter which is :
 
         Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 

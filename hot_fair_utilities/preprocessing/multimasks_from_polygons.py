@@ -30,12 +30,12 @@ def multimasks_from_polygons(
     in_poly_dir,
     in_chip_dir,
     out_mask_dir,
-    input_contact_spacing=4,
-    input_boundary_width=2,
+    input_contact_spacing=0.75,
+    input_boundary_width=0.5,
 ):
     """
     Create multichannel building footprint masks from a folder of geojson files.
-    This also requires the path to the matching image chips directory.Unit of input_contact_spacing and input_boundary_width is in pixel width which is :
+    This also requires the path to the matching image chips directory.Unit of input_contact_spacing and input_boundary_width is in meter which is :
 
     Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
@@ -43,10 +43,9 @@ def multimasks_from_polygons(
         in_poly_dir (str): Path to directory containing geojson files.
         in_chip_dir (str): Path to directory containing image chip files with names matching geojson files.
         out_mask_dir (str): Path to directory containing output SDT masks.
-        input_contact_spacing (int, optional): Width in pixel units of boundary class around building footprints,
-            in pixels. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
+        input_contact_spacing (int, optional): Width in meters of boundary class pixels around building footprint. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
         input_boundary_width (int, optional): Pixels that are closer to two different polygons than contact_spacing
-            (in pixel units) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
+            (in meters) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
 
     Example:
         multimasks_from_polygons(
@@ -99,27 +98,38 @@ def multimasks_from_polygons(
 
         if crs_is_metric(gdf):
             meters = True
-
-            # CJ 20220824: convert pixels to meters for call to df_to_pix_mask
-            boundary_width = min(reference_im.res) * input_boundary_width
-            contact_spacing = min(reference_im.res) * input_contact_spacing
+            boundary_width = input_boundary_width
+            contact_spacing = input_contact_spacing
             if first_iteration:
                 print(
                     "Resolution (pixel width) in meter :",
                     min(reference_im.res),
                 )
+                print(
+                    "Multimasks labels , Input boundary_width in meters :",
+                    boundary_width,
+                )
+                print(
+                    "Multimasks labels , Input contact_spacing in meters :",
+                    contact_spacing,
+                )
+                first_iteration = False
         else:
             meters = False
-            boundary_width = input_boundary_width
-            contact_spacing = input_contact_spacing
-        if first_iteration:
-            print(
-                "Multimasks labels , Input boundary_width in meters :", boundary_width
-            )
-            print(
-                "Multimasks labels , Input contact_spacing in meters :", contact_spacing
-            )
-            first_iteration = False
+            # convert meter to pixel unit
+            boundary_width = int(input_boundary_width / min(reference_im.res))
+            contact_spacing = int(input_contact_spacing / min(reference_im.res))
+
+            if first_iteration:
+                print(
+                    "Multimasks labels , Input boundary_width in pixel :",
+                    boundary_width,
+                )
+                print(
+                    "Multimasks labels , Input contact_spacing in pixel :",
+                    contact_spacing,
+                )
+                first_iteration = False
         # NOTE: solaris does not support multipolygon geodataframes
         # So first we call explode() to turn multipolygons into polygon dataframes
         # ignore_index=True prevents polygons from the same multipolygon from being grouped into a series. -+
