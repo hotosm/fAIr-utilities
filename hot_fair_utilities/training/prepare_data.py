@@ -14,7 +14,7 @@ class RaiseError(Exception):
         self.message = message
 
 
-def split_training_2_validation(input_path, output_path):
+def split_training_2_validation(input_path, output_path, multimasks=False):
     """Converts training 2 validation
 
     Currently supported for ramp , It converts training dataset provided by preprocessing script to validation datastes reuqired by ramp
@@ -101,14 +101,21 @@ def split_training_2_validation(input_path, output_path):
         raise ex
 
     try:
+        if multimasks:
+            sd = f"{dst_path}/multimasks"
+            td = f"{dst_path}/val-multimasks"
+        else:
+            sd = f"{dst_path}/binarymasks"
+            td = f"{dst_path}/val-binarymasks"
+
         subprocess.check_output(
             [
                 python_exec,
                 f"{RAMP_HOME}/ramp-code/scripts/move_chips_from_csv.py",
                 "-sd",
-                f"{dst_path}/multimasks",
+                sd,
                 "-td",
-                f"{dst_path}/val-multimasks",
+                td,
                 "-csv",
                 f"{dst_path}/fair_split_val.csv",
                 "-mv",

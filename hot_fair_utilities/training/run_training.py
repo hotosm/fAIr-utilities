@@ -67,7 +67,9 @@ def apply_feedback(
         os.makedirs(output_path)
 
     # Update the fine-tuning configuration
-    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size,freeze_layers)
+    fine_tuning_cfg = manage_fine_tuning_config(
+        output_path, num_epochs, batch_size, freeze_layers
+    )
 
     # Set the path of the pre-trained model in the configuration
     fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
@@ -76,7 +78,9 @@ def apply_feedback(
     run_main_train_code(fine_tuning_cfg)
 
 
-def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers):
+def manage_fine_tuning_config(
+    output_path, num_epochs, batch_size, freeze_layers, multimasks=False
+):
     # Define the paths to the source and destination JSON files
     working_dir = os.path.realpath(os.path.dirname(__file__))
     config_base_path = os.path.join(working_dir, "ramp_config_base.json")
@@ -88,9 +92,16 @@ def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers
 
     # Modify the content of the data dictionary datasets
     data["datasets"]["train_img_dir"] = f"{output_path}/chips"
-    data["datasets"]["train_mask_dir"] = f"{output_path}/multimasks"
+    if multimasks:
+        data["datasets"]["train_mask_dir"] = f"{output_path}/multimasks"
+    else:
+        data["datasets"]["train_mask_dir"] = f"{output_path}/binarymasks"
+
     data["datasets"]["val_img_dir"] = f"{output_path}/val-chips"
-    data["datasets"]["val_mask_dir"] = f"{output_path}/val-multimasks"
+    if multimasks:
+        data["datasets"]["val_mask_dir"] = f"{output_path}/val-multimasks"
+    else:
+        data["datasets"]["val_mask_dir"] = f"{output_path}/val-binarymasks"
 
     # epoch batchconfig
     data["num_epochs"] = num_epochs
@@ -158,13 +169,12 @@ def run_main_train_code(cfg):
         ), f"the saved model was not constructed: {model_path}"
 
         if cfg["freeze_layers"]:
-            num_layers_to_freeze = 4 # freeze lower layers 
+            num_layers_to_freeze = 4  # freeze lower layers
             for index, layer in enumerate(the_model.layers):
                 if index < num_layers_to_freeze:
                     layer.trainable = False
                 else:
                     layer.trainable = True
-
 
         if not cfg["saved_model"]["save_optimizer_state"]:
             # If you don't want to save the original state of training, recompile the model.
