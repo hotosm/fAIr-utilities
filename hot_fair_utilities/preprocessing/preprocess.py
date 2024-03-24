@@ -43,10 +43,8 @@ def preprocess(
             If rasterize=False, rasterize_options will be ignored.
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
-        input_contact_spacing (int, optional): Width in pixel units of boundary class around building footprints,
-            in meters. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
-        input_boundary_width (int, optional): Pixels that are closer to two different polygons than contact_spacing
-            (in meters) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
+        input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
+        input_boundary_width (int, optional): Width in meters of boundary inner buffer around building footprints
 
         Unit of input_contact_spacing and input_boundary_width is in meter which is :
 

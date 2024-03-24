@@ -43,9 +43,8 @@ def multimasks_from_polygons(
         in_poly_dir (str): Path to directory containing geojson files.
         in_chip_dir (str): Path to directory containing image chip files with names matching geojson files.
         out_mask_dir (str): Path to directory containing output SDT masks.
-        input_contact_spacing (int, optional): Width in meters of boundary class pixels around building footprint. This variable is about creating a visible, protective bubble around each building, and you get to decide how thick this bubble is.
-        input_boundary_width (int, optional): Pixels that are closer to two different polygons than contact_spacing
-            (in meters) will be labeled with the contact mask. This variable  is about what happens when two buildings' bubbles are about to touch or overlap; it switches to a different kind of marking to show the boundary clearly between them, ensuring each building's space is respected.
+        input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
+        input_boundary_width (int, optional): Width in meters of boundary inner buffer around building footprints
 
     Example:
         multimasks_from_polygons(
