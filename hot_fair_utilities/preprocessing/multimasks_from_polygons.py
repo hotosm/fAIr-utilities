@@ -30,12 +30,14 @@ def multimasks_from_polygons(
     in_poly_dir,
     in_chip_dir,
     out_mask_dir,
-    input_contact_spacing=0.75,
-    input_boundary_width=0.5,
+    input_contact_spacing=8,
+    input_boundary_width=3,
 ):
     """
     Create multichannel building footprint masks from a folder of geojson files.
-    This also requires the path to the matching image chips directory.Unit of input_contact_spacing and input_boundary_width is in meter which is :
+    This also requires the path to the matching image chips directory.Unit of input_contact_spacing and input_boundary_width is in pixel which is :
+
+    ## Can not use meters for contact spacing and width because it won't maintain consistency in different zoom levels
 
     Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
@@ -44,7 +46,7 @@ def multimasks_from_polygons(
         in_chip_dir (str): Path to directory containing image chip files with names matching geojson files.
         out_mask_dir (str): Path to directory containing output SDT masks.
         input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
-        input_boundary_width (int, optional): Width in meters of boundary inner buffer around building footprints
+        input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
 
     Example:
         multimasks_from_polygons(
@@ -70,7 +72,6 @@ def multimasks_from_polygons(
 
     # construct a list of full paths to the mask files
     json_chip_mask_zips = zip(label_paths, chip_paths, mask_paths)
-    first_iteration = True
     for json_path, chip_path, mask_path in tqdm(
         json_chip_mask_zips, desc="Multimasks for input"
     ):
@@ -97,38 +98,14 @@ def multimasks_from_polygons(
 
         if crs_is_metric(gdf):
             meters = True
-            boundary_width = input_boundary_width
-            contact_spacing = input_contact_spacing
-            if first_iteration:
-                print(
-                    "Resolution (pixel width) in meter :",
-                    min(reference_im.res),
-                )
-                print(
-                    "Multimasks labels , Input boundary_width in meters :",
-                    boundary_width,
-                )
-                print(
-                    "Multimasks labels , Input contact_spacing in meters :",
-                    contact_spacing,
-                )
-                first_iteration = False
+            boundary_width = min(reference_im.res) * input_boundary_width
+            contact_spacing = min(reference_im.res) * input_contact_spacing
+
         else:
             meters = False
-            # convert meter to pixel unit
-            boundary_width = int(input_boundary_width / min(reference_im.res))
-            contact_spacing = int(input_contact_spacing / min(reference_im.res))
+            boundary_width = input_boundary_width
+            contact_spacing = input_contact_spacing
 
-            if first_iteration:
-                print(
-                    "Multimasks labels , Input boundary_width in pixel :",
-                    boundary_width,
-                )
-                print(
-                    "Multimasks labels , Input contact_spacing in pixel :",
-                    contact_spacing,
-                )
-                first_iteration = False
         # NOTE: solaris does not support multipolygon geodataframes
         # So first we call explode() to turn multipolygons into polygon dataframes
         # ignore_index=True prevents polygons from the same multipolygon from being grouped into a series. -+

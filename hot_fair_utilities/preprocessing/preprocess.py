@@ -15,8 +15,8 @@ def preprocess(
     rasterize_options=None,
     georeference_images=False,
     multimasks=False,
-    input_contact_spacing=0.75,  # only required if multimasks is set to true
-    input_boundary_width=0.5,  # only required if mulltimasks is set to true
+    input_contact_spacing=8,  # only required if multimasks is set to true
+    input_boundary_width=3,  # only required if mulltimasks is set to true
 ) -> None:
     """Fully preprocess the input data.
 
@@ -44,9 +44,9 @@ def preprocess(
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
         input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
-        input_boundary_width (int, optional): Width in meters of boundary inner buffer around building footprints
+        input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
 
-        Unit of input_contact_spacing and input_boundary_width is in meter which is :
+        Unit of input_contact_spacing and input_boundary_width is in pixel, we couldn't use meters to maintain consistency based on different zoom level as pixel resolution will be different which is :
 
         Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
