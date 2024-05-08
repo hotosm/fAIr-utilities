@@ -78,14 +78,14 @@ def run_feedback(
     epoch_size: int,
     batch_size: int,
     freeze_layers: bool = True,
-    multi_masks: bool = False,
+    multimasks: bool = False,
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
     os.environ.update(os.environ)
     os.environ["RAMP_HOME"] = model_home
     print("Starting to prepare data for training")
-    split_training_2_validation(input_path, output_path, split_training_2_validation)
+    split_training_2_validation(input_path, output_path, multimasks)
     print("Data is ready for training")
 
     apply_feedback(
@@ -94,7 +94,7 @@ def run_feedback(
         epoch_size,
         batch_size,
         freeze_layers,
-        multi_masks,
+        multimasks,
     )
     final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
     return (final_accuracy, final_model_path)
