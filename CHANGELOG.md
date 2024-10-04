@@ -1,3 +1,17 @@
+## v1.3.0 (2024-10-04)
+
+### Feat
+
+- **multimasks**: binary or multimasks option in training
+
+### Fix
+
+- **multimasks**: fix bug on inconsistency between different zoom levels
+
+### Perf
+
+- **preprocess**: accepts input in meters instead of pixel width for better user understanding
+
 ## v1.2.3 (2023-10-26)
 
 ### Fix
