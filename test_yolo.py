@@ -26,12 +26,9 @@ class print_time:
         print(f"{self.name} took {round(time.perf_counter() - self.start, 2)} seconds")
 
 
-print(
-    f"\nUsing tensorflow version {tf.__version__} with no of gpu : {len(tf.config.experimental.list_physical_devices('GPU'))}\n"
-)
-os.environ.update(os.environ)
-os.environ["RAMP_HOME"] = os.getcwd()
-print(os.environ["RAMP_HOME"])
+# os.environ.update(os.environ)
+# os.environ["RAMP_HOME"] = os.getcwd()
+# print(os.environ["RAMP_HOME"])
 
 start_time = time.time()
 base_path = f"{os.getcwd()}/ramp-data/sample_2"
