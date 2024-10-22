@@ -59,7 +59,7 @@ with print_time("yolo conversion"):
 
 output_path = train_yolo(
     data=f"{base_path}",
-    weights=f"{os.getcwd()}/weights/yolov8alb/best.pt",
+    weights=f"{os.getcwd()}/ylov8_seg_alb_best.pt",
     gpu="cpu",
     epochs=2,
     batch_size=16,
