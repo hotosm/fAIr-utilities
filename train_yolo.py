@@ -77,7 +77,7 @@ def main():
     train(**vars(opt))
 
 
-def train(data, weights, gpu, epochs, batch_size, pc, output_path):
+def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
     back = (
         "n"
         if "yolov8n" in weights
