@@ -1,11 +1,14 @@
+# Standard library imports
 import argparse
-import torch
 import os
-import ultralytics
 from pathlib import Path
 
-from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
+# Third party imports
+import torch
+import ultralytics
 
+# Reader imports
+from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
 ROOT = Path(__file__).parent.absolute()
 DATA_ROOT = str(ROOT / "ramp-training")
@@ -33,17 +36,34 @@ HYPERPARAM_CHANGES = {
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', type=str, default="0", help='GPU id')
-    parser.add_argument('--data', type=str, default=os.path.join(DATA_ROOT),
-                        help='Directory containing diractory \'yolo\' with dataset.yaml.')
-    parser.add_argument('--weights', type=str, default="yolov8n-seg.yaml",
-                        help='See https://docs.ultralytics.com/tasks/detect/#train')
-    parser.add_argument('--epochs', type=int, default=100,
-                        help='Num of training epochs. Default is 100.')
-    parser.add_argument('--batch-size', type=int, default=16,
-                        help='Number of images in a single batch.')
-    parser.add_argument('--pc', type=float, default=1.0,
-                        help='Positive weight in BCE loss. pc > 1 (pc < 1) encourages higher recall (precision)')
+    parser.add_argument("--gpu", type=str, default="0", help="GPU id")
+    parser.add_argument(
+        "--data",
+        type=str,
+        default=os.path.join(DATA_ROOT),
+        help="Directory containing diractory 'yolo' with dataset.yaml.",
+    )
+    parser.add_argument(
+        "--weights",
+        type=str,
+        default="yolov8n-seg.yaml",
+        help="See https://docs.ultralytics.com/tasks/detect/#train",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=100,
+        help="Num of training epochs. Default is 100.",
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=16, help="Number of images in a single batch."
+    )
+    parser.add_argument(
+        "--pc",
+        type=float,
+        default=1.0,
+        help="Positive weight in BCE loss. pc > 1 (pc < 1) encourages higher recall (precision)",
+    )
     opt = parser.parse_args()
     return opt
 
@@ -51,18 +71,27 @@ def parse_opt():
 def main():
     opt = parse_opt()
     os.environ["CUDA_VISIBLE_DEVICES"] = str(opt.gpu)
-    print(f"GPU available: {torch.cuda.is_available()}, GPU count: {torch.cuda.device_count()}")
+    print(
+        f"GPU available: {torch.cuda.is_available()}, GPU count: {torch.cuda.device_count()}"
+    )
     train(**vars(opt))
 
 
-def train(data, weights, gpu, epochs, batch_size, pc):
-    back = "n" if "yolov8n" in weights else "s" if "yolov8s" in weights else "m" if "yolov8m" in weights else "?"
+def train(data, weights, gpu, epochs, batch_size, pc, output_path):
+    back = (
+        "n"
+        if "yolov8n" in weights
+        else "s" if "yolov8s" in weights else "m" if "yolov8m" in weights else "?"
+    )
     data_scn = str(Path(data) / "yolo" / "dataset.yaml")
     dataset = data_scn.split("/")[-3]
     kwargs = HYPERPARAM_CHANGES
 
     print(f"Backbone: {back}, Dataset: {dataset}, Epochs: {epochs}")
     name = f"yolov8{back}-seg_{dataset}_ep{epochs}_bs{batch_size}"
+
+    if output_path:
+        name = output_path
     if float(pc) != 0.0:
         name += f"_pc{pc}"
         kwargs = {**kwargs, "pc": pc}
@@ -80,8 +109,9 @@ def train(data, weights, gpu, epochs, batch_size, pc):
         resume=resume,
         deterministic=False,
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
-        **kwargs
+        **kwargs,
     )
+    return name
 
 
 def check4checkpoint(name, weights):

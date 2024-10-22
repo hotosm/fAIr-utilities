@@ -1,13 +1,17 @@
+# Standard library imports
 import os
 import time
 import warnings
+
+# Third party imports
 import tensorflow as tf
 
-from hot_fair_utilities import preprocess, predict, polygonize
+# Reader imports
+from hot_fair_utilities import polygonize, predict, preprocess
 from hot_fair_utilities.preprocessing.yolo_format import yolo_format
 from train_yolo import train as train_yolo
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 class print_time:
@@ -41,7 +45,7 @@ with print_time("preprocessing"):
         rasterize=True,
         rasterize_options=["binary"],
         georeference_images=True,
-        multimasks=True  # new arg
+        multimasks=True,  # new arg
     )
 
 yolo_data_dir = f"{base_path}/yolo"
@@ -50,19 +54,20 @@ with print_time("yolo conversion"):
         preprocessed_dirs=preprocess_output,
         yolo_dir=yolo_data_dir,
         multimask=True,
-        p_val=0.05
+        p_val=0.05,
     )
 
-train_yolo(data=f"{base_path}",
-               weights=f"{os.getcwd()}/checkpoints/yolov8n-seg_ramp-training_ep500_bs16_deg30_pc2.0/weights/best.pt",
-               gpu="cpu",
-               epochs=2,
-               batch_size=16,
-               pc=2.0
-               )
+output_path = train_yolo(
+    data=f"{base_path}",
+    weights=f"{os.getcwd()}/weights/yolov8alb/best.pt",
+    gpu="cpu",
+    epochs=2,
+    batch_size=16,
+    pc=2.0,
+)
 
 prediction_output = f"{base_path}/prediction/output"
-model_path = f"{os.getcwd()}/checkpoints/yolov8n-seg_sample_2_ep2_bs16_pc2.0/weights/best.pt"
+model_path = f"{output_path}/weights/best.pt"
 with print_time("inference"):
     predict(
         checkpoint_path=model_path,
