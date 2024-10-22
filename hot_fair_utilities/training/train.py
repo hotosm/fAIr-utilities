@@ -14,6 +14,7 @@ def train(
     model: str,
     model_home: str,
     freeze_layers: bool = False,
+    multimasks: bool = False,
 ):
     """Trains the input image with base model
 
@@ -25,6 +26,13 @@ def train(
         batch_size: Batch size to be used for training
         model : Choose Model, Options supported are , ramp
         model_home : Model Home directory which contains necessary file in order to run model
+        freeze_layers : Either to freeze previous training knowleadge layers or not
+        multimasks : Either to use multimask labels in training or not , default : binary 0/1 , Multimaks classes include : "classes": [
+                "background",
+                "buildings",
+                "boundary",
+                "close_contact"
+            ]
     Example::
 
         final_accuracy, final_model_path = train(
@@ -51,9 +59,9 @@ def train(
         os.environ["RAMP_HOME"] = model_home
         # Print the environment variables to verify that the new variable was added
         print("Starting to prepare data for training")
-        split_training_2_validation(input_path, output_path)
+        split_training_2_validation(input_path, output_path, multimasks)
         cfg = manage_fine_tuning_config(
-            output_path, epoch_size, batch_size, freeze_layers
+            output_path, epoch_size, batch_size, freeze_layers, multimasks
         )
         print("Data is ready for training")
         run_main_train_code(cfg)
@@ -70,17 +78,23 @@ def run_feedback(
     epoch_size: int,
     batch_size: int,
     freeze_layers: bool = True,
+    multimasks: bool = False,
 ):
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
     os.environ.update(os.environ)
     os.environ["RAMP_HOME"] = model_home
     print("Starting to prepare data for training")
-    split_training_2_validation(input_path, output_path)
+    split_training_2_validation(input_path, output_path, multimasks)
     print("Data is ready for training")
 
     apply_feedback(
-        feedback_base_model, output_path, epoch_size, batch_size, freeze_layers
+        feedback_base_model,
+        output_path,
+        epoch_size,
+        batch_size,
+        freeze_layers,
+        multimasks,
     )
     final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
     return (final_accuracy, final_model_path)

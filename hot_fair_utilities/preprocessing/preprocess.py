@@ -4,6 +4,7 @@ import os
 from ..georeferencing import georeference
 from .clip_labels import clip_labels
 from .fix_labels import fix_labels
+from .multimasks_from_polygons import multimasks_from_polygons
 from .reproject_labels import reproject_labels_to_epsg3857
 from .multimasks_from_polygons import multimasks_from_polygons
 
@@ -14,7 +15,9 @@ def preprocess(
     rasterize=False,
     rasterize_options=None,
     georeference_images=False,
-    multimasks=False
+    multimasks=False,
+    input_contact_spacing=8,  # only required if multimasks is set to true
+    input_boundary_width=3,  # only required if mulltimasks is set to true
 ) -> None:
     """Fully preprocess the input data.
 
@@ -41,6 +44,13 @@ def preprocess(
             If rasterize=False, rasterize_options will be ignored.
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
+
+        input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
+        input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
+
+        Unit of input_contact_spacing and input_boundary_width is in pixel, we couldn't use meters to maintain consistency based on different zoom level as pixel resolution will be different which is :
+
+        Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
     Example::
 
@@ -88,5 +98,14 @@ def preprocess(
     os.remove(f"{output_path}/labels_epsg3857.geojson")
 
     if multimasks:
-        assert os.path.isdir(f"{output_path}/chips"), "Chips do not exist. Set georeference_images=True."
-        multimasks_from_polygons(f"{output_path}/labels", f"{output_path}/chips", f"{output_path}/multimasks")
+
+        assert os.path.isdir(
+            f"{output_path}/chips"
+        ), "Chips do not exist. Set georeference_images=True."
+        multimasks_from_polygons(
+            f"{output_path}/labels",
+            f"{output_path}/chips",
+            f"{output_path}/multimasks",
+            input_contact_spacing=input_contact_spacing,
+            input_boundary_width=input_boundary_width,
+        )
