@@ -111,11 +111,11 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
         **kwargs,
     )
-    return name
+    return weights
 
 
 def check4checkpoint(name, weights):
-    ckpt = os.path.join(LOGS_ROOT, name, "weights", "last.pt")
+    ckpt = os.path.join(LOGS_ROOT, name, "weights", "best.pt")
     if os.path.exists(ckpt):
         print(f"Set weights to {ckpt}")
         return ckpt, True

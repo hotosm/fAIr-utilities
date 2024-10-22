@@ -60,7 +60,7 @@ with print_time("yolo conversion"):
         p_val=0.05,
     )
 
-output_path = train_yolo(
+output_model_path = train_yolo(
     data=f"{base_path}",
     weights=f"{os.getcwd()}/ylov8_seg_alb_best.pt",
     gpu="cpu",
@@ -70,10 +70,10 @@ output_path = train_yolo(
 )
 
 prediction_output = f"{base_path}/prediction/output"
-model_path = f"{output_path}/weights/best.pt"
+# model_path = f"{output_path}/weights/best.pt"
 with print_time("inference"):
     predict(
-        checkpoint_path=model_path,
+        checkpoint_path=output_model_path,
         input_path=f"{base_path}/prediction/input",
         prediction_path=prediction_output,
     )
