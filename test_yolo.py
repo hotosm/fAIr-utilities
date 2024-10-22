@@ -3,6 +3,12 @@ import os
 import time
 import warnings
 
+print(os.getcwd())
+os.environ.update(os.environ)
+os.environ["RAMP_HOME"] = os.getcwd()
+print(os.environ["RAMP_HOME"])
+
+
 # Third party imports
 import tensorflow as tf
 
