@@ -18,6 +18,7 @@ from solaris.vector.mask import crs_is_metric
 from tqdm import tqdm
 
 
+
 def get_rasterio_shape_and_transform(image_path):
     # get the image shape and the affine transform to pass into df_to_px_mask.
     with rio.open(image_path) as rio_dset:
@@ -41,10 +42,12 @@ def multimasks_from_polygons(
 
     Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
 
+
     Args:
         in_poly_dir (str): Path to directory containing geojson files.
         in_chip_dir (str): Path to directory containing image chip files with names matching geojson files.
         out_mask_dir (str): Path to directory containing output SDT masks.
+
         input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
         input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
 
@@ -66,6 +69,7 @@ def multimasks_from_polygons(
     # construct the output mask file names from the chip file names.
     # these will have the same base filenames as the chip files,
     # with a mask.tif extension in place of the .tif extension.
+
     mask_paths = [
         construct_mask_filepath(out_mask_dir, chip_path) for chip_path in chip_paths
     ]
@@ -98,6 +102,7 @@ def multimasks_from_polygons(
 
         if crs_is_metric(gdf):
             meters = True
+
             boundary_width = min(reference_im.res) * input_boundary_width
             contact_spacing = min(reference_im.res) * input_contact_spacing
 
@@ -112,6 +117,7 @@ def multimasks_from_polygons(
         gdf_poly = gdf.explode(ignore_index=True)
 
         # multi_mask is a one-hot, channels-last encoded mask
+
         onehot_multi_mask = df_to_px_mask(
             df=gdf_poly,
             out_file=mask_path,
@@ -126,6 +132,7 @@ def multimasks_from_polygons(
             meters=meters,
         )
 
+
         # convert onehot_multi_mask to a sparse encoded mask
         # of shape (1,H,W) for compatibility with rasterio writer
         sparse_multi_mask = multimask_to_sparse_multimask(onehot_multi_mask)
@@ -135,6 +142,7 @@ def multimasks_from_polygons(
         with rio.open(chip_path, "r") as src:
             meta = src.meta.copy()
             meta.update(count=sparse_multi_mask.shape[0])
+
             meta.update(dtype="uint8")
             meta.update(nodata=None)
             with rio.open(mask_path, "w", **meta) as dst:

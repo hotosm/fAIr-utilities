@@ -6,6 +6,7 @@ from .clip_labels import clip_labels
 from .fix_labels import fix_labels
 from .multimasks_from_polygons import multimasks_from_polygons
 from .reproject_labels import reproject_labels_to_epsg3857
+from .multimasks_from_polygons import multimasks_from_polygons
 
 
 def preprocess(
@@ -43,6 +44,7 @@ def preprocess(
             If rasterize=False, rasterize_options will be ignored.
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
+
         input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
         input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
 
@@ -96,6 +98,7 @@ def preprocess(
     os.remove(f"{output_path}/labels_epsg3857.geojson")
 
     if multimasks:
+
         assert os.path.isdir(
             f"{output_path}/chips"
         ), "Chips do not exist. Set georeference_images=True."
