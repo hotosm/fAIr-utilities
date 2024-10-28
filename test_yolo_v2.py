@@ -53,7 +53,7 @@ with print_time("yolo conversion"):
 
 output_model_path = train_yolo(
     data=f"{base_path}",
-    weights=f"{os.getcwd()}/yolov8s_v2-seg.pt",  ## Todo : replace with finetuned ramp model checkpoint
+    weights=f"{os.getcwd()}/yolov8s_v2-seg-best.pt",  ## Todo : replace with finetuned ramp model checkpoint
     gpu="cpu",
     epochs=2,
     batch_size=16,
