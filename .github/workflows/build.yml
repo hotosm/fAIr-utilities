@@ -61,4 +61,4 @@ jobs:
 
       - name : Run test yolo
         run : |
-          python test_yolo.py
+          python test_yolo_v1.py
