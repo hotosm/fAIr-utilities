@@ -9,13 +9,10 @@ os.environ["RAMP_HOME"] = os.getcwd()
 print(os.environ["RAMP_HOME"])
 
 
-# Third party imports
-import tensorflow as tf
-
 # Reader imports
 from hot_fair_utilities import polygonize, predict, preprocess
-from hot_fair_utilities.preprocessing.yolo_format import yolo_format
-from train_yolo import train as train_yolo
+from hot_fair_utilities.preprocessing.yolov8_v1.yolo_format import yolo_format
+from hot_fair_utilities.training.yolo_v8_v1.train import train as train_yolo
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -31,10 +28,6 @@ class print_time:
     def __exit__(self, type, value, traceback):
         print(f"{self.name} took {round(time.perf_counter() - self.start, 2)} seconds")
 
-
-# os.environ.update(os.environ)
-# os.environ["RAMP_HOME"] = os.getcwd()
-# print(os.environ["RAMP_HOME"])
 
 start_time = time.time()
 base_path = f"{os.getcwd()}/ramp-data/sample_2"
@@ -62,7 +55,7 @@ with print_time("yolo conversion"):
 
 output_model_path = train_yolo(
     data=f"{base_path}",
-    weights=f"{os.getcwd()}/ylov8_seg_alb_best.pt",
+    weights=f"{os.getcwd()}/ylov8_v1_seg_best.pt",
     gpu="cpu",
     epochs=2,
     batch_size=16,

@@ -10,16 +10,13 @@ import ultralytics
 # Reader imports
 from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
-ROOT = Path(__file__).parent.absolute()
-DATA_ROOT = str(ROOT / "ramp-training")
-LOGS_ROOT = str(ROOT / "checkpoints")
+# Get environment variables with fallbacks
+ROOT = Path(os.getenv("YOLO_ROOT", Path(__file__).parent.absolute()))
+DATA_ROOT = str(Path(os.getenv("YOLO_DATA_ROOT", ROOT / "yolo-training")))
+LOGS_ROOT = str(Path(os.getenv("YOLO_LOGS_ROOT", ROOT / "checkpoints")))
 
-
-#
 # Different hyperparameters from default in YOLOv8 release models
 # https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/default.yaml
-#
-
 HYPERPARAM_CHANGES = {
     "imgsz": 256,
     "mosaic": 0.0,
@@ -31,17 +28,14 @@ HYPERPARAM_CHANGES = {
 }
 
 
-# torch.set_float32_matmul_precision("high")
-
-
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument("--gpu", type=str, default="0", help="GPU id")
     parser.add_argument(
         "--data",
         type=str,
-        default=os.path.join(DATA_ROOT),
-        help="Directory containing diractory 'yolo' with dataset.yaml.",
+        default=DATA_ROOT,  # Using the environment variable with fallback
+        help="Directory containing directory 'yolo' with dataset.yaml.",
     )
     parser.add_argument(
         "--weights",
@@ -86,10 +80,9 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
     data_scn = str(Path(data) / "yolo" / "dataset.yaml")
     dataset = data_scn.split("/")[-3]
     kwargs = HYPERPARAM_CHANGES
-
     print(f"Backbone: {back}, Dataset: {dataset}, Epochs: {epochs}")
-    name = f"yolov8{back}-seg_{dataset}_ep{epochs}_bs{batch_size}"
 
+    name = f"yolov8{back}-seg_{dataset}_ep{epochs}_bs{batch_size}"
     if output_path:
         name = output_path
     if float(pc) != 0.0:
@@ -103,7 +96,7 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
     model = yolo(weights)
     model.train(
         data=data_scn,
-        project=LOGS_ROOT,
+        project=LOGS_ROOT,  # Using the environment variable with fallback
         name=name,
         epochs=int(epochs),
         resume=resume,

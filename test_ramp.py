@@ -43,7 +43,7 @@ preprocess(
 
 # Reader imports
 # %%
-from hot_fair_utilities import train
+from hot_fair_utilities.training.ramp import train
 
 # %%
 train_output = f"{base_path}/train"

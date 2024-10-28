@@ -36,7 +36,7 @@ def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
     Returns:
         A tuple, (x_min, y_min, x_max, y_max), with coordinates in meters.
     """
-    filename = re.sub(r'\.(png|jpeg)$', '', filename)
+    filename = re.sub(r"\.(png|jpeg)$", "", filename)
     _, *tile_info = re.split("-", filename)
     x_tile, y_tile, zoom = map(int, tile_info)
 
@@ -213,7 +213,7 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
             executor.submit(download_image, url, base_path, source_name)
 
 
-def fetch_osm_data(payload: json, API_URL="https://raw-data-api0.hotosm.org/v1"):
+def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
     """
     args :
         payload : Payload request for API URL
