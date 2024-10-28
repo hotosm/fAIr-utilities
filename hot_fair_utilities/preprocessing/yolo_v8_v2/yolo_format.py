@@ -141,7 +141,7 @@ def find_files(data_folders):
 
     for folder in data_folders:
         # Pattern to match all .tif files in the current folder, including subdirectories
-        tif_pattern = f"{folder}/**/*.tif"
+        tif_pattern = f"{folder}/chips/*.tif"
 
         # Find all .tif files in the current 'training*' folder and its subdirectories
         found_tif_files = glob.glob(tif_pattern, recursive=True)
@@ -152,7 +152,7 @@ def find_files(data_folders):
                 cwps.append(file)
 
         # Pattern to match all .geojson files in the current folder, including subdirectories
-        geojson_pattern = f"{folder}/**/*.geojson"
+        geojson_pattern = f"{folder}/labels/*.geojson"
 
         # Find all .geojson files
         found_geojson_files = glob.glob(geojson_pattern, recursive=True)
@@ -165,7 +165,9 @@ def find_files(data_folders):
     lwps.sort()
 
     # Assert that the the number files for each type are the same
-    assert len(cwps) == len(lwps), "Number of tif files and label files do not match"
+    assert len(cwps) == len(
+        lwps
+    ), f"Number of {len(cwps)} tif files and {len(lwps) }label files do not match"
 
     # Function to check that the filenames match
     for n, cwp in enumerate(cwps):
