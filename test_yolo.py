@@ -11,7 +11,7 @@ print(os.environ["RAMP_HOME"])
 
 # Reader imports
 from hot_fair_utilities import polygonize, predict, preprocess
-from hot_fair_utilities.preprocessing.yolov8_v1 import yolo_format
+from hot_fair_utilities.preprocessing.yolo_v8_v1.yolo_format import yolo_format
 from hot_fair_utilities.training.yolo_v8_v1.train import train as train_yolo
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
