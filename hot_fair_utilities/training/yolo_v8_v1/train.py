@@ -23,9 +23,18 @@ HYPERPARAM_CHANGES = {
     "overlap_mask": False,
     "cls": 0.5,
     "degrees": 30.0,
+    "plots": True,
     # "optimizer": "SGD",
     # "weight_decay": 0.001,
 }
+
+# (weights): YOLO is trained from scratch instead of using pretrained weights of COCO dataset, because the data of drone imagery greatly differs from COCO images.
+# (imgsz): image size is changed from 640 to 256, to match RAMP size.
+# (mosaic): mosaic augmentations removed at all, because they did not make any sense to me to perform them on drone imagery. Mosaic augmentation can furthermore harm the final performance in some cases.
+# (mask_overlap): set False, so the masks of building footprints do not overlap with masks of building edges and borders.
+# (degrees): set to 30, it is an additional data augmentation that randomly rotates training images up to 30 degrees. Slightly improves the performance.
+# (epochs): changed from 100 to 500. This amount better reproduces the numbers reported by ultralytics on COCO dataset for yolov8n trained from scratch (for object detection task). (Ablated.)
+# (pc): new implemented option, set to 2.0, which is a weight for positive part of the classification loss, it corresponds to the `pos_weight` in BCEWithLogitsLoss. (Ablated.)
 
 
 def parse_opt():
@@ -108,7 +117,7 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
 
 
 def check4checkpoint(name, weights):
-    ckpt = os.path.join(LOGS_ROOT, name, "weights", "best.pt")
+    ckpt = os.path.join(LOGS_ROOT, name, "weights", "last.pt")
     if os.path.exists(ckpt):
         print(f"Set weights to {ckpt}")
         return ckpt, True

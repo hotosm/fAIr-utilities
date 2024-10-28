@@ -4,12 +4,13 @@ import os
 
 # Third party imports
 import numpy as np
+import yaml
 from tqdm import tqdm
 
 from .utils import convert_tif_to_jpg, write_yolo_file
 
 
-def preprocess(
+def yolo_format(
     input_path="preprocessed/*",
     output_path="ramp_data_yolo",
     seed=42,
@@ -97,6 +98,20 @@ def preprocess(
         print("Generating test images")
         for test_cwp in tqdm(test_cwps):
             convert_tif_to_jpg(test_cwp, "test", output_path)
+
+        attr = {
+            "path": output_path,
+            "train": "train/images",
+            "val": "val/images",
+            "names": {0: 1},
+        }
+        os.makedirs(os.path.join(output_path, "yolo"))
+
+        YAML_PATH = os.path.join(output_path, "yolo", "dataset.yaml")
+        print(f"Writing the data file with path={YAML_PATH}")
+        # Write the file
+        with open(YAML_PATH, "w") as f:
+            yaml.dump(attr, f)
 
     else:
         print("Data already converted")

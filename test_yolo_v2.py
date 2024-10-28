@@ -11,8 +11,8 @@ print(os.environ["RAMP_HOME"])
 
 # Reader imports
 from hot_fair_utilities import polygonize, predict, preprocess
-from hot_fair_utilities.preprocessing.yolo_v8_v1.yolo_format import yolo_format
-from hot_fair_utilities.training.yolo_v8_v1.train import train as train_yolo
+from hot_fair_utilities.preprocessing.yolo_v8_v2.yolo_format import yolo_format
+from hot_fair_utilities.training.yolo_v8_v2.train import train as train_yolo
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -41,21 +41,19 @@ with print_time("preprocessing"):
         rasterize=True,
         rasterize_options=["binary"],
         georeference_images=True,
-        multimasks=True,  # new arg
+        multimasks=False,
     )
 
 yolo_data_dir = f"{base_path}/yolo"
 with print_time("yolo conversion"):
     yolo_format(
-        preprocessed_dirs=preprocess_output,
-        yolo_dir=yolo_data_dir,
-        multimask=True,
-        p_val=0.05,
+        input_path=preprocess_output,
+        output_path=yolo_data_dir,
     )
 
 output_model_path = train_yolo(
     data=f"{base_path}",
-    weights=f"{os.getcwd()}/ylov8_v1_seg_best.pt",
+    weights=f"{os.getcwd()}/yolov8s_v2-seg.pt",  ## Todo : replace with finetuned ramp model checkpoint
     gpu="cpu",
     epochs=2,
     batch_size=16,
