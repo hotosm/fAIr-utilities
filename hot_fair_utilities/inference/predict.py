@@ -75,7 +75,7 @@ def predict(
     elif isinstance(model, YOLO):
         for idx in range(0, len(image_paths), BATCH_SIZE):
             batch = image_paths[idx:idx + BATCH_SIZE]
-            for i, r in enumerate(model(batch, stream=True, conf=confidence, verbose=False)):
+            for i, r in enumerate(model.predict(batch, stream=True, conf=confidence, verbose=False)):
                 if hasattr(r, 'masks') and r.masks is not None:  # Check for segmentation output
                     preds = r.masks.data.max(dim=0)[0]  # Take only footprint
                     preds = torch.where(preds > confidence, torch.tensor(1), torch.tensor(0))
