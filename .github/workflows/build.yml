@@ -47,7 +47,7 @@ jobs:
         run: pip install tensorflow==2.9.2
 
       - name : Install pytorch and ultralytics
-        run: pip install torch==2.4.1+cu113 torchvision==0.20.1+cu113 torchaudio==2.4.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.2.103
+        run: pip install torch==2.4.0 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.1.6
 
       - name: Install fair utilities
         run: pip install -e .
