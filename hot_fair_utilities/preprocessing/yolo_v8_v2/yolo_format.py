@@ -105,9 +105,9 @@ def yolo_format(
             "val": "val/images",
             "names": {0: 1},
         }
-        os.makedirs(os.path.join(output_path, "yolo"))
+        # os.makedirs(os.path.join(output_path, "yolo"), exist_ok=True)
 
-        YAML_PATH = os.path.join(output_path, "yolo", "dataset.yaml")
+        YAML_PATH = os.path.join(output_path, "dataset.yaml")
         print(f"Writing the data file with path={YAML_PATH}")
         # Write the file
         with open(YAML_PATH, "w") as f:
