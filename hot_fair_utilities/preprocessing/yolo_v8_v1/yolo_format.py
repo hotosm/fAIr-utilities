@@ -99,19 +99,16 @@ def yolo_format(
         "names": {i - 1: name for i, name in zip(classes, CLASS_NAMES[: len(classes)])},
         "path": str(yolo_dir.absolute()),
         "train": (
-            f"{yolo_dir.absolute()}/images/{str(preprocessed_dirs_stems[0])}/"
+            f"./images/{str(preprocessed_dirs_stems[0])}/"
             if len(preprocessed_dirs) == 1
-            else [
-                f"{yolo_dir.absolute()}/images/{str(d)}"
-                for d in preprocessed_dirs_stems
-            ]
+            else [f"./images/{str(d)}" for d in preprocessed_dirs_stems]
         ),
     }
     if len(val_dirs_stems) > 0:
         dataset["val"] = (
-            f"{yolo_dir.absolute()}/images/{str(val_dirs_stems[0])}/"
+            f"./images/{str(val_dirs_stems[0])}/"
             if len(val_dirs_stems) == 1
-            else [f"{yolo_dir.absolute()}/images/{str(d)}" for d in val_dirs_stems]
+            else [f"./images/{str(d)}" for d in val_dirs_stems]
         )
     with open(yolo_dir / "dataset.yaml", "w") as handle:
         yaml.dump(dataset, handle, default_flow_style=False)
