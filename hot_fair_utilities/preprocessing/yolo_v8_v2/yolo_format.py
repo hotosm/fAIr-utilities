@@ -101,8 +101,8 @@ def yolo_format(
 
         attr = {
             "path": output_path,
-            "train": "train/images",
-            "val": "val/images",
+            "train": "images/train",
+            "val": "images/val",
             "names": {0: 1},
         }
         # os.makedirs(os.path.join(output_path, "yolo"), exist_ok=True)
