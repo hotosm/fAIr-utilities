@@ -94,7 +94,7 @@ def yolo_format(
         val_dirs_stems = [str(p) + "_val" for p in preprocessed_dirs_stems]
         preprocessed_dirs_stems = [str(p) + "_train" for p in preprocessed_dirs_stems]
 
-    # Save dataset.yaml
+    # Save yolo_dataset.yaml
     dataset = {
         "names": {i - 1: name for i, name in zip(classes, CLASS_NAMES[: len(classes)])},
         "path": str(yolo_dir.absolute()),
@@ -110,7 +110,7 @@ def yolo_format(
             if len(val_dirs_stems) == 1
             else [f"./images/{str(d)}" for d in val_dirs_stems]
         )
-    with open(yolo_dir / "dataset.yaml", "w") as handle:
+    with open(yolo_dir / "yolo_dataset.yaml", "w") as handle:
         yaml.dump(dataset, handle, default_flow_style=False)
 
 

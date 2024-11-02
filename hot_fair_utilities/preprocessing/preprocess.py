@@ -18,6 +18,7 @@ def preprocess(
     multimasks=False,
     input_contact_spacing=8,  # only required if multimasks is set to true
     input_boundary_width=3,  # only required if mulltimasks is set to true
+    epsg=3857,
 ) -> None:
     """Fully preprocess the input data.
 
@@ -63,6 +64,7 @@ def preprocess(
         )
     """
     # Check if rasterizing options are valid
+    assert epsg in (4326,3857),"Projection not supported"
     if rasterize:
         assert (
             rasterize_options is not None
@@ -80,22 +82,23 @@ def preprocess(
     os.makedirs(output_path, exist_ok=True)
 
     if georeference_images:
-        georeference(input_path, f"{output_path}/chips")
+        georeference(input_path, f"{output_path}/chips",epsg=epsg)
 
     fix_labels(
         f"{input_path}/labels.geojson",
         f"{output_path}/corrected_labels.geojson",
     )
+    if epsg==3857:
+        reproject_labels_to_epsg3857(
+            f"{output_path}/corrected_labels.geojson",
+            f"{output_path}/labels_epsg3857.geojson",
+        )
 
-    reproject_labels_to_epsg3857(
-        f"{output_path}/corrected_labels.geojson",
-        f"{output_path}/labels_epsg3857.geojson",
-    )
-
-    clip_labels(input_path, output_path, rasterize, rasterize_options)
+    clip_labels(input_path, output_path, rasterize, rasterize_options,all_geojson_file=f"{output_path}/corrected_labels.geojson" if epsg==4326 else f"{output_path}/labels_epsg3857.geojson",epsg=epsg)
 
     os.remove(f"{output_path}/corrected_labels.geojson")
-    os.remove(f"{output_path}/labels_epsg3857.geojson")
+    if epsg==3857:
+        os.remove(f"{output_path}/labels_epsg3857.geojson")
 
     if multimasks:
 

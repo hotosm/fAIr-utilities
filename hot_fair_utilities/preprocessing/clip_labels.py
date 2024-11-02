@@ -13,7 +13,7 @@ from ..utils import get_bounding_box
 
 
 def clip_labels(
-    input_path: str, output_path: str, rasterize=False, rasterize_options=None
+    input_path: str, output_path: str, rasterize=False, rasterize_options=None,all_geojson_file=None,epsg=3857
 ) -> None:
     """Clip and rasterize the GeoJSON labels for each aerial image.
 
@@ -71,11 +71,14 @@ def clip_labels(
         glob(f"{input_path}/*.png"), desc=f"Clipping labels for {Path(input_path).stem}"
     ):
         filename = Path(path).stem
-        geojson_file_all_labels = f"{output_path}/labels_epsg3857.geojson"
+        if all_geojson_file:
+            geojson_file_all_labels=all_geojson_file
+        else : 
+            geojson_file_all_labels = f"{output_path}/labels_epsg3857.geojson"
         clipped_geojson_file = f"{output_geojson_path}/{filename}.geojson"
 
         # Bounding box as a tuple
-        x_min, y_min, x_max, y_max = get_bounding_box(filename)
+        x_min, y_min, x_max, y_max = get_bounding_box(filename,epsg=epsg)
         # Bounding box as a polygon
         bounding_box_polygon = box(x_min, y_min, x_max, y_max)
 
@@ -87,7 +90,7 @@ def clip_labels(
             gdf_clipped.to_file(clipped_geojson_file)
         else:
             schema = {"geometry": "Polygon", "properties": {"id": "int"}}
-            crs = "EPSG:3857"
+            crs = f"EPSG:{epsg}"
             gdf_clipped.to_file(clipped_geojson_file, schema=schema, crs=crs)
 
         # Rasterizing

@@ -11,7 +11,7 @@ from tqdm import tqdm
 from .utils import get_bounding_box
 
 
-def georeference(input_path: str, output_path: str, is_mask=False) -> None:
+def georeference(input_path: str, output_path: str, is_mask=False,epsg=3857) -> None:
     """Perform georeferencing and remove the fourth band from images (if any).
 
     CRS of the georeferenced images will be EPSG:3857 ('WGS 84 / Pseudo-Mercator').
@@ -38,7 +38,7 @@ def georeference(input_path: str, output_path: str, is_mask=False) -> None:
         out_file = f"{output_path}/{filename}.tif"
 
         # Get bounding box in EPSG:3857
-        x_min, y_min, x_max, y_max = get_bounding_box(filename)
+        x_min, y_min, x_max, y_max = get_bounding_box(filename,epsg=epsg)
 
         # Use one band for masks and the first three bands for images
         bands = [1] if is_mask else [1, 2, 3]
@@ -51,7 +51,7 @@ def georeference(input_path: str, output_path: str, is_mask=False) -> None:
             format="GTiff",
             bandList=bands,
             outputBounds=[x_min, y_max, x_max, y_min],
-            outputSRS="EPSG:3857",
+            outputSRS=f"EPSG:{epsg}",
         )
         # Close dataset
         _ = None

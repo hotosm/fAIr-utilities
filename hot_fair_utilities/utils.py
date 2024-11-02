@@ -26,7 +26,7 @@ def get_prefix(path: str) -> str:
     return os.path.splitext(filename)[0]
 
 
-def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
+def get_bounding_box(filename: str,epsg=3857) -> Tuple[float, float, float, float]:
     """Get the EPSG:3857 coordinates of bounding box for the OAM image.
 
     This function gives the coordinates of lower left and upper right
@@ -49,7 +49,8 @@ def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
     gdf_4326 = geopandas.GeoDataFrame({"geometry": [box_4326]}, crs="EPSG:4326")
 
     # Reproject to EPSG:3857
-    gdf_3857 = gdf_4326.to_crs("EPSG:3857")
+
+    gdf_3857 = gdf_4326.to_crs(f"EPSG:{epsg}")
 
     # Bounding box in EPSG:3857 as a tuple (x_min, y_min, x_max, y_max)
     box_3857 = gdf_3857.iloc[0, 0].bounds

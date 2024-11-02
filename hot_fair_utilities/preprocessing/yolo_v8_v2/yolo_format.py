@@ -6,7 +6,7 @@ import os
 import numpy as np
 import yaml
 from tqdm import tqdm
-
+import shutil
 from .utils import convert_tif_to_jpg, write_yolo_file
 
 
@@ -68,53 +68,53 @@ def yolo_format(
     print(f"Test array size: {len(test_cwps)}\n")
 
     # Check if the YOLO folder exists, if not create labels, images, and folders
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
+    if  os.path.exists(output_path):
+        shutil.rmtree(output_path)
 
-        # Write the YOLO label files for the training set
-        print("Generating training labels")
-        for train_cwp in tqdm(train_cwps):
-            write_yolo_file(train_cwp, "train", output_path)
+    os.makedirs(output_path)
 
-        # Write the YOLO label files for the validation set
-        print("Generating validation labels")
-        for val_cwp in tqdm(val_cwps):
-            write_yolo_file(val_cwp, "val", output_path)
+    # Write the YOLO label files for the training set
+    print("Generating training labels")
+    for train_cwp in tqdm(train_cwps):
+        write_yolo_file(train_cwp, "train", output_path)
 
-        # Write the YOLO label files for the test set
-        print("Generating test labels")
-        for test_cwp in tqdm(test_cwps):
-            write_yolo_file(test_cwp, "test", output_path)
+    # Write the YOLO label files for the validation set
+    print("Generating validation labels")
+    for val_cwp in tqdm(val_cwps):
+        write_yolo_file(val_cwp, "val", output_path)
 
-        # Convert the chip files to JPEG format
-        print("Generating training images")
-        for train_cwp in tqdm(train_cwps):
-            convert_tif_to_jpg(train_cwp, "train", output_path)
+    # Write the YOLO label files for the test set
+    print("Generating test labels")
+    for test_cwp in tqdm(test_cwps):
+        write_yolo_file(test_cwp, "test", output_path)
 
-        print("Generating validation images")
-        for val_cwp in tqdm(val_cwps):
-            convert_tif_to_jpg(val_cwp, "val", output_path)
+    # Convert the chip files to JPEG format
+    print("Generating training images")
+    for train_cwp in tqdm(train_cwps):
+        convert_tif_to_jpg(train_cwp, "train", output_path)
 
-        print("Generating test images")
-        for test_cwp in tqdm(test_cwps):
-            convert_tif_to_jpg(test_cwp, "test", output_path)
+    print("Generating validation images")
+    for val_cwp in tqdm(val_cwps):
+        convert_tif_to_jpg(val_cwp, "val", output_path)
 
-        attr = {
-            "path": output_path,
-            "train": "images/train",
-            "val": "images/val",
-            "names": {0: 1},
-        }
-        # os.makedirs(os.path.join(output_path, "yolo"), exist_ok=True)
+    print("Generating test images")
+    for test_cwp in tqdm(test_cwps):
+        convert_tif_to_jpg(test_cwp, "test", output_path)
 
-        YAML_PATH = os.path.join(output_path, "dataset.yaml")
-        print(f"Writing the data file with path={YAML_PATH}")
-        # Write the file
-        with open(YAML_PATH, "w") as f:
-            yaml.dump(attr, f)
+    attr = {
+        "path": output_path,
+        "train": "images/train",
+        "val": "images/val",
+        "names": {0: 1},
+    }
+    # os.makedirs(os.path.join(output_path, "yolo"), exist_ok=True)
 
-    else:
-        print("Data already converted")
+    YAML_PATH = os.path.join(output_path, "yolo_dataset.yaml")
+    print(f"Writing the data file with path={YAML_PATH}")
+    # Write the file
+    with open(YAML_PATH, "w") as f:
+        yaml.dump(attr, f)
+
 
 
 def find_files(data_folders):

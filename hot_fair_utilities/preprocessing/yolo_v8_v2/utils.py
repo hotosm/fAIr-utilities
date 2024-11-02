@@ -200,6 +200,10 @@ def convert_coordinates(coordinates, geo_dict):
     return coordinates
 
 
+
+
+
+
 def write_yolo_file(iwp, folder, output_path, class_index=0):
     """
     Writes YOLO label file based on the given image with path and class index.
@@ -217,10 +221,7 @@ def write_yolo_file(iwp, folder, output_path, class_index=0):
     lwp = iwp.replace(".tif", ".geojson").replace("chips", "labels")
 
     # Create the YOLO label filename with path from the chip filename with path
-    ywp = os.path.join(output_path, iwp.split("/")[-1].replace(".tif", ".txt")).replace(
-        "folder", folder
-    )
-
+    ywp = os.path.join(output_path,'labels',folder, os.path.basename(iwp).replace(".tif", ".txt"))
     # Create the YOLO label folder if it does not exist
     os.makedirs(os.path.dirname(ywp), exist_ok=True)
 

@@ -12,7 +12,6 @@ from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
 ROOT = Path(os.getenv("YOLO_ROOT", Path(__file__).parent.absolute()))
 DATA_ROOT = str(Path(os.getenv("YOLO_DATA_ROOT", ROOT / "yolo-training")))
-LOGS_ROOT = str(Path(os.getenv("YOLO_LOGS_ROOT", ROOT / "checkpoints")))
 
 
 HYPERPARAM_CHANGES = {
@@ -52,20 +51,19 @@ HYPERPARAM_CHANGES = {
 }
 
 
-def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
+def train(data, weights, gpu, epochs, batch_size, pc, output_path, dataset_yaml_path):
     back = (
         "n"
         if "yolov8n" in weights
         else "s" if "yolov8s" in weights else "m" if "yolov8m" in weights else "?"
     )
-    data_scn = str(Path(data) / "yolo" / "dataset.yaml")
+    data_scn = dataset_yaml_path
     dataset = data_scn.split("/")[-3]
     kwargs = HYPERPARAM_CHANGES
     print(f"Backbone: {back}, Dataset: {dataset}, Epochs: {epochs}")
 
     name = f"yolov8{back}-seg_{dataset}_ep{epochs}_bs{batch_size}"
-    if output_path:
-        name = output_path
+
     if float(pc) != 0.0:
         name += f"_pc{pc}"
         kwargs = {**kwargs, "pc": pc}
@@ -73,11 +71,11 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
     else:
         yolo = ultralytics.YOLO
 
-    weights, resume = check4checkpoint(name, weights)
+    weights, resume = check4checkpoint(name, weights,output_path)
     model = yolo(weights)
     model.train(
         data=data_scn,
-        project=LOGS_ROOT,  # Using the environment variable with fallback
+        project=os.path.join(output_path,"checkpoints"),  # Using the environment variable with fallback
         name=name,
         epochs=int(epochs),
         resume=resume,
@@ -88,8 +86,8 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path=None):
     return weights
 
 
-def check4checkpoint(name, weights):
-    ckpt = os.path.join(LOGS_ROOT, name, "weights", "last.pt")
+def check4checkpoint(name, weights,output_path):
+    ckpt = os.path.join(os.path.join(output_path,"checkpoints"), name, "weights", "last.pt")
     if os.path.exists(ckpt):
         print(f"Set weights to {ckpt}")
         return ckpt, True

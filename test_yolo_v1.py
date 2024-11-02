@@ -6,7 +6,7 @@ import warnings
 print(os.getcwd())
 os.environ.update(os.environ)
 os.environ["RAMP_HOME"] = os.getcwd()
-print(os.environ["RAMP_HOME"])
+
 
 
 # Reader imports
@@ -44,7 +44,7 @@ with print_time("preprocessing"):
         multimasks=True,  # new arg
     )
 
-yolo_data_dir = f"{base_path}/yolo"
+yolo_data_dir = f"{base_path}/yolo_v1"
 with print_time("yolo conversion"):
     yolo_format(
         preprocessed_dirs=preprocess_output,
@@ -60,6 +60,9 @@ output_model_path = train_yolo(
     epochs=2,
     batch_size=16,
     pc=2.0,
+    output_path=yolo_data_dir,
+    dataset_yaml_path=os.path.join(yolo_data_dir,'yolo_dataset.yaml')
+
 )
 
 prediction_output = f"{base_path}/prediction/output"
