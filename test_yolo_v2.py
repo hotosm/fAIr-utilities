@@ -43,7 +43,7 @@ with print_time("preprocessing"):
         epsg=4326
     )
 
-yolo_data_dir = f"{base_path}/yolo_v1"
+yolo_data_dir = f"{base_path}/yolo_v2"
 with print_time("yolo conversion"):
     yolo_format(
         input_path=preprocess_output,

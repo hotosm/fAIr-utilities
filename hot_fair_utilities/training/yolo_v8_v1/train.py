@@ -88,6 +88,7 @@ def train(
     batch_size=8,
     pc=2.0,
     output_path=None,
+    dataset_yaml_path=None,
 ):
     back = (
         "n"
