@@ -51,7 +51,7 @@ HYPERPARAM_CHANGES = {
 }
 
 
-def train(data, weights, gpu, epochs, batch_size, pc, output_path, dataset_yaml_path):
+def train(data, weights, epochs, batch_size, pc, output_path, dataset_yaml_path,gpu=("cuda" if torch.cuda.is_available() else "cpu"),):
     back = (
         "n"
         if "yolov8n" in weights
@@ -83,7 +83,10 @@ def train(data, weights, gpu, epochs, batch_size, pc, output_path, dataset_yaml_
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
         **kwargs,
     )
-    return weights
+
+    # metrics = model.val(save_json=True, plots=True)
+    # print(model.val())
+    return  os.path.join(os.path.join(output_path,"checkpoints"), name, "weights", "best.pt")
 
 
 def check4checkpoint(name, weights,output_path):
