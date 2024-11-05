@@ -53,10 +53,10 @@ with print_time("yolo conversion"):
         p_val=0.05,
     )
 
-output_model_path = train_yolo(
+output_model_path,output_model_iou_accuracy = train_yolo(
     data=f"{base_path}",
     weights=f"{os.getcwd()}/yolov8s_v1-seg-best.pt",
-    gpu="cpu",
+    # gpu="cpu",
     epochs=2,
     batch_size=16,
     pc=2.0,
@@ -64,6 +64,7 @@ output_model_path = train_yolo(
     dataset_yaml_path=os.path.join(yolo_data_dir,'yolo_dataset.yaml')
 
 )
+print(output_model_iou_accuracy)
 
 prediction_output = f"{base_path}/prediction/output"
 # model_path = f"{output_path}/weights/best.pt"

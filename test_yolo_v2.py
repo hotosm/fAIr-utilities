@@ -2,6 +2,7 @@
 import os
 import time
 import warnings
+import ultralytics
 
 os.environ.update(os.environ)
 os.environ["RAMP_HOME"] = os.getcwd()
@@ -50,18 +51,17 @@ with print_time("yolo conversion"):
         output_path=yolo_data_dir,
     )
 
-output_model_path = train_yolo(
+output_model_path,output_model_iou_accuracy = train_yolo(
     data=f"{base_path}",
-    weights=f"{os.getcwd()}/yolov8s_v2-seg.pt",  ## Todo : replace with finetuned ramp model checkpoint
-    gpu="cpu",
+    weights=f"{os.getcwd()}/yolov8s_v2-seg.pt", 
+    # gpu="cpu",
     epochs=2,
     batch_size=16,
     pc=2.0,
     output_path=yolo_data_dir,
     dataset_yaml_path=os.path.join(yolo_data_dir,'yolo_dataset.yaml')
 )
-
-print(output_model_path)
+print(output_model_iou_accuracy)
 
 prediction_output = f"{base_path}/prediction/output"
 # model_path = f"{output_path}/weights/best.pt"

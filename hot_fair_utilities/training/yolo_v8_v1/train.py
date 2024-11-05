@@ -9,7 +9,7 @@ import ultralytics
 
 # Reader imports
 from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
-
+from ...utils import compute_iou_chart_from_yolo_results, get_yolo_iou_metrics
 # Get environment variables with fallbacks
 ROOT = Path(os.getenv("YOLO_ROOT", Path(__file__).parent.absolute()))
 DATA_ROOT = str(Path(os.getenv("YOLO_DATA_ROOT", ROOT / "yolo-training")))
@@ -121,7 +121,14 @@ def train(
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
         **kwargs,
     )
-    return weights
+    compute_iou_chart_from_yolo_results(results_csv_path=os.path.join(output_path,"checkpoints", name,'results.csv'),results_output_chart_path=os.path.join(output_path,"checkpoints", name,'iou_chart.png'))
+    
+    output_model_path=os.path.join(os.path.join(output_path,"checkpoints"), name, "weights", "best.pt")
+
+    iou_model_accuracy=get_yolo_iou_metrics(output_model_path)
+
+    return  output_model_path,iou_model_accuracy
+
 
 
 def check4checkpoint(name, weights,output_path):

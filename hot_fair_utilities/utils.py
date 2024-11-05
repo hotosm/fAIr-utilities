@@ -5,12 +5,15 @@ import json
 import math
 import os
 import re
+import ultralytics
+
 import time
 import urllib.request
 import zipfile
 from glob import glob
 from typing import Tuple
-
+import pandas as pd 
+import matplotlib.pyplot as plt
 # Third party imports
 # Third-party imports
 import geopandas
@@ -251,3 +254,45 @@ def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/
         with zip_ref.open("Export.geojson") as file:
             my_export_geojson = json.loads(file.read())
     return my_export_geojson
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def compute_iou_chart_from_yolo_results(results_csv_path,results_output_chart_path):
+
+    data = pd.read_csv(results_csv_path)
+
+
+    data['IoU(M)'] = 1 / (
+        1 / data['metrics/precision(M)'] + 1 / data['metrics/recall(M)'] - 1
+    )
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(data['epoch'], data['IoU(M)'], label='IoU (Mask)')
+    plt.xlabel('Epoch')
+    plt.xticks(data['epoch'].astype(int))
+    plt.ylabel('IoU')
+    plt.title('IoU over Epochs')
+    plt.legend()
+    plt.grid()
+
+    plt.savefig(results_output_chart_path)
+    return results_output_chart_path
+
+
+def get_yolo_iou_metrics(model_path):
+
+    model_val = ultralytics.YOLO(model_path)
+    model_val_metrics = (
+        model_val.val().results_dict
+    )  ### B and M denotes bounding box and mask respectively
+    # print(metrics)
+    iou_accuracy = 1 / (
+        1 / model_val_metrics["metrics/precision(M)"]
+        + 1 / model_val_metrics["metrics/recall(M)"]
+        - 1
+    )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
+    final_accuracy = iou_accuracy * 100
+    return final_accuracy
