@@ -1,0 +1,36 @@
+name: Build and Publish to TestPyPI
+
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Remove solaris
+        run: |
+          sudo rm -rf docker
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+
+      - name: Build package
+        run: python setup.py sdist
+
+      - name: Publish to TestPyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_API_TOKEN }}
+        run: twine upload --repository-url https://test.pypi.org/legacy/ dist/*
