@@ -8,7 +8,7 @@ os.environ.update(os.environ)
 os.environ["RAMP_HOME"] = os.getcwd()
 
 
-# Reader imports
+# Reader import
 from hot_fair_utilities import polygonize, predict, preprocess
 from hot_fair_utilities.preprocessing.yolo_v8_v2.yolo_format import yolo_format
 from hot_fair_utilities.training.yolo_v8_v2.train import train as train_yolo
