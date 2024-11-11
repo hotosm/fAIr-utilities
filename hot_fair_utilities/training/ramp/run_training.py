@@ -353,7 +353,7 @@ def run_main_train_code(cfg):
 
     plt.legend()
     plt.savefig(
-        f"{cfg['graph_location']}/training_validation_sparse_categorical_accuracy.png"
+        f"{cfg['graph_location']}/training_accuracy.png"
     )
     plt.clf()
     print(f"Graph generated at : {cfg['graph_location']}")
