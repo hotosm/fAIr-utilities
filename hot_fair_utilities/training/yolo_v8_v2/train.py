@@ -10,8 +10,8 @@ from ...utils import get_yolo_iou_metrics,compute_iou_chart_from_yolo_results
 # Reader imports
 from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
-ROOT = Path(os.getenv("YOLO_ROOT", Path(__file__).parent.absolute()))
-DATA_ROOT = str(Path(os.getenv("YOLO_DATA_ROOT", ROOT / "yolo-training")))
+# ROOT = Path(os.getenv("YOLO_ROOT", Path(__file__).parent.absolute()))
+# DATA_ROOT = str(Path(os.getenv("YOLO_DATA_ROOT", ROOT / "yolo-training")))
 
 
 HYPERPARAM_CHANGES = {
@@ -80,6 +80,7 @@ def train(data, weights, epochs, batch_size, pc, output_path, dataset_yaml_path,
         epochs=int(epochs),
         resume=resume,
         deterministic=False,
+        save_dir= os.path.join(output_path),
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
         **kwargs,
     )
