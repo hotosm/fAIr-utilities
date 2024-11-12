@@ -118,6 +118,7 @@ def train(
         epochs=int(epochs),
         resume=resume,
         deterministic=False,
+        verbose=True,
         save_dir= os.path.join(output_path),
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
         **kwargs,
