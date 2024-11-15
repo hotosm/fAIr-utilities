@@ -71,4 +71,4 @@ def merge_polygons(polygons_path, new_polygons_path, distance_threshold):
             features.append(feature)
 
     gs = GeoSeries(features).set_crs(SOURCE_CRS)
-    gs.simplify(TOLERANCE).to_file(new_polygons_path)
+    gs.simplify(TOLERANCE).to_file(new_polygons_path, driver="GeoJSON")

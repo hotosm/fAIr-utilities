@@ -1,12 +1,21 @@
 # Patched from ramp-code.scripts.calculate_accuracy.iou created for ramp project by carolyn.johnston@dev.global
 
+# Standard library imports
 from pathlib import Path
+
+# Third party imports
 import geopandas as gpd
 
-from ramp.utils.eval_utils import get_iou_accuracy_metrics
+try:
+    # Third party imports
+    from ramp.utils.eval_utils import get_iou_accuracy_metrics
+except ImportError:
+    print("Ramp eval metrics are not available, Possibly ramp is not installed")
 
 
-def evaluate(test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verbose=False):
+def evaluate(
+    test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verbose=False
+):
     """
     Calculate precision/recall/F1-score based on intersection-over-union accuracy evaluation protocol defined by RAMP.
 
@@ -29,9 +38,9 @@ def evaluate(test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verb
     truth_df, test_df = gpd.read_file(str(truth_path)), gpd.read_file(str(test_path))
     metrics = get_iou_accuracy_metrics(test_df, truth_df, filter_area_m2, iou_threshold)
 
-    n_detections = metrics['n_detections']
+    n_detections = metrics["n_detections"]
     n_truth = metrics["n_truth"]
-    n_truepos = metrics['true_pos']
+    n_truepos = metrics["true_pos"]
     n_falsepos = n_detections - n_truepos
     n_falseneg = n_truth - n_truepos
     agg_precision = n_truepos / n_detections

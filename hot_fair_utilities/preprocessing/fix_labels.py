@@ -33,4 +33,4 @@ def fix_labels(input_path: str, output_path: str) -> None:
     if gdf.empty:
         raise ValueError("Error: gdf is empty, No Labels found : Check your labels")
     gdf["geometry"] = gdf.apply(remove_self_intersection, axis=1)
-    gdf.to_file(output_path)
+    gdf.to_file(output_path, driver="GeoJSON")

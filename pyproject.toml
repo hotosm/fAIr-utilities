@@ -2,6 +2,10 @@
 requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["hot_fair_utilities"]
+
+
 [project]
 name = "hot-fair-utilities"
 version = "2.0.0"
@@ -18,7 +22,7 @@ keywords = [
     "postprocessing", "stitching","training"
 ]
 dependencies = [
-    "shapely==1.8.0", "GDAL", "numpy", 
+    "shapely==1.8.0","GDAL", "numpy", 
     "Pillow==9.1", "geopandas<=0.14.5","pandas==2.2.0", 
     "rasterio", "mercantile==1.2.1", "tqdm==4.64.0", 
     "rtree","opencv-python-headless<=4.9.0.80",

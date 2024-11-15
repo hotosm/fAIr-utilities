@@ -1,5 +1,7 @@
+# Standard library imports
 import collections
 
+# Third party imports
 from geopandas import GeoSeries
 from shapely.geometry import MultiPolygon, Polygon
 from shapely.ops import unary_union
@@ -75,4 +77,4 @@ class BuildingExtract(object):
                 self.features.append(feature)
 
     def save(self, out):
-        GeoSeries(self.features).set_crs(CRS).to_file(out)
+        GeoSeries(self.features).set_crs(CRS).to_file(out, driver="GeoJSON")
