@@ -1,9 +1,7 @@
 name: Build and Publish to TestPyPI
-
 on:
-  pull_request:
-    branches:
-      - master
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
