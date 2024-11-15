@@ -1,3 +1,13 @@
+## v3.0.0 (2024-11-15)
+
+### Feat
+
+- **yololib**: adds lib required for packaging yolo code
+
+### Fix
+
+- **bundlelib**: bundles lib itself with new pandas version
+
 ## v2.0.0 (2024-11-15)
 
 ### Feat
