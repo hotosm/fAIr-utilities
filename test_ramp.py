@@ -19,7 +19,7 @@ print(os.environ["RAMP_HOME"])
 start_time = time.time()
 # Third party imports
 # %%
-import ramp.utils
+# import ramp.utils
 
 # Reader imports
 import hot_fair_utilities
