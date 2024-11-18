@@ -4,9 +4,7 @@ import os
 from ..georeferencing import georeference
 from .clip_labels import clip_labels
 from .fix_labels import fix_labels
-from .multimasks_from_polygons import multimasks_from_polygons
 from .reproject_labels import reproject_labels_to_epsg3857
-from .multimasks_from_polygons import multimasks_from_polygons
 
 
 def preprocess(
@@ -64,7 +62,7 @@ def preprocess(
         )
     """
     # Check if rasterizing options are valid
-    assert epsg in (4326,3857),"Projection not supported"
+    assert epsg in (4326, 3857), "Projection not supported"
     if rasterize:
         assert (
             rasterize_options is not None
@@ -82,25 +80,37 @@ def preprocess(
     os.makedirs(output_path, exist_ok=True)
 
     if georeference_images:
-        georeference(input_path, f"{output_path}/chips",epsg=epsg)
+        georeference(input_path, f"{output_path}/chips", epsg=epsg)
 
     fix_labels(
         f"{input_path}/labels.geojson",
         f"{output_path}/corrected_labels.geojson",
     )
-    if epsg==3857:
+    if epsg == 3857:
         reproject_labels_to_epsg3857(
             f"{output_path}/corrected_labels.geojson",
             f"{output_path}/labels_epsg3857.geojson",
         )
 
-    clip_labels(input_path, output_path, rasterize, rasterize_options,all_geojson_file=f"{output_path}/corrected_labels.geojson" if epsg==4326 else f"{output_path}/labels_epsg3857.geojson",epsg=epsg)
+    clip_labels(
+        input_path,
+        output_path,
+        rasterize,
+        rasterize_options,
+        all_geojson_file=(
+            f"{output_path}/corrected_labels.geojson"
+            if epsg == 4326
+            else f"{output_path}/labels_epsg3857.geojson"
+        ),
+        epsg=epsg,
+    )
 
     os.remove(f"{output_path}/corrected_labels.geojson")
-    if epsg==3857:
+    if epsg == 3857:
         os.remove(f"{output_path}/labels_epsg3857.geojson")
 
     if multimasks:
+        from .multimasks_from_polygons import multimasks_from_polygons
 
         assert os.path.isdir(
             f"{output_path}/chips"
