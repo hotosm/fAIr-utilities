@@ -1,7 +1,7 @@
 # Third party imports
 import geopandas
 from shapely.validation import explain_validity, make_valid
-
+import os
 
 def remove_self_intersection(row):
     """Fix self-intersections in the polygons.
@@ -29,7 +29,8 @@ def fix_labels(input_path: str, output_path: str) -> None:
         input_path: Path to the GeoJSON file where the input data are stored.
         output_path: Path to the GeoJSON file where the output data will go.
     """
-    gdf = geopandas.read_file(input_path)
+    gdf = geopandas.read_file(os.path.relpath(input_path))
+    # print(gdf)
     if gdf.empty:
         raise ValueError("Error: gdf is empty, No Labels found : Check your labels")
     gdf["geometry"] = gdf.apply(remove_self_intersection, axis=1)

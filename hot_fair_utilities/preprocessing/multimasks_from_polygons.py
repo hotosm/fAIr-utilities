@@ -2,7 +2,7 @@
 
 # Standard library imports
 from pathlib import Path
-
+import os
 # Third party imports
 import geopandas as gpd
 import rasterio as rio
@@ -88,7 +88,7 @@ def multimasks_from_polygons(
         # workaround for bug in solaris
         mask_shape, mask_transform = get_rasterio_shape_and_transform(chip_path)
 
-        gdf = gpd.read_file(json_path)
+        gdf = gpd.read_file(os.path.relpath(json_path))
 
         # remove empty and null geometries
         gdf = gdf[~gdf["geometry"].isna()]

@@ -90,7 +90,7 @@ def clip_labels(
 
         # Read all labels into a GeoDataFrame, clip it and
         # write to GeoJSON
-        gdf_all_labels = geopandas.read_file(geojson_file_all_labels)
+        gdf_all_labels = geopandas.read_file(os.path.relpath(geojson_file_all_labels))
         gdf_clipped = gdf_all_labels.clip(bounding_box_polygon)
         if len(gdf_clipped) > 0:
             gdf_clipped.to_file(clipped_geojson_file, driver="GeoJSON")
