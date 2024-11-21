@@ -2,9 +2,13 @@
 requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["hot_fair_utilities"]
+
+
 [project]
 name = "hot-fair-utilities"
-version = "1.3.0"
+version = "3.0.0"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
@@ -18,10 +22,12 @@ keywords = [
     "postprocessing", "stitching","training"
 ]
 dependencies = [
-    "shapely==1.8.0", "GDAL", "numpy", 
-    "Pillow==9.0.1", "geopandas<=0.14.5","pandas==1.5.3", 
-    "rasterio", "mercantile==1.2.1", "tqdm==4.62.3", 
-    "rtree", "opencv-python==4.5.5.64","opencv-python-headless<=4.7.0.68","ramp-fair==0.1.2"
+    "shapely==1.8.0","GDAL", "numpy", 
+    "Pillow==9.1.0", "geopandas==0.14.4","pandas==2.2.3", 
+    "rasterio", "mercantile==1.2.1", "tqdm==4.67.0", 
+    "rtree","opencv-python-headless<=4.10.0.84",
+    "torch==2.5.1", "torchvision==0.20.1", "torchaudio==2.5.1","ultralytics==8.3.26",
+    "ramp-fair==0.1.2"
 ]
 requires-python = ">=3.7"
 

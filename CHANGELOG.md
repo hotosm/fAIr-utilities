@@ -1,3 +1,26 @@
+## v3.0.0 (2024-11-15)
+
+### Feat
+
+- **yololib**: adds lib required for packaging yolo code
+
+### Fix
+
+- **bundlelib**: bundles lib itself with new pandas version
+
+## v2.0.0 (2024-11-15)
+
+### Feat
+
+- **yololib**: adds lib required for packaging yolo code
+- replace FastSAM with YOLO including training
+- add FastSAM inference
+
+### Fix
+
+- **postprocessing/utils**: resolve OAM-x-y-z.mask.tif
+- **predict**: support both .png and .tif in inference
+
 ## v1.3.0 (2024-10-04)
 
 ### Feat

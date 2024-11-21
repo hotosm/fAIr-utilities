@@ -12,7 +12,7 @@ from ultralytics import YOLO
 
 from ..georeferencing import georeference
 from ..utils import remove_files
-from .utils import open_images, save_mask, initialize_model
+from .utils import initialize_model, open_images, save_mask
 
 BATCH_SIZE = 8
 IMAGE_SIZE = 256
@@ -20,7 +20,11 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def predict(
-    checkpoint_path: str, input_path: str, prediction_path: str, confidence: float = 0.5, remove_images=True
+    checkpoint_path: str,
+    input_path: str,
+    prediction_path: str,
+    confidence: float = 0.5,
+    remove_images=True,
 ) -> None:
     """Predict building footprints for aerial images given a model checkpoint.
 
@@ -46,7 +50,7 @@ def predict(
     """
     start = time.time()
     print(f"Using : {checkpoint_path}")
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = initialize_model(checkpoint_path, device=device)
     print(f"It took {round(time.time()-start)} sec to load model")
     start = time.time()
@@ -74,14 +78,24 @@ def predict(
                 )
     elif isinstance(model, YOLO):
         for idx in range(0, len(image_paths), BATCH_SIZE):
-            batch = image_paths[idx:idx + BATCH_SIZE]
-            for i, r in enumerate(model(batch, stream=True, conf=confidence, verbose=False)):
-                if r.masks is None:
-                    preds = np.zeros((IMAGE_SIZE, IMAGE_SIZE,), dtype=np.float32)
+            batch = image_paths[idx : idx + BATCH_SIZE]
+            for i, r in enumerate(
+                model.predict(batch, conf=confidence, imgsz=IMAGE_SIZE, verbose=False)
+            ):
+                if hasattr(r, "masks") and r.masks is not None:
+                    preds = (
+                        r.masks.data.max(dim=0)[0].detach().cpu().numpy()
+                    )  # Combine masks and convert to numpy
+
                 else:
-                    preds = r.masks.data.max(dim=0)[0]  # dim=0 means to take only footprint
-                    preds = torch.where(preds > confidence, torch.tensor(1), torch.tensor(0))
-                    preds = preds.detach().cpu().numpy()
+                    preds = np.zeros(
+                        (
+                            IMAGE_SIZE,
+                            IMAGE_SIZE,
+                        ),
+                        dtype=np.float32,
+                    )  # Default if no masks
+
                 save_mask(preds, str(f"{prediction_path}/{Path(batch[i]).stem}.png"))
     else:
         raise RuntimeError("Loaded model is not supported")

@@ -3,6 +3,7 @@ import os
 from glob import glob
 from pathlib import Path
 
+# Third party imports
 # Third-party imports
 import geopandas
 from osgeo import gdal
@@ -13,7 +14,12 @@ from ..utils import get_bounding_box
 
 
 def clip_labels(
-    input_path: str, output_path: str, rasterize=False, rasterize_options=None
+    input_path: str,
+    output_path: str,
+    rasterize=False,
+    rasterize_options=None,
+    all_geojson_file=None,
+    epsg=3857,
 ) -> None:
     """Clip and rasterize the GeoJSON labels for each aerial image.
 
@@ -71,24 +77,29 @@ def clip_labels(
         glob(f"{input_path}/*.png"), desc=f"Clipping labels for {Path(input_path).stem}"
     ):
         filename = Path(path).stem
-        geojson_file_all_labels = f"{output_path}/labels_epsg3857.geojson"
+        if all_geojson_file:
+            geojson_file_all_labels = all_geojson_file
+        else:
+            geojson_file_all_labels = f"{output_path}/labels_epsg3857.geojson"
         clipped_geojson_file = f"{output_geojson_path}/{filename}.geojson"
 
         # Bounding box as a tuple
-        x_min, y_min, x_max, y_max = get_bounding_box(filename)
+        x_min, y_min, x_max, y_max = get_bounding_box(filename, epsg=epsg)
         # Bounding box as a polygon
         bounding_box_polygon = box(x_min, y_min, x_max, y_max)
 
         # Read all labels into a GeoDataFrame, clip it and
         # write to GeoJSON
-        gdf_all_labels = geopandas.read_file(geojson_file_all_labels)
+        gdf_all_labels = geopandas.read_file(os.path.relpath(geojson_file_all_labels))
         gdf_clipped = gdf_all_labels.clip(bounding_box_polygon)
         if len(gdf_clipped) > 0:
-            gdf_clipped.to_file(clipped_geojson_file)
+            gdf_clipped.to_file(clipped_geojson_file, driver="GeoJSON")
         else:
             schema = {"geometry": "Polygon", "properties": {"id": "int"}}
-            crs = "EPSG:3857"
-            gdf_clipped.to_file(clipped_geojson_file, schema=schema, crs=crs)
+            crs = f"EPSG:{epsg}"
+            gdf_clipped.to_file(
+                clipped_geojson_file, schema=schema, crs=crs, driver="GeoJSON"
+            )
 
         # Rasterizing
         if rasterize:

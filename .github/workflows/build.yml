@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.9.20
 
       - name: Remove solaris
         run: sudo rm -rf ./docker ./weights
@@ -46,8 +46,8 @@ jobs:
       - name: Install tensorflow
         run: pip install tensorflow==2.9.2
 
-      - name : Install pytorch and ultralytics
-        run: pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.1.6
+      - name: Install pytorch and ultralytics
+        run: pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.3.26
 
       - name: Install fair utilities
         run: pip install -e .
@@ -55,10 +55,11 @@ jobs:
       - name: Run test ramp
         run: |
           pip uninstall -y gdal
-          pip install numpy
+          pip install numpy==1.26.4
           pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
-          python test_app.py
+          python test_ramp.py
 
-      - name : Run test yolo
-        run : |
-          python test_yolo.py
+      - name: Run test yolo
+        run: |
+          python test_yolo_v1.py
+          python test_yolo_v2.py

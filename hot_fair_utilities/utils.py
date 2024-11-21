@@ -5,12 +5,15 @@ import json
 import math
 import os
 import re
+import ultralytics
+
 import time
 import urllib.request
 import zipfile
 from glob import glob
 from typing import Tuple
-
+import pandas as pd 
+import matplotlib.pyplot as plt
 # Third party imports
 # Third-party imports
 import geopandas
@@ -26,7 +29,7 @@ def get_prefix(path: str) -> str:
     return os.path.splitext(filename)[0]
 
 
-def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
+def get_bounding_box(filename: str,epsg=3857) -> Tuple[float, float, float, float]:
     """Get the EPSG:3857 coordinates of bounding box for the OAM image.
 
     This function gives the coordinates of lower left and upper right
@@ -36,7 +39,7 @@ def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
     Returns:
         A tuple, (x_min, y_min, x_max, y_max), with coordinates in meters.
     """
-    filename = re.sub(r'\.(png|jpeg)$', '', filename)
+    filename = re.sub(r"\.(png|jpeg)$", "", filename)
     _, *tile_info = re.split("-", filename)
     x_tile, y_tile, zoom = map(int, tile_info)
 
@@ -49,7 +52,8 @@ def get_bounding_box(filename: str) -> Tuple[float, float, float, float]:
     gdf_4326 = geopandas.GeoDataFrame({"geometry": [box_4326]}, crs="EPSG:4326")
 
     # Reproject to EPSG:3857
-    gdf_3857 = gdf_4326.to_crs("EPSG:3857")
+
+    gdf_3857 = gdf_4326.to_crs(f"EPSG:{epsg}")
 
     # Bounding box in EPSG:3857 as a tuple (x_min, y_min, x_max, y_max)
     box_3857 = gdf_3857.iloc[0, 0].bounds
@@ -213,7 +217,7 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
             executor.submit(download_image, url, base_path, source_name)
 
 
-def fetch_osm_data(payload: json, API_URL="https://raw-data-api0.hotosm.org/v1"):
+def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
     """
     args :
         payload : Payload request for API URL
@@ -250,3 +254,37 @@ def fetch_osm_data(payload: json, API_URL="https://raw-data-api0.hotosm.org/v1")
         with zip_ref.open("Export.geojson") as file:
             my_export_geojson = json.loads(file.read())
     return my_export_geojson
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def compute_iou_chart_from_yolo_results(results_csv_path,results_output_chart_path):
+
+    data = pd.read_csv(results_csv_path)
+
+
+    data['IoU(M)'] = 1 / (
+        1 / data['metrics/precision(M)'] + 1 / data['metrics/recall(M)'] - 1
+    )
+    chart = data.plot(x='epoch',y='IoU(M)',title='IoU (Mask) per Epoch',xticks=data['epoch'].astype(int)).get_figure()
+
+    chart.savefig(results_output_chart_path)
+    return results_output_chart_path
+
+
+def get_yolo_iou_metrics(model_path):
+
+    model_val = ultralytics.YOLO(model_path)
+    model_val_metrics = (
+        model_val.val().results_dict
+    )  ### B and M denotes bounding box and mask respectively
+    # print(metrics)
+    iou_accuracy = 1 / (
+        1 / model_val_metrics["metrics/precision(M)"]
+        + 1 / model_val_metrics["metrics/recall(M)"]
+        - 1
+    )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
+    final_accuracy = iou_accuracy * 100
+    return final_accuracy
