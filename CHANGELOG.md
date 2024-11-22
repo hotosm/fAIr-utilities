@@ -1,4 +1,4 @@
-## v3.0.0 (2024-11-15)
+## v2.0.1 (2024-11-22)
 
 ### Feat
 
@@ -6,7 +6,15 @@
 
 ### Fix
 
+- **dependencies**: downgrade geopandas version to 0.14.4
+- **dependencies**: update geopandas version to 1.0.0
+- **version-fix**: fixes version of geopandas
+- **libversion**: added version of pandas and other integration
 - **bundlelib**: bundles lib itself with new pandas version
+
+### Refactor
+
+- **preprocessing**: clean up imports and improve code formatting
 
 ## v2.0.0 (2024-11-15)
 
