@@ -2,6 +2,11 @@
 
 Initially lib was developed during Open AI Challenge with [Omdeena](https://omdena.com/). Learn more about challenge from [here](https://www.hotosm.org/tech-blog/hot-tech-talk-open-ai-challenge/)
 
+
+## Prerequisties
+
+- Install gdal-python and numpy array
+
 ## `hot_fair_utilities` Installation
 
 Installing all libraries could be pain so we suggest you to use docker , If you like to do it bare , You can follow `.github/build.yml`
@@ -59,3 +64,6 @@ Now you can play with your data , use your own data , use different models for t
 
 ### Version Control
 Follow [Version Control Docs](./docs/Version_control.md) to publish and maintain new version
+
+master --- > Dev  
+Releases ---- > Production
