@@ -1,3 +1,9 @@
+## v2.0.2 (2024-11-23)
+
+### Fix
+
+- **lib**: remove hard gdal installation requirements
+
 ## v2.0.1 (2024-11-22)
 
 ### Feat
