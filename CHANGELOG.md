@@ -1,3 +1,9 @@
+## v2.0.6 (2024-11-25)
+
+### Fix
+
+- **version**: loosen version for torch
+
 ## v2.0.5 (2024-11-25)
 
 ### Fix
