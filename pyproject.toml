@@ -27,7 +27,7 @@ dependencies = [
     "rasterio", "mercantile==1.2.1", "tqdm==4.67.0", 
     "rtree","opencv-python-headless<=4.10.0.84",
     "torch==2.5.1", "torchvision==0.20.1", "torchaudio==2.5.1","ultralytics==8.3.26",
-    "ramp-fair==0.1.2"
+    "ramp-fair==0.1.2", "protobuf==3.20.2"
 ]
 requires-python = ">=3.7"
 
