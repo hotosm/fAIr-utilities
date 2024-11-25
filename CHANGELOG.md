@@ -1,3 +1,9 @@
+## v2.0.3 (2024-11-25)
+
+### Fix
+
+- **onnx**: supports onnx output of the yolo models for the inference
+
 ## v2.0.2 (2024-11-23)
 
 ### Fix

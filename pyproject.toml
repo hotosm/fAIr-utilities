@@ -8,7 +8,7 @@ packages = ["hot_fair_utilities"]
 
 [project]
 name = "hot-fair-utilities"
-version = "2.0.2"
+version = "2.0.3"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
