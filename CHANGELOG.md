@@ -1,3 +1,9 @@
+## v2.0.5 (2024-11-25)
+
+### Fix
+
+- **version**: loosen version of pandas
+
 ## v2.0.4 (2024-11-25)
 
 ### Fix
