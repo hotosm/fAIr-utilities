@@ -288,3 +288,11 @@ def get_yolo_iou_metrics(model_path):
     )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
     final_accuracy = iou_accuracy * 100
     return final_accuracy
+
+
+
+def export_model_to_onnx(model_path):
+    model = ultralytics.YOLO(model_path)
+    model.export(format='onnx',imgsz=[256,256])
+    # model.export(format='tflite')
+    return True

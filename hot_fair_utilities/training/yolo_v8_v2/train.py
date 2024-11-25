@@ -6,7 +6,7 @@ from pathlib import Path
 # Third party imports
 import torch
 import ultralytics
-from ...utils import get_yolo_iou_metrics,compute_iou_chart_from_yolo_results
+from ...utils import get_yolo_iou_metrics,compute_iou_chart_from_yolo_results,export_model_to_onnx
 # Reader imports
 from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
@@ -73,6 +73,7 @@ def train(data, weights, epochs, batch_size, pc, output_path, dataset_yaml_path,
 
     weights, resume = check4checkpoint(name, weights,output_path)
     model = yolo(weights)
+
     model.train(
         data=data_scn,
         project=os.path.join(output_path,"checkpoints"),  # Using the environment variable with fallback
@@ -93,6 +94,7 @@ def train(data, weights, epochs, batch_size, pc, output_path, dataset_yaml_path,
     output_model_path=os.path.join(os.path.join(output_path,"checkpoints"), name, "weights", "best.pt")
 
     iou_model_accuracy=get_yolo_iou_metrics(output_model_path)
+    export_model_to_onnx(output_model_path)
 
     return  output_model_path,iou_model_accuracy
 
