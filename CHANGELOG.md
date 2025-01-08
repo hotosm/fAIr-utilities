@@ -1,3 +1,9 @@
+## v2.0.7 (2025-01-08)
+
+### Fix
+
+- **version**: fixes sub packages not being included in the packaging
+
 ## v2.0.6 (2024-11-25)
 
 ### Fix

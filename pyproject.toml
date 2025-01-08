@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hot-fair-utilities"
-version = "2.0.6"
+version = "2.0.7"
 description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
