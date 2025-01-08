@@ -1,3 +1,11 @@
+## v2.0.8 (2025-01-09)
+
+### Fix
+
+- **config**: added ramp config json in setup files
+- **workflow**: change installation method to use setup.py in build configuration
+- **workflow**: update Python version to 3.9 in build configuration
+
 ## v2.0.7 (2025-01-08)
 
 ### Fix

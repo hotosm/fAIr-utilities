@@ -5,19 +5,19 @@ import json
 import math
 import os
 import re
-import ultralytics
-
 import time
 import urllib.request
 import zipfile
 from glob import glob
 from typing import Tuple
-import pandas as pd 
-import matplotlib.pyplot as plt
+
 # Third party imports
 # Third-party imports
 import geopandas
+import matplotlib.pyplot as plt
+import pandas as pd
 import requests
+import ultralytics
 from shapely.geometry import box
 
 IMAGE_SIZE = 256
@@ -29,7 +29,7 @@ def get_prefix(path: str) -> str:
     return os.path.splitext(filename)[0]
 
 
-def get_bounding_box(filename: str,epsg=3857) -> Tuple[float, float, float, float]:
+def get_bounding_box(filename: str, epsg=3857) -> Tuple[float, float, float, float]:
     """Get the EPSG:3857 coordinates of bounding box for the OAM image.
 
     This function gives the coordinates of lower left and upper right
@@ -256,19 +256,24 @@ def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/
     return my_export_geojson
 
 
-import pandas as pd
+# Third party imports
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
-def compute_iou_chart_from_yolo_results(results_csv_path,results_output_chart_path):
+def compute_iou_chart_from_yolo_results(results_csv_path, results_output_chart_path):
 
     data = pd.read_csv(results_csv_path)
 
-
-    data['IoU(M)'] = 1 / (
-        1 / data['metrics/precision(M)'] + 1 / data['metrics/recall(M)'] - 1
+    data["IoU(M)"] = 1 / (
+        1 / data["metrics/precision(M)"] + 1 / data["metrics/recall(M)"] - 1
     )
-    chart = data.plot(x='epoch',y='IoU(M)',title='IoU (Mask) per Epoch',xticks=data['epoch'].astype(int)).get_figure()
+    chart = data.plot(
+        x="epoch",
+        y="IoU(M)",
+        title="IoU (Mask) per Epoch",
+        xticks=data["epoch"].astype(int),
+    ).get_figure()
 
     chart.savefig(results_output_chart_path)
     return results_output_chart_path
@@ -290,9 +295,8 @@ def get_yolo_iou_metrics(model_path):
     return final_accuracy
 
 
-
 def export_model_to_onnx(model_path):
     model = ultralytics.YOLO(model_path)
-    model.export(format='onnx',imgsz=[256,256])
+    model.export(format="onnx", imgsz=[256, 256])
     # model.export(format='tflite')
     return True
