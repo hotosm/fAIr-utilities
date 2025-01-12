@@ -1,3 +1,10 @@
+## v2.0.9 (2025-01-12)
+
+### Fix
+
+- **workflow**: change installation method to use pip for fair utilities
+- **ramp-config**: fixes config not found error
+
 ## v2.0.8 (2025-01-09)
 
 ### Fix
