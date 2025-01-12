@@ -52,6 +52,8 @@ from ramp.training import (
 from ramp.training.augmentation_constructors import get_augmentation_fn
 from ramp.utils.misc_ramp_utils import get_num_files
 
+from .config import RAMP_CONFIG
+
 # Segmentation Models: using `keras` framework.
 sm.set_framework("tf.keras")
 
@@ -86,14 +88,10 @@ def apply_feedback(
 def manage_fine_tuning_config(
     output_path, num_epochs, batch_size, freeze_layers, multimasks=False
 ):
-    # Define the paths to the source and destination JSON files
-    working_dir = os.path.realpath(os.path.dirname(__file__))
-    config_base_path = os.path.join(working_dir, "ramp_config_base.json")
+
     dst_path = os.path.join(output_path, "ramp_fair_config_finetune.json")
 
-    # Read the content of the source JSON file
-    with open(config_base_path, "r") as f:
-        data = json.load(f)
+    data = RAMP_CONFIG
 
     # Modify the content of the data dictionary datasets
     data["datasets"]["train_img_dir"] = f"{output_path}/chips"
@@ -352,8 +350,6 @@ def run_main_train_code(cfg):
     plt.title("Training and Validation Accuracy")
 
     plt.legend()
-    plt.savefig(
-        f"{cfg['graph_location']}/training_accuracy.png"
-    )
+    plt.savefig(f"{cfg['graph_location']}/training_accuracy.png")
     plt.clf()
     print(f"Graph generated at : {cfg['graph_location']}")
