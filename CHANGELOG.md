@@ -1,3 +1,9 @@
+## v2.0.10 (2025-01-12)
+
+### Fix
+
+- **weight**: if weight doesn't exits in the folder then download it
+
 ## v2.0.9 (2025-01-12)
 
 ### Fix
