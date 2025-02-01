@@ -28,5 +28,63 @@
 | 24  | 525     | 420    | Quincy          | USA         | America North | Peri-Urban   | Grid    | Shingles | [Download](https://fair-dev.hotosm.org/api/v1/workspace/download/training_525/preprocessed.zip/) |
 | 25  | 528     | 756    | Ngaoundere      | Cameroon    | Africa       | Peri-Urban   | Grid    | Metal    | [Download](https://fair-dev.hotosm.org/api/v1/workspace/download/training_528/preprocessed.zip/) |
 
-
 Source and Credit : Anna
+
+## **How to Get the Data**
+
+You can use the following Python script to generate download links for all available training datasets:
+
+```python
+# List of training IDs from the table
+training_ids = [
+    364, 370, 372, 373, 391, 394, 397, 398, 399, 456, 
+    459, 462, 463, 485, 488, 489, 529, 508, 539, 530, 
+    526, 523, 524, 525, 528
+]
+
+base_url = "https://fair-dev.hotosm.org/api/v1/workspace/download/training_{}/preprocessed.zip/"
+
+download_links = [base_url.format(train_id) for train_id in training_ids]
+
+for link in download_links:
+    print(link)
+```
+# **Dataset Structure & Download Guide**
+
+## **Overview**
+This dataset consists of **256x256 pixel image tiles** that follow the **Mercator tiling scheme**. Each tile is associated with:
+- **Imagery ("chips/")**
+- **Vector labels ("labels/")**
+- **Binary masks ("binarymasks/") (optional)**
+
+The filenames follow this **naming convention**:
+
+**OAM-{mercantile_tile_x}-{mercantile_tile_y}-{zoom_level}.ext**
+
+Where:
+- **OAM**: Prefix indicating OpenAerialMap (or similar sources).
+- **mercantile_tile_x / mercantile_tile_y**: Tile coordinates in the Mercator grid.
+- **zoom_level**: The zoom level of the tile.
+- **ext**: `.tif` (imagery), `.geojson` (labels), `.mask.tif` (binary masks).
+
+---
+
+## **Folder Structure**
+
+
+### **1. Chips (`chips/`)**
+- **Contains satellite/aerial imagery tiles**.
+- Each `.tif` file corresponds to a **specific Mercator grid tile**.
+- Example: `OAM-1251460-1026614-21.tif`.
+
+### **2. Labels (`labels/`)**
+- **Contains vector annotations (GeoJSON)**.
+- Each file is clipped to the **exact boundary** of the corresponding image tile.
+- Example: `OAM-1251450-1026604-21.geojson` matches `OAM-1251450-1026604-21.tif`.
+
+### **3. Binary Masks (`binarymasks/`)**
+- **Rasterized (burned) version of the labels**.
+- Binary format (**0/1**) indicating building footprints.
+- **Not required** if users prefer to generate masks from `chips/` and `labels/`.
+- Example: `OAM-1251456-1026606-21.mask.tif`.
+
