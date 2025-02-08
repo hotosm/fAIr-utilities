@@ -49,6 +49,12 @@ download_links = [base_url.format(train_id) for train_id in training_ids]
 for link in download_links:
     print(link)
 ```
+
+if you want to get area of interest for those training area , it would be inside `training_{}/aois.geojson` 
+
+& Training details can be found from API call like this : https://fair-dev.hotosm.org/api/v1/training/364/ 
+
+ 
 # **Dataset Structure & Download Guide**
 
 ## **Overview**
