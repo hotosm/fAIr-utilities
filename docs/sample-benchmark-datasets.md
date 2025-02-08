@@ -28,7 +28,13 @@
 | 24  | 525     | 420    | Quincy          | USA         | America North | Peri-Urban   | Grid    | Shingles | [Download](https://fair-dev.hotosm.org/api/v1/workspace/download/training_525/preprocessed.zip/) |
 | 25  | 528     | 756    | Ngaoundere      | Cameroon    | Africa       | Peri-Urban   | Grid    | Metal    | [Download](https://fair-dev.hotosm.org/api/v1/workspace/download/training_528/preprocessed.zip/) |
 
-Source and Credit : Anna
+Source and Credit : Anna Zanchetta
+
+Download all of them at once : [Download All](https://fair-dev.s3.us-east-1.amazonaws.com/prod/metric_test_data.zip)
+
+```bash
+wget https://fair-dev.s3.us-east-1.amazonaws.com/prod/metric_test_data.zip
+```
 
 ## **How to Get the Data**
 
