@@ -30,11 +30,6 @@
 
 Source and Credit : Anna Zanchetta
 
-Download all of them at once : [Download All](https://fair-dev.s3.us-east-1.amazonaws.com/prod/metric_test_data.zip)
-
-```bash
-wget https://fair-dev.s3.us-east-1.amazonaws.com/prod/metric_test_data.zip
-```
 
 ## **How to Get the Data**
 
