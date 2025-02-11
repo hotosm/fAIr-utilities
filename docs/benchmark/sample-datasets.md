@@ -93,3 +93,10 @@ Where:
 - **Not required** if users prefer to generate masks from `chips/` and `labels/`.
 - Example: `OAM-1251456-1026606-21.mask.tif`.
 
+## Distribution of datasets 
+![image](https://github.com/user-attachments/assets/1c0d3930-6aed-4116-ba2a-c05f2edf3cb7)
+
+## More info 
+
+Check this presentation for Anna's research result and explanation [here](https://ciupava.github.io/talks/ml4eo24/slides.html#/introduction)
+
