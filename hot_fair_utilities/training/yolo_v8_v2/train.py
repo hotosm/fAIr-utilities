@@ -102,6 +102,7 @@ def train(
         ),  # Using the environment variable with fallback
         name=name,
         epochs=int(epochs),
+        batch = int(batch_size),
         resume=resume,
         verbose=True,
         deterministic=False,
