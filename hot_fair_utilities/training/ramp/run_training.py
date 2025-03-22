@@ -36,10 +36,12 @@ class RaiseError(Exception):
 
 # Third party imports
 import segmentation_models as sm
+
 from ramp.data_mgmt.data_generator import (
     test_batches_from_gtiff_dirs,
     training_batches_from_gtiff_dirs,
 )
+
 from ramp.training import (
     callback_constructors,
     loss_constructors,
@@ -52,14 +54,15 @@ from ramp.training import (
 from ramp.training.augmentation_constructors import get_augmentation_fn
 from ramp.utils.misc_ramp_utils import get_num_files
 
-from .config import RAMP_CONFIG
+from hot_fair_utilities.training.ramp.config import RAMP_CONFIG
 
 # Segmentation Models: using `keras` framework.
 sm.set_framework("tf.keras")
 
 
 # this variable must be defined. It is the parent of the 'ramp-code' directory.
-working_ramp_home = os.environ["RAMP_HOME"]
+# working_ramp_home = os.environ["RAMP_HOME"]
+repo_home = os.system("git rev-parse --show-toplevel")
 
 
 def apply_feedback(

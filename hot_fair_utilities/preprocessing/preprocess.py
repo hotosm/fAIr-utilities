@@ -1,10 +1,10 @@
 # Standard library imports
 import os
 
-from ..georeferencing import georeference
-from .clip_labels import clip_labels
-from .fix_labels import fix_labels
-from .reproject_labels import reproject_labels_to_epsg3857
+from hot_fair_utilities.preprocessing.georeferencing import georeference
+from hot_fair_utilities.preprocessing.clip_labels import clip_labels
+from hot_fair_utilities.preprocessing.fix_labels import fix_labels
+from hot_fair_utilities.preprocessing.reproject_labels import reproject_labels_to_epsg3857
 
 
 def preprocess(

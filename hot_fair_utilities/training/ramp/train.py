@@ -1,9 +1,9 @@
 # Standard library imports
 import os
 
-from .cleanup import extract_highest_accuracy_model
-from .prepare_data import split_training_2_validation
-from .run_training import apply_feedback, manage_fine_tuning_config, run_main_train_code
+from hot_fair_utilities.training.ramp.cleanup import extract_highest_accuracy_model
+from hot_fair_utilities.training.ramp.prepare_data import split_training_2_validation
+from hot_fair_utilities.training.ramp.run_training import apply_feedback, manage_fine_tuning_config, run_main_train_code
 
 
 def train(
@@ -83,7 +83,7 @@ def run_feedback(
     assert os.path.exists(input_path), "Input Feedback Path Doesn't Exist"
     assert os.path.exists(feedback_base_model), "Feedback base Model Doesn't Exist"
     os.environ.update(os.environ)
-    os.environ["RAMP_HOME"] = model_home
+    # os.environ["RAMP_HOME"] = model_home
     print("Starting to prepare data for training")
     split_training_2_validation(input_path, output_path, multimasks)
     print("Data is ready for training")
