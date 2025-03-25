@@ -26,10 +26,10 @@ jobs:
         run: pip install gdown
 
       - name: Download Basemodel
-        run: gdown --fuzzy https://drive.google.com/file/d/1YQsY61S_rGfJ_f6kLQq4ouYE2l3iRe1k/view?usp=sharing
+        run: wget https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp-model-baseline.zip
 
       - name: Unzip and Move Basemodel
-        run: unzip checkpoint.tf.zip -d ramp-code/ramp
+        run: unzip ramp-model-baseline.zip -d ramp-code/ramp
 
       - name: Install gdal
         run: |
