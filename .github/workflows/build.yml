@@ -29,7 +29,7 @@ jobs:
         run: wget https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp/baseline.zip
 
       - name: Unzip and Move Basemodel
-        run: unzip ramp-model-baseline.zip -d ramp-code/ramp
+        run: unzip baseline.zip -d ramp-code/ramp
 
       - name: Install gdal
         run: |
