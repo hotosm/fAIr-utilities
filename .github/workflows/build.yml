@@ -26,7 +26,7 @@ jobs:
         run: pip install gdown
 
       - name: Download Basemodel
-        run: wget https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp-model-baseline.zip
+        run: wget https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp/baseline.zip
 
       - name: Unzip and Move Basemodel
         run: unzip ramp-model-baseline.zip -d ramp-code/ramp
