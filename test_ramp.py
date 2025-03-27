@@ -35,15 +35,37 @@ ramp_sample_input_folder = os.path.join(sample_ramp_data_folder_path,'input')
 # model_input_image_path = f"{base_path}/input"
 ramp_sample_preprocessed_folder = os.path.join(sample_ramp_data_folder_path,'preprocessed')
 # preprocess_output = f"/{base_path}/preprocessed"
-preprocess(
-    input_path=ramp_sample_input_folder,
-    output_path=ramp_sample_preprocessed_folder,
-    rasterize=True,
-    rasterize_options=["binary"],
-    georeference_images=True,
-    # multimasks=True,
-    multimasks=False
-)
+
+def test_preprocess_binary():
+    preprocess(
+        input_path=ramp_sample_input_folder,
+        output_path=ramp_sample_preprocessed_folder,
+        rasterize=True,
+        rasterize_options=["binary"],
+        georeference_images=True,
+        multimasks=False
+    )
+    print("Preprocessing with binary masks completed successfully.")
+
+    return
+
+test_preprocess_binary()
+
+def test_preprocess_multimask():
+    preprocess(
+        input_path=ramp_sample_input_folder,
+        output_path=ramp_sample_preprocessed_folder,
+        rasterize=True,
+        rasterize_options=["binary"],
+        georeference_images=True,
+        multimasks=True
+    )
+
+    print("Preprocessing with multi-masks completed successfully.")
+
+    return
+
+test_preprocess_multimask()
 
 # Reader imports
 # %%
@@ -52,13 +74,16 @@ from hot_fair_utilities.training.ramp import train
 # %%
 # train_output = f"{base_path}/train"
 ramp_sample_ready_for_training_folder = os.path.join(sample_ramp_data_folder_path,'ready_for_trainining')
+
+
 final_accuracy, final_model_path = train(
     input_path=ramp_sample_preprocessed_folder,
     output_path=ramp_sample_ready_for_training_folder,
     epoch_size=2,
     batch_size=2,
     model="ramp",
-    model_home=os.environ["RAMP_HOME"],
+    # model_home=os.environ["RAMP_HOME"],
+    model_home=top_level_repo_folder_path
 )
 
 # %%
