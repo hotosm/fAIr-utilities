@@ -10,6 +10,7 @@ import ultralytics
 from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
 from ...utils import (
+    check4checkpoint,
     compute_iou_chart_from_yolo_results,
     export_model_to_onnx,
     get_yolo_iou_metrics,
@@ -92,7 +93,7 @@ def train(
     else:
         yolo = ultralytics.YOLO
 
-    weights, resume = check4checkpoint(name, weights, output_path)
+    weights, resume = check4checkpoint(name, weights, output_path, remove_old=True)
     model = yolo(weights)
 
     model.train(
@@ -102,7 +103,7 @@ def train(
         ),  # Using the environment variable with fallback
         name=name,
         epochs=int(epochs),
-        batch = int(batch_size),
+        batch=int(batch_size),
         resume=resume,
         verbose=True,
         deterministic=False,
@@ -128,13 +129,3 @@ def train(
     export_model_to_onnx(output_model_path)
 
     return output_model_path, iou_model_accuracy
-
-
-def check4checkpoint(name, weights, output_path):
-    ckpt = os.path.join(
-        os.path.join(output_path, "checkpoints"), name, "weights", "last.pt"
-    )
-    if os.path.exists(ckpt):
-        print(f"Set weights to {ckpt}")
-        return ckpt, True
-    return weights, False

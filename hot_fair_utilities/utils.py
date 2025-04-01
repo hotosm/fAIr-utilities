@@ -300,3 +300,18 @@ def export_model_to_onnx(model_path):
     model.export(format="onnx", imgsz=[256, 256])
     # model.export(format='tflite')
     return True
+
+
+
+def check4checkpoint(name, weights, output_path, remove_old=False):
+    ckpt = os.path.join(
+        os.path.join(output_path, "checkpoints"), name, "weights", "last.pt"
+    )
+    if os.path.exists(ckpt):
+        if remove_old:
+            os.remove(ckpt)
+            print(f"Removed old checkpoint {ckpt}")
+            return weights, False
+        print(f"Set weights to {ckpt}")
+        return ckpt, True
+    return weights, False
