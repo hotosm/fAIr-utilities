@@ -1,7 +1,6 @@
 # hot_fair_utilities ( Utilities for AI Assisted Mapping fAIr )
 
-Initially lib was developed during Open AI Challenge with [Omdeena](https://omdena.com/). Learn more about challenge from [here](https://www.hotosm.org/tech-blog/hot-tech-talk-open-ai-challenge/)
-
+Initially lib was developed during Open AI Challenge with [Omdeena](https://omdena.com/). We frequently do AI challenges with community ! 
 
 ## Prerequisties
 
