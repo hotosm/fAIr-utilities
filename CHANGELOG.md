@@ -1,3 +1,9 @@
+## v2.0.11 (2025-04-02)
+
+### Fix
+
+- **enhance**: fixes bug for the yolo batch size for dep and enhance readme
+
 ## v2.0.10 (2025-01-12)
 
 ### Fix
