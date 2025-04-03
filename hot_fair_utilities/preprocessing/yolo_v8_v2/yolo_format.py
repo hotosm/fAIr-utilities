@@ -1,12 +1,13 @@
 # Standard library imports
 import glob
 import os
+import shutil
 
 # Third party imports
 import numpy as np
 import yaml
 from tqdm import tqdm
-import shutil
+
 from .utils import convert_tif_to_jpg, write_yolo_file
 
 
@@ -68,10 +69,10 @@ def yolo_format(
     print(f"Test array size: {len(test_cwps)}\n")
 
     # Check if the YOLO folder exists, if not create labels, images, and folders
-    if  os.path.exists(output_path):
-        shutil.rmtree(output_path)
+    if os.path.exists(output_path):
+        shutil.rmtree(output_path, ignore_errors=True)
 
-    os.makedirs(output_path)
+    os.makedirs(output_path, exist_ok=True)
 
     # Write the YOLO label files for the training set
     print("Generating training labels")
@@ -114,7 +115,6 @@ def yolo_format(
     # Write the file
     with open(YAML_PATH, "w") as f:
         yaml.dump(attr, f)
-
 
 
 def find_files(data_folders):
@@ -178,4 +178,5 @@ def find_files(data_folders):
 
         base_folders.append(cwp.split("/")[1])
 
+    return cwps, lwps, base_folders
     return cwps, lwps, base_folders
