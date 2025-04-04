@@ -6,12 +6,12 @@ import os
 # Third party imports
 import geopandas as gpd
 import rasterio as rio
-from ramp.data_mgmt.chip_label_pairs import (
-    construct_mask_filepath,
-    get_tq_chip_label_pairs,
-)
-from ramp.utils.img_utils import to_channels_first
-from ramp.utils.multimask_utils import df_to_px_mask, multimask_to_sparse_multimask
+
+from ramp_fair.data_mgmt.chip_label_pairs import construct_mask_filepath
+from ramp_fair.data_mgmt.chip_label_pairs import get_tq_chip_label_pairs
+
+from ramp_fair.utils.img_utils import to_channels_first
+from ramp_fair.utils.multimask_utils import df_to_px_mask, multimask_to_sparse_multimask
 from solaris.utils.core import _check_rasterio_im_load
 from solaris.utils.geo import get_crs
 from solaris.vector.mask import crs_is_metric
@@ -96,13 +96,23 @@ def multimasks_from_polygons(
 
         reference_im = _check_rasterio_im_load(chip_path)
 
-        if get_crs(gdf) != get_crs(reference_im):
-            # BUGFIX: if crs's don't match, reproject the geodataframe
-            gdf = gdf.to_crs(get_crs(reference_im))
+        #check co-ordinate systems
+        gdf_crs = get_crs(gdf)
+        ref_crs = get_crs(reference_im)
+        
+        # Only attempt reprojection if both CRS values are valid and not equal.
+        if gdf_crs is None or ref_crs is None:
+            raise ValueError("Invalid CRS encountered in input data.")
+        if gdf_crs != ref_crs:
+            try:
+                gdf = gdf.to_crs(ref_crs)
+                print("Reprojected GeoDataFrame to reference CRS.")
+            except Exception as e:
+                print("Error reprojecting GeoDataFrame:", e)
+                raise
 
         if crs_is_metric(gdf):
             meters = True
-
             boundary_width = min(reference_im.res) * input_boundary_width
             contact_spacing = min(reference_im.res) * input_contact_spacing
 
