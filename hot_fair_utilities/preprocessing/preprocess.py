@@ -1,7 +1,7 @@
 # Standard library imports
 import os
 
-from hot_fair_utilities.preprocessing.georeferencing import georeference
+from hot_fair_utilities.georeferencing import georeference
 from hot_fair_utilities.preprocessing.clip_labels import clip_labels
 from hot_fair_utilities.preprocessing.fix_labels import fix_labels
 from hot_fair_utilities.preprocessing.reproject_labels import reproject_labels_to_epsg3857
@@ -110,7 +110,7 @@ def preprocess(
         os.remove(f"{output_path}/labels_epsg3857.geojson")
 
     if multimasks:
-        from .multimasks_from_polygons import multimasks_from_polygons
+        from hot_fair_utilities.preprocessing.multimasks_from_polygons import multimasks_from_polygons
 
         assert os.path.isdir(
             f"{output_path}/chips"

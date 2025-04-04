@@ -8,7 +8,7 @@ import geopandas as gpd
 
 try:
     # Third party imports
-    from ramp.utils.eval_utils import get_iou_accuracy_metrics
+    from ramp_fair.utils.eval_utils import get_iou_accuracy_metrics
 except ImportError:
     print("Ramp eval metrics are not available, Possibly ramp is not installed")
 
