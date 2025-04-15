@@ -15,7 +15,6 @@ from typing import Tuple
 # Third party imports
 # Third-party imports
 import geopandas
-import matplotlib.pyplot as plt
 import pandas as pd
 import requests
 import ultralytics
@@ -258,7 +257,6 @@ def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/
 
 
 # Third party imports
-import matplotlib.pyplot as plt
 import pandas as pd
 
 

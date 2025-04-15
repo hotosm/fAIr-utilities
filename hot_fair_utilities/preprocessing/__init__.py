@@ -1,2 +1,2 @@
-from .preprocess import preprocess
-from .yolo_v8_v1 import yolo_format
+from hot_fair_utilities.preprocessing import preprocess
+from hot_fair_utilities.preprocessing.yolo_v8_v1 import yolo_format

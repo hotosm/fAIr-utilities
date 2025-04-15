@@ -10,7 +10,7 @@ from osgeo import gdal
 from shapely.geometry import box
 from tqdm import tqdm
 
-from ..utils import get_bounding_box
+from hot_fair_utilities.utils import get_bounding_box
 
 
 def clip_labels(

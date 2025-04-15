@@ -8,7 +8,7 @@ from pathlib import Path
 from osgeo import gdal
 from tqdm import tqdm
 
-from .utils import get_bounding_box
+from hot_fair_utilities.utils import get_bounding_box
 
 
 def georeference(input_path: str, output_path: str, is_mask=False,epsg=3857) -> None:
