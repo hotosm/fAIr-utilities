@@ -1,3 +1,10 @@
+## v2.0.12 (2025-04-15)
+
+### Fix
+
+- **cleanup**: fixes cleanup script after yolo training
+- **shutil**: fixes shutil error
+
 ## v2.0.11 (2025-04-02)
 
 ### Fix
