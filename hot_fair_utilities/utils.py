@@ -1,6 +1,7 @@
 # Standard library imports
 import concurrent.futures
 import io
+import gc
 import json
 import math
 import os
@@ -292,6 +293,8 @@ def get_yolo_iou_metrics(model_path):
         - 1
     )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
     final_accuracy = iou_accuracy * 100
+    del model_val  # release model reference
+    gc.collect()   # trigger cleanup of file handles
     return final_accuracy
 
 
@@ -299,6 +302,8 @@ def export_model_to_onnx(model_path):
     model = ultralytics.YOLO(model_path)
     model.export(format="onnx", imgsz=[256, 256])
     # model.export(format='tflite')
+    del model  # release model reference
+    gc.collect()
     return True
 
 
