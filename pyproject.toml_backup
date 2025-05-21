@@ -1,6 +1,11 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "hot-fair-utilities"
 version = "2.0.12"
+description = "Utilities for AI - Assisted Mapping fAIr"
 readme = "README.md"
 authors = [{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
 license = { file = "LICENSE" }
@@ -12,18 +17,22 @@ keywords = [
     "preprocessing", "inference", 
     "postprocessing", "stitching","training"
 ]
-requires-python = ">=3.10"
 dependencies = [
-    "fairpredictor>=0.3.0",
-    "geomltoolkits>=0.3.0",
-    "ramp-fair>=0.1.2",
-    "torch>=2.7.0",
-    "torchaudio>=2.7.0",
-    "torchvision>=0.22.0",
-    "ultralytics>=8.3.141",
+    "shapely==1.8.0", "numpy", 
+    "Pillow==9.1.0", "geopandas>=0.12.0,<=0.14.4", "pandas>=2.0.0,<=2.2.3" , 
+    "rasterio", "mercantile==1.2.1", "tqdm==4.67.0", 
+    "rtree","opencv-python-headless<=4.10.0.84",
+    "torch>=2.0.0,<=2.5.1", "torchvision>=0.10.0,<=0.20.1", "torchaudio>=2.0.0,<=2.5.1","ultralytics>=8.0.0,<=8.3.26",
+    "ramp-fair==0.1.2", "protobuf==3.20.2"
 ]
+requires-python = ">=3.7"
 
+    [project.optional-dependencies]
+    build = ["build", "twine"]
+    dev   = ["black", "bumpver", "isort"]
 
+    [project.urls]
+    repository    = "https://github.com/hotosm/fAIr-utilities"
 
 [tool.bumpver]
 current_version = "1.0.51"
@@ -33,12 +42,11 @@ commit          = true
 tag             = true
 push            = false
 
-[tool.bumpver.file_patterns]
-"pyproject.toml" = [
-    'current_version = "{version}"',
-    'version = "{version}"',
-]
-
+    [tool.bumpver.file_patterns]
+    "pyproject.toml" = [
+        'current_version = "{version}"',
+        'version = "{version}"',
+    ]
 
 [tool.isort]
 profile                   = "black"
@@ -52,11 +60,3 @@ tag_format = "v$version"
 version_scheme = "semver"
 version_provider = "pep621"
 update_changelog_on_bump = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["hot_fair_utilities"]
-include = ["hot_fair_utilities/**/*.json", "hot_fair_utilities/**/*.yaml", "hot_fair_utilities/**/*.yml", "hot_fair_utilities/**/*.txt", "hot_fair_utilities/**/*.csv"]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
