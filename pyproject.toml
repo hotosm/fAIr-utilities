@@ -14,28 +14,75 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = [
-    "preprocessing", "inference", 
+    "preprocessing", "inference",
     "postprocessing", "stitching","training"
 ]
 dependencies = [
-    "shapely==1.8.0", "numpy", 
-    "Pillow==9.1.0", "geopandas>=0.12.0,<=0.14.4", "pandas>=2.0.0,<=2.2.3" , 
-    "rasterio", "mercantile==1.2.1", "tqdm==4.67.0", 
-    "rtree","opencv-python-headless<=4.10.0.84",
-    "torch>=2.0.0,<=2.5.1", "torchvision>=0.10.0,<=0.20.1", "torchaudio>=2.0.0,<=2.5.1","ultralytics>=8.0.0,<=8.3.26",
-    "ramp-fair==0.1.2", "protobuf==3.20.2"
+    # Core geospatial dependencies
+    "shapely>=1.8.0,<3.0.0",
+    "numpy>=1.21.0,<2.0.0",
+    "Pillow>=9.1.0,<11.0.0",
+    "geopandas>=0.12.0,<=0.14.4",
+    "pandas>=2.0.0,<=2.2.3",
+    "rasterio>=1.3.0,<2.0.0",
+    "mercantile>=1.2.1,<2.0.0",
+    "tqdm>=4.67.0,<5.0.0",
+    "rtree>=1.0.0,<2.0.0",
+
+    # Computer vision dependencies
+    "opencv-python-headless>=4.8.0,<=4.10.0.84",
+    "torch>=2.0.0,<=2.5.1",
+    "torchvision>=0.10.0,<=0.20.1",
+    "torchaudio>=2.0.0,<=2.5.1",
+    "ultralytics>=8.0.0,<=8.3.26",
+
+    # ML model dependencies
+    "ramp-fair==0.1.2",
+    "protobuf>=3.20.2,<5.0.0",
+    "tensorflow>=2.10.0,<3.0.0",
+
+    # New integrated functionality dependencies
+    "aiohttp>=3.8.0,<4.0.0",
+    "pyproj>=3.0.0,<4.0.0",
+
+    # Monitoring and validation dependencies
+    "psutil>=5.8.0,<6.0.0",
+
+    # Security and validation
+    "urllib3>=1.26.0,<3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=2.20.0",
+]
+
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "responses>=0.22.0",
+]
+
+docs = [
+    "sphinx>=5.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+    "myst-parser>=0.18.0",
 ]
 requires-python = ">=3.7"
-
-    [project.optional-dependencies]
-    build = ["build", "twine"]
-    dev   = ["black", "bumpver", "isort"]
 
     [project.urls]
     repository    = "https://github.com/hotosm/fAIr-utilities"
 
 [tool.bumpver]
-current_version = "1.0.51"
+current_version = "2.0.12"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true

@@ -16,10 +16,14 @@ from typing import Tuple
 # Third-party imports
 import geopandas
 import matplotlib.pyplot as plt
+import mercantile
 import pandas as pd
+import rasterio
+from rasterio.merge import merge
 import requests
 import ultralytics
 from shapely.geometry import box
+import shapely.geometry
 
 IMAGE_SIZE = 256
 
@@ -320,3 +324,194 @@ def check4checkpoint(name, weights, output_path, remove_old=False):
         print(f"Set weights to {ckpt}")
         return ckpt, True
     return weights, False
+
+
+def get_tiles(zoom, geojson=None, bbox=None, within=False):
+    """
+    Get tiles for a given zoom level and area of interest.
+
+    Args:
+        zoom: Zoom level
+        geojson: GeoJSON file path, string, or dictionary
+        bbox: Bounding box coordinates [xmin, ymin, xmax, ymax]
+        within: Whether to get only tiles completely within the geometry
+
+    Returns:
+        List of mercantile.Tile objects
+    """
+    if geojson is not None:
+        geometry = get_geometry(geojson, None)
+    elif bbox is not None:
+        geometry = get_geometry(None, bbox)
+    else:
+        raise ValueError("Either geojson or bbox must be provided")
+
+    # Get tiles for the geometry
+    if within:
+        tiles = list(mercantile.tiles(*geometry['coordinates'][0][0], zoom))
+    else:
+        # Get bounding box of geometry
+        if geometry['type'] == 'Polygon':
+            coords = geometry['coordinates'][0]
+        else:
+            # For other geometry types, get bounds
+            import shapely.geometry
+            geom = shapely.geometry.shape(geometry)
+            bounds = geom.bounds
+            coords = [[bounds[0], bounds[1]], [bounds[2], bounds[3]]]
+
+        # Get all coordinates to find bounds
+        lons = [coord[0] for coord in coords]
+        lats = [coord[1] for coord in coords]
+
+        west, south, east, north = min(lons), min(lats), max(lons), max(lats)
+        tiles = list(mercantile.tiles(west, south, east, north, zoom))
+
+    return tiles
+
+
+def get_geometry(geojson=None, bbox=None):
+    """
+    Get geometry from either geojson or bbox.
+
+    Args:
+        geojson: GeoJSON file path, string, or dictionary
+        bbox: Bounding box coordinates [xmin, ymin, xmax, ymax]
+
+    Returns:
+        GeoJSON geometry dictionary
+    """
+    if geojson is not None:
+        if isinstance(geojson, str):
+            if os.path.exists(geojson):
+                import geopandas as gpd
+                gdf = gpd.read_file(geojson)
+                # Union all geometries and get the first one
+                geom = gdf.geometry.unary_union
+                if hasattr(geom, '__geo_interface__'):
+                    return geom.__geo_interface__
+                else:
+                    return geom
+            else:
+                try:
+                    geojson_data = json.loads(geojson)
+                    if 'features' in geojson_data:
+                        # Return the first feature's geometry
+                        return geojson_data['features'][0]['geometry']
+                    else:
+                        return geojson_data
+                except json.JSONDecodeError:
+                    raise ValueError("Invalid GeoJSON string")
+        else:
+            # Assume it's already a dictionary
+            if 'features' in geojson:
+                return geojson['features'][0]['geometry']
+            else:
+                return geojson
+    elif bbox is not None:
+        # Create a polygon from bbox
+        xmin, ymin, xmax, ymax = bbox
+        return {
+            "type": "Polygon",
+            "coordinates": [[
+                [xmin, ymin],
+                [xmax, ymin],
+                [xmax, ymax],
+                [xmin, ymax],
+                [xmin, ymin]
+            ]]
+        }
+    else:
+        raise ValueError("Either geojson or bbox must be provided")
+
+
+def split_geojson_by_tiles(geojson_path, tiles_geojson, output_dir, prefix="OAM"):
+    """
+    Split a GeoJSON file by tiles.
+
+    Args:
+        geojson_path: Path to the GeoJSON file to split
+        tiles_geojson: GeoJSON containing tile geometries
+        output_dir: Output directory for split files
+        prefix: Prefix for output files
+    """
+    import geopandas as gpd
+
+    # Read the main GeoJSON
+    main_gdf = gpd.read_file(geojson_path)
+
+    # Read tiles GeoJSON
+    if isinstance(tiles_geojson, str):
+        if os.path.exists(tiles_geojson):
+            tiles_gdf = gpd.read_file(tiles_geojson)
+        else:
+            # Parse as JSON string
+            tiles_data = json.loads(tiles_geojson)
+            tiles_gdf = gpd.GeoDataFrame.from_features(tiles_data['features'])
+    else:
+        tiles_gdf = gpd.GeoDataFrame.from_features(tiles_geojson['features'])
+
+    # Ensure same CRS
+    if main_gdf.crs != tiles_gdf.crs:
+        tiles_gdf = tiles_gdf.to_crs(main_gdf.crs)
+
+    # Split by each tile
+    for idx, tile_row in tiles_gdf.iterrows():
+        tile_geom = tile_row.geometry
+
+        # Find intersecting features
+        intersecting = main_gdf[main_gdf.intersects(tile_geom)]
+
+        if not intersecting.empty:
+            # Create output filename based on tile properties or index
+            output_filename = f"{prefix}-tile-{idx}.geojson"
+            output_path = os.path.join(output_dir, output_filename)
+
+            # Save intersecting features
+            intersecting.to_file(output_path, driver="GeoJSON")
+
+
+def merge_rasters(input_dir, output_path):
+    """
+    Merge all raster files in a directory into a single raster.
+
+    Args:
+        input_dir: Directory containing raster files
+        output_path: Path for the merged output raster
+    """
+    # Find all raster files
+    raster_files = []
+    for ext in ['*.tif', '*.tiff', '*.png', '*.jpg', '*.jpeg']:
+        raster_files.extend(glob(os.path.join(input_dir, ext)))
+
+    if not raster_files:
+        raise ValueError(f"No raster files found in {input_dir}")
+
+    # Open all raster files
+    src_files_to_mosaic = []
+    for file in raster_files:
+        src = rasterio.open(file)
+        src_files_to_mosaic.append(src)
+
+    # Merge rasters
+    mosaic, out_trans = merge(src_files_to_mosaic)
+
+    # Update metadata
+    out_meta = src_files_to_mosaic[0].meta.copy()
+    out_meta.update({
+        "driver": "GTiff",
+        "height": mosaic.shape[1],
+        "width": mosaic.shape[2],
+        "transform": out_trans,
+        "crs": src_files_to_mosaic[0].crs
+    })
+
+    # Write merged raster
+    with rasterio.open(output_path, "w", **out_meta) as dest:
+        dest.write(mosaic)
+
+    # Close all source files
+    for src in src_files_to_mosaic:
+        src.close()
+
+    print(f"Merged {len(raster_files)} rasters into {output_path}")
