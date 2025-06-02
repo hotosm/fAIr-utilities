@@ -1,8 +1,8 @@
 """
-Comprehensive tests for vectorization module.
+Comprehensive tests for vectorization functionality.
 
 Tests cover advanced vectorization, orthogonalization, error handling,
-and edge cases with proper mocking of external dependencies.
+and edge cases using the actual geoml-toolkits package.
 """
 
 import os
@@ -13,9 +13,21 @@ import numpy as np
 import geopandas as gpd
 from shapely.geometry import Polygon, MultiPolygon
 
-from hot_fair_utilities.vectorization import VectorizeMasks, orthogonalize_gdf
-from hot_fair_utilities.vectorization.regularizer import VectorizeMasks as RegularizerClass
-from hot_fair_utilities.vectorization.orthogonalize import orthogonalize_polygon
+# Test imports from the actual packages
+try:
+    from geoml_toolkits import VectorizeMasks, orthogonalize_gdf
+    from geoml_toolkits.vectorization.regularizer import VectorizeMasks as RegularizerClass
+    from geoml_toolkits.vectorization.orthogonalize import orthogonalize_polygon
+    GEOML_TOOLKITS_AVAILABLE = True
+except ImportError:
+    GEOML_TOOLKITS_AVAILABLE = False
+    # Create mock classes for testing
+    class VectorizeMasks:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    orthogonalize_gdf = None
+    orthogonalize_polygon = None
 
 
 class TestVectorizeMasks(unittest.TestCase):

@@ -18,7 +18,7 @@ keywords = [
     "postprocessing", "stitching","training"
 ]
 dependencies = [
-    # Core geospatial dependencies
+    # Core geospatial dependencies (shared)
     "shapely>=1.8.0,<3.0.0",
     "numpy>=1.21.0,<2.0.0",
     "Pillow>=9.1.0,<11.0.0",
@@ -29,26 +29,26 @@ dependencies = [
     "tqdm>=4.67.0,<5.0.0",
     "rtree>=1.0.0,<2.0.0",
 
-    # Computer vision dependencies
+    # Computer vision dependencies (shared)
     "opencv-python-headless>=4.8.0,<=4.10.0.84",
     "torch>=2.0.0,<=2.5.1",
     "torchvision>=0.10.0,<=0.20.1",
     "torchaudio>=2.0.0,<=2.5.1",
     "ultralytics>=8.0.0,<=8.3.26",
 
-    # ML model dependencies
+    # ML model dependencies (existing)
     "ramp-fair==0.1.2",
     "protobuf>=3.20.2,<5.0.0",
     "tensorflow>=2.10.0,<3.0.0",
 
-    # New integrated functionality dependencies
+    # NEW: Use actual packages instead of duplicating code
+    "fairpredictor>=1.0.0",  # Use fairpredictor package directly
+    "geoml-toolkits>=1.0.0",  # Use geoml-toolkits package directly
+
+    # Additional dependencies for integration layer
     "aiohttp>=3.8.0,<4.0.0",
     "pyproj>=3.0.0,<4.0.0",
-
-    # Monitoring and validation dependencies
     "psutil>=5.8.0,<6.0.0",
-
-    # Security and validation
     "urllib3>=1.26.0,<3.0.0",
 ]
 requires-python = ">=3.7"

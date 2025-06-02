@@ -1,19 +1,27 @@
 # hot_fair_utilities ( Utilities for AI Assisted Mapping fAIr )
 
-🚀 **Now with integrated geoml-toolkits and fairpredictor functionality!**
+🚀 **Now with package-based architecture using fairpredictor and geoml-toolkits!**
 
-A comprehensive Python library for AI-assisted mapping workflows, providing end-to-end capabilities from data acquisition to model prediction and advanced vectorization.
+A comprehensive Python library for AI-assisted mapping workflows that provides a unified interface to specialized packages, eliminating code duplication while offering end-to-end capabilities from data acquisition to model prediction and advanced vectorization.
 
 Initially developed during Open AI Challenge with [Omdeena](https://omdena.com/). We frequently do AI challenges with community!
 
-## ✨ What's New in the Integrated Version
+## 🏗️ New Package-Based Architecture
 
-- **🌍 Data Acquisition**: Async tile downloading from TMS sources with multiple schemes support
-- **🏗️ OSM Integration**: Direct OSM data downloading via HOT Raw Data API
-- **🎯 End-to-End Prediction**: Complete pipeline from tiles to predictions in one function
-- **🔧 Advanced Vectorization**: Potrace and rasterio-based vectorization with geometry regularization
-- **📐 Orthogonalization**: Automatic building footprint regularization
-- **🔗 Easy Model Integration**: Simple framework for adding new models
+Instead of duplicating code, fAIr-utilities now uses specialized packages directly:
+
+- **`fairpredictor`**: Advanced prediction pipelines and model management
+- **`geoml-toolkits`**: Data acquisition and vectorization tools
+- **`fAIr-utilities`**: Core training, inference, and integration layer
+
+## ✨ Features Available Through Package Integration
+
+- **🌍 Data Acquisition** (from geoml-toolkits): Async tile downloading with multiple schemes
+- **🏗️ OSM Integration** (from geoml-toolkits): Direct OSM data downloading via HOT Raw Data API
+- **🎯 End-to-End Prediction** (from fairpredictor): Complete pipeline from tiles to predictions
+- **🔧 Advanced Vectorization** (from geoml-toolkits): Potrace and rasterio-based vectorization
+- **📐 Orthogonalization** (from geoml-toolkits): Automatic building footprint regularization
+- **🔗 Dependency Resolution**: Automatic handling of version conflicts between packages
 
 ## 🚀 Quick Start
 

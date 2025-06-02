@@ -1,8 +1,8 @@
 """
-Comprehensive tests for data acquisition module.
+Comprehensive tests for data acquisition functionality.
 
 Tests cover TMS downloading, OSM data acquisition, error handling,
-and edge cases with proper mocking of external dependencies.
+and edge cases using the actual geoml-toolkits package.
 """
 
 import asyncio
@@ -13,12 +13,22 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 from typing import Dict, Any
 
-import aiohttp
-import mercantile
 import pytest
 
-from hot_fair_utilities.data_acquisition import TileSource, download_tiles, download_osm_data
-from hot_fair_utilities.data_acquisition.tms_downloader import _generate_tile_url_from_template, _apply_georeferencing
+# Test imports from the actual packages
+try:
+    from geoml_toolkits import TileSource, download_tiles, download_osm_data
+    from geoml_toolkits.tms_downloader import _generate_tile_url_from_template, _apply_georeferencing
+    GEOML_TOOLKITS_AVAILABLE = True
+except ImportError:
+    GEOML_TOOLKITS_AVAILABLE = False
+    # Create mock classes for testing
+    class TileSource:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    download_tiles = None
+    download_osm_data = None
 
 
 class TestTileSource(unittest.TestCase):
