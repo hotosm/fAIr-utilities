@@ -41,9 +41,9 @@ dependencies = [
     "protobuf>=3.20.2,<5.0.0",
     "tensorflow>=2.10.0,<3.0.0",
 
-    # NEW: Use actual packages instead of duplicating code
-    "fairpredictor>=1.0.0",  # Use fairpredictor package directly
-    "geoml-toolkits>=1.0.0",  # Use geoml-toolkits package directly
+    # NEW: Use actual packages instead of duplicating code (when available on PyPI)
+    # "fairpredictor>=1.0.0",  # Use fairpredictor package directly (uncomment when available)
+    # "geoml-toolkits>=1.0.0",  # Use geoml-toolkits package directly (uncomment when available)
 
     # Additional dependencies for integration layer
     "aiohttp>=3.8.0,<4.0.0",
