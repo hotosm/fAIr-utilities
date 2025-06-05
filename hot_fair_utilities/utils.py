@@ -16,10 +16,14 @@ from typing import Tuple
 # Third-party imports
 import geopandas
 import matplotlib.pyplot as plt
+import mercantile
 import pandas as pd
+import rasterio
+from rasterio.merge import merge
 import requests
 import ultralytics
 from shapely.geometry import box
+import shapely.geometry
 
 IMAGE_SIZE = 256
 
@@ -152,45 +156,119 @@ def bbox2tiles(bbox_coords, zm_level, tile_size):
     return start, end
 
 
-def download_image(url, base_path, source_name):
-    response = requests.get(url)
-    image = response.content
-
-    url_splitted_list = url.split("/")
-    filename = f"{base_path}/{source_name}-{url_splitted_list[-2]}-{url_splitted_list[-1]}-{url_splitted_list[-3]}.png"
-
-    with open(filename, "wb") as f:
-        f.write(image)
-
-    # print(f"Downloaded: {url}")
-
-
 def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
     """Downloads imagery from start to end tile coordinate system
+
+    DEPRECATED: This function is deprecated. Use geoml_toolkits.download_tiles() instead.
+    This wrapper is maintained for backward compatibility.
 
     Args:
         start (list):[tile_x,tile_y]
         end (list): [tile_x,tile_y],
-        source (string): it should be eithre url string or maxar value
+        source (string): it should be either url string or maxar value
         zm_level : Zoom level
         base_path : Source where image will be downloaded
-
     """
+    import warnings
+    warnings.warn(
+        "tms2img is deprecated. Use 'from geoml_toolkits import download_tiles' instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
 
-    begin_x = start[0]  # this will be the beginning of the download loop for x
-    begin_y = start[1]  # this will be the beginning of the download loop for x
-    stop_x = end[0]  # this will be the end of the download loop for x
-    stop_y = end[1]  # this will be the end of the download loop for x
+    try:
+        from geoml_toolkits import download_tiles, TileSource
+
+        # Convert start/end coordinates to bbox
+        # Note: This is a simplified conversion - the original function had complex logic
+        # For full compatibility, users should migrate to geoml_toolkits directly
+
+        # Create TileSource based on source parameter
+        if source == "maxar":
+            connect_id = os.environ.get("MAXAR_CONNECT_ID")
+            if not connect_id:
+                raise ValueError("MAXAR_CONNECT_ID environment variable is required for Maxar source")
+
+            tile_source = TileSource(
+                name="maxar",
+                url=f"https://services.digitalglobe.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@jpg/{{z}}/{{x}}/{{y}}.jpg?connectId={connect_id}&flipy=true",
+                scheme="xyz"
+            )
+        else:
+            # Assume source is a URL template
+            tile_source = TileSource(
+                name="custom",
+                url=source,
+                scheme="xyz"
+            )
+
+        # Convert tile coordinates to approximate bbox
+        # This is a simplified conversion - for exact behavior, use geoml_toolkits directly
+        import mercantile
+
+        # Get bounds for the tile range
+        west_tile = mercantile.Tile(start[0], start[1], zm_level)
+        east_tile = mercantile.Tile(end[0], end[1], zm_level)
+
+        west_bounds = mercantile.bounds(west_tile)
+        east_bounds = mercantile.bounds(east_tile)
+
+        bbox = [
+            min(west_bounds.west, east_bounds.west),
+            min(west_bounds.south, east_bounds.south),
+            max(west_bounds.east, east_bounds.east),
+            max(west_bounds.north, east_bounds.north)
+        ]
+
+        # Use geoml_toolkits download_tiles function
+        import asyncio
+
+        async def download_wrapper():
+            return await download_tiles(
+                tms=tile_source,
+                zoom=zm_level,
+                bbox=bbox,
+                output_dir=base_path,
+                georeference=True
+            )
+
+        # Run the async function
+        return asyncio.run(download_wrapper())
+
+    except ImportError:
+        # Fallback to original implementation if geoml_toolkits is not available
+        print("Warning: geoml_toolkits not available, using legacy implementation")
+        _legacy_tms2img(start, end, zm_level, base_path, source)
+
+
+def _legacy_tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
+    """Legacy implementation of tms2img for backward compatibility."""
+
+    def download_image(url, base_path, source_name):
+        response = requests.get(url)
+        image = response.content
+
+        url_splitted_list = url.split("/")
+        filename = f"{base_path}/{source_name}-{url_splitted_list[-2]}-{url_splitted_list[-1]}-{url_splitted_list[-3]}.png"
+
+        with open(filename, "wb") as f:
+            f.write(image)
+
+    begin_x = start[0]
+    begin_y = start[1]
+    stop_x = end[0]
+    stop_y = end[1]
 
     print(f"Download starting from {start} to {end} using source {source} - {zm_level}")
 
-    start_x = begin_x  # starting loop from beginning
-    start_y = begin_y  # starting y loop from beginnig
-    source_name = "OAM"  # default
+    start_x = begin_x
+    start_y = begin_y
+    source_name = "OAM"
     download_urls = []
-    while start_x <= stop_x:  # download  x section while keeping y as c
+
+    while start_x <= stop_x:
         start_y = begin_y
-        while start_y >= stop_y:  # download  y section while keeping x as c
+        while start_y >= stop_y:
             download_path = [start_x, start_y]
             if source == "maxar":
                 try:
@@ -199,18 +277,13 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
                     raise ex
                 source_name = source
                 download_url = f"https://services.digitalglobe.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@jpg/{zm_level}/{download_path[0]}/{download_path[1]}.jpg?connectId={connect_id}&flipy=true"
-
-            # add multiple logic on supported sources here
             else:
-                # source should be url as string , like this :  https://tiles.openaerialmap.org/62dbd947d8499800053796ec/0/62dbd947d8499800053796ed/{z}/{x}/{y}
                 download_url = source.format(
                     x=download_path[0], y=download_path[1], z=zm_level
                 )
             download_urls.append(download_url)
-
-            start_y = start_y - 1  # decrease the y
-
-        start_x = start_x + 1  # increase the x
+            start_y = start_y - 1
+        start_x = start_x + 1
 
     # Use the ThreadPoolExecutor to download the images in parallel
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -220,12 +293,67 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
 
 def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
     """
+    DEPRECATED: This function is deprecated. Use geoml_toolkits.download_osm_data() instead.
+    This wrapper is maintained for backward compatibility.
+
     args :
         payload : Payload request for API URL
         API_URL : Raw data API URL
     Returns :
         geojson
     """
+    import warnings
+    warnings.warn(
+        "fetch_osm_data is deprecated. Use 'from geoml_toolkits import download_osm_data' instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+
+    try:
+        from geoml_toolkits import download_osm_data
+
+        # Try to extract parameters from payload for the new function
+        # This is a best-effort conversion - for full functionality, use geoml_toolkits directly
+
+        if 'geometry' in payload:
+            # Extract bbox from geometry if possible
+            geometry = payload['geometry']
+            if geometry.get('type') == 'Polygon':
+                coords = geometry['coordinates'][0]
+                lons = [coord[0] for coord in coords]
+                lats = [coord[1] for coord in coords]
+                bbox = [min(lons), min(lats), max(lons), max(lats)]
+            else:
+                raise ValueError("Only Polygon geometry is supported in this compatibility wrapper")
+        else:
+            raise ValueError("Payload must contain 'geometry' field")
+
+        # Extract other parameters
+        feature_type = payload.get('filters', {}).get('tags', {}).get('building', 'yes')
+        if feature_type == 'yes':
+            feature_type = 'building'
+
+        # Use geoml_toolkits download_osm_data function
+        import asyncio
+
+        async def download_wrapper():
+            return await download_osm_data(
+                bbox=bbox,
+                feature_type=feature_type,
+                api_url=API_URL
+            )
+
+        # Run the async function and return the result
+        return asyncio.run(download_wrapper())
+
+    except ImportError:
+        # Fallback to original implementation if geoml_toolkits is not available
+        print("Warning: geoml_toolkits not available, using legacy implementation")
+        return _legacy_fetch_osm_data(payload, API_URL)
+
+
+def _legacy_fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
+    """Legacy implementation of fetch_osm_data for backward compatibility."""
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
     task_response = requests.post(
@@ -320,3 +448,194 @@ def check4checkpoint(name, weights, output_path, remove_old=False):
         print(f"Set weights to {ckpt}")
         return ckpt, True
     return weights, False
+
+
+def get_tiles(zoom, geojson=None, bbox=None, within=False):
+    """
+    Get tiles for a given zoom level and area of interest.
+
+    Args:
+        zoom: Zoom level
+        geojson: GeoJSON file path, string, or dictionary
+        bbox: Bounding box coordinates [xmin, ymin, xmax, ymax]
+        within: Whether to get only tiles completely within the geometry
+
+    Returns:
+        List of mercantile.Tile objects
+    """
+    if geojson is not None:
+        geometry = get_geometry(geojson, None)
+    elif bbox is not None:
+        geometry = get_geometry(None, bbox)
+    else:
+        raise ValueError("Either geojson or bbox must be provided")
+
+    # Get tiles for the geometry
+    if within:
+        tiles = list(mercantile.tiles(*geometry['coordinates'][0][0], zoom))
+    else:
+        # Get bounding box of geometry
+        if geometry['type'] == 'Polygon':
+            coords = geometry['coordinates'][0]
+        else:
+            # For other geometry types, get bounds
+            import shapely.geometry
+            geom = shapely.geometry.shape(geometry)
+            bounds = geom.bounds
+            coords = [[bounds[0], bounds[1]], [bounds[2], bounds[3]]]
+
+        # Get all coordinates to find bounds
+        lons = [coord[0] for coord in coords]
+        lats = [coord[1] for coord in coords]
+
+        west, south, east, north = min(lons), min(lats), max(lons), max(lats)
+        tiles = list(mercantile.tiles(west, south, east, north, zoom))
+
+    return tiles
+
+
+def get_geometry(geojson=None, bbox=None):
+    """
+    Get geometry from either geojson or bbox.
+
+    Args:
+        geojson: GeoJSON file path, string, or dictionary
+        bbox: Bounding box coordinates [xmin, ymin, xmax, ymax]
+
+    Returns:
+        GeoJSON geometry dictionary
+    """
+    if geojson is not None:
+        if isinstance(geojson, str):
+            if os.path.exists(geojson):
+                import geopandas as gpd
+                gdf = gpd.read_file(geojson)
+                # Union all geometries and get the first one
+                geom = gdf.geometry.unary_union
+                if hasattr(geom, '__geo_interface__'):
+                    return geom.__geo_interface__
+                else:
+                    return geom
+            else:
+                try:
+                    geojson_data = json.loads(geojson)
+                    if 'features' in geojson_data:
+                        # Return the first feature's geometry
+                        return geojson_data['features'][0]['geometry']
+                    else:
+                        return geojson_data
+                except json.JSONDecodeError:
+                    raise ValueError("Invalid GeoJSON string")
+        else:
+            # Assume it's already a dictionary
+            if 'features' in geojson:
+                return geojson['features'][0]['geometry']
+            else:
+                return geojson
+    elif bbox is not None:
+        # Create a polygon from bbox
+        xmin, ymin, xmax, ymax = bbox
+        return {
+            "type": "Polygon",
+            "coordinates": [[
+                [xmin, ymin],
+                [xmax, ymin],
+                [xmax, ymax],
+                [xmin, ymax],
+                [xmin, ymin]
+            ]]
+        }
+    else:
+        raise ValueError("Either geojson or bbox must be provided")
+
+
+def split_geojson_by_tiles(geojson_path, tiles_geojson, output_dir, prefix="OAM"):
+    """
+    Split a GeoJSON file by tiles.
+
+    Args:
+        geojson_path: Path to the GeoJSON file to split
+        tiles_geojson: GeoJSON containing tile geometries
+        output_dir: Output directory for split files
+        prefix: Prefix for output files
+    """
+    import geopandas as gpd
+
+    # Read the main GeoJSON
+    main_gdf = gpd.read_file(geojson_path)
+
+    # Read tiles GeoJSON
+    if isinstance(tiles_geojson, str):
+        if os.path.exists(tiles_geojson):
+            tiles_gdf = gpd.read_file(tiles_geojson)
+        else:
+            # Parse as JSON string
+            tiles_data = json.loads(tiles_geojson)
+            tiles_gdf = gpd.GeoDataFrame.from_features(tiles_data['features'])
+    else:
+        tiles_gdf = gpd.GeoDataFrame.from_features(tiles_geojson['features'])
+
+    # Ensure same CRS
+    if main_gdf.crs != tiles_gdf.crs:
+        tiles_gdf = tiles_gdf.to_crs(main_gdf.crs)
+
+    # Split by each tile
+    for idx, tile_row in tiles_gdf.iterrows():
+        tile_geom = tile_row.geometry
+
+        # Find intersecting features
+        intersecting = main_gdf[main_gdf.intersects(tile_geom)]
+
+        if not intersecting.empty:
+            # Create output filename based on tile properties or index
+            output_filename = f"{prefix}-tile-{idx}.geojson"
+            output_path = os.path.join(output_dir, output_filename)
+
+            # Save intersecting features
+            intersecting.to_file(output_path, driver="GeoJSON")
+
+
+def merge_rasters(input_dir, output_path):
+    """
+    Merge all raster files in a directory into a single raster.
+
+    Args:
+        input_dir: Directory containing raster files
+        output_path: Path for the merged output raster
+    """
+    # Find all raster files
+    raster_files = []
+    for ext in ['*.tif', '*.tiff', '*.png', '*.jpg', '*.jpeg']:
+        raster_files.extend(glob(os.path.join(input_dir, ext)))
+
+    if not raster_files:
+        raise ValueError(f"No raster files found in {input_dir}")
+
+    # Open all raster files
+    src_files_to_mosaic = []
+    for file in raster_files:
+        src = rasterio.open(file)
+        src_files_to_mosaic.append(src)
+
+    # Merge rasters
+    mosaic, out_trans = merge(src_files_to_mosaic)
+
+    # Update metadata
+    out_meta = src_files_to_mosaic[0].meta.copy()
+    out_meta.update({
+        "driver": "GTiff",
+        "height": mosaic.shape[1],
+        "width": mosaic.shape[2],
+        "transform": out_trans,
+        "crs": src_files_to_mosaic[0].crs
+    })
+
+    # Write merged raster
+    with rasterio.open(output_path, "w", **out_meta) as dest:
+        dest.write(mosaic)
+
+    # Close all source files
+    for src in src_files_to_mosaic:
+        src.close()
+
+    print(f"Merged {len(raster_files)} rasters into {output_path}")

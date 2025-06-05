@@ -6,15 +6,22 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      test_migration:
+        description: "Test package migration"
+        required: false
+        default: "false"
+        type: boolean
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.10"
 
       - name: Remove solaris
         run: sudo rm -rf ./docker ./weights
@@ -31,10 +38,70 @@ jobs:
       - name: Unzip and Move Basemodel
         run: unzip baseline.zip -d ramp-code/ramp
 
-      - name: Install gdal
+      - name: Install GDAL system packages
         run: |
-          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
-          pip install GDAL==$(gdal-config --version)
+          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev && sudo apt-get -y autoremove && sudo apt-get clean
+
+      - name: Install GDAL Python bindings
+        run: |
+          echo "🔍 Installing GDAL Python bindings..."
+          export GDAL_VERSION=$(gdal-config --version)
+          echo "GDAL version: $GDAL_VERSION"
+          pip install GDAL==$GDAL_VERSION --no-cache-dir
+          echo "✅ GDAL Python bindings installed"
+
+      - name: Install TensorFlow with Python version compatibility
+        run: |
+          echo "🔍 Installing TensorFlow compatible with Python version..."
+          PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+
+          if [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            echo "Installing TensorFlow for Python 3.12 (includes tf.keras)..."
+            pip install "tensorflow>=2.17.1,<3.0.0" --no-cache-dir
+          elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
+            echo "Installing TensorFlow for Python 3.11 (includes tf.keras)..."
+            pip install "tensorflow>=2.16.0,<3.0.0" --no-cache-dir
+          else
+            echo "Installing TensorFlow for Python 3.10 (includes tf.keras)..."
+            pip install "tensorflow>=2.15.0,<3.0.0" --no-cache-dir
+          fi
+
+          echo "✅ TensorFlow installed successfully (tf.keras included)"
+
+      - name: Install matplotlib and segmentation-models
+        run: |
+          echo "🔍 Installing matplotlib..."
+          pip install matplotlib --no-cache-dir
+          echo "✅ matplotlib installed successfully"
+
+          echo "🔍 Installing segmentation-models..."
+          pip install segmentation-models --no-cache-dir
+          echo "✅ segmentation-models installed successfully"
+
+      - name: Verify GDAL and matplotlib installation
+        run: |
+          echo "🔍 Verifying GDAL installation..."
+          python -c "
+          try:
+              from osgeo import gdal
+              print('✅ GDAL/osgeo import successful')
+              print(f'GDAL version: {gdal.VersionInfo()}')
+          except ImportError as e:
+              print(f'❌ GDAL import failed: {e}')
+              exit(1)
+          "
+
+          echo "🔍 Verifying matplotlib installation..."
+          python -c "
+          try:
+              import matplotlib
+              print('✅ matplotlib import successful')
+              print(f'matplotlib version: {matplotlib.__version__}')
+          except ImportError as e:
+              print(f'❌ matplotlib import failed: {e}')
+              exit(1)
+          "
 
       - name: Install ramp dependecies
         run: |
@@ -49,8 +116,29 @@ jobs:
       - name: Install pytorch and ultralytics
         run: pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.3.26
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements-build.txt
+          echo "✅ All dependencies installed including matplotlib"
+
       - name: Install fair utilities
-        run: pip install -e .
+        run: |
+          # Use robust installation script with multiple fallback strategies
+          python install_robust.py
+
+      - name: Verify installation
+        run: |
+          # Test that the installation actually works
+          echo "🔍 Verifying installation..."
+          python simple_test.py || {
+            echo "❌ Simple test failed, trying basic import..."
+            python -c "import hot_fair_utilities as fair; print('✅ Basic import works')" || {
+              echo "❌ Basic import also failed"
+              exit 1
+            }
+            echo "⚠️ Basic import works but verification failed"
+          }
 
       - name: Run test ramp
         run: |

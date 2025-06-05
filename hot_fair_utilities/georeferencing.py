@@ -4,8 +4,16 @@ from glob import glob
 from pathlib import Path
 
 # Third party imports
-# Third-party imports
-from osgeo import gdal
+try:
+    from osgeo import gdal
+except ImportError:
+    raise ImportError(
+        "GDAL library is required for georeferencing functionality. "
+        "Please install it using:\n"
+        "  sudo apt-get install gdal-bin libgdal-dev\n"
+        "  pip install GDAL==$(gdal-config --version)"
+    )
+
 from tqdm import tqdm
 
 from .utils import get_bounding_box
