@@ -26,6 +26,13 @@ Pillow>=9.1.0,<11.0.0
 pyproj>=3.0.0,<4.0.0
 rtree>=1.0.0,<2.0.0
 
+# GDAL - installed separately via system packages and pip
+# GDAL will be installed via: pip install GDAL==$(gdal-config --version)
+
 # Package dependencies (optional - install if available)
 # fairpredictor>=1.0.0  # Commented out until published on PyPI
 # geoml-toolkits>=1.0.0  # Commented out until published on PyPI
+
+# Note: GDAL is a special case that requires system packages first:
+# 1. sudo apt-get install gdal-bin libgdal-dev
+# 2. pip install GDAL==$(gdal-config --version)

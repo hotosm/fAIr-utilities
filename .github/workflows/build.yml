@@ -38,10 +38,30 @@ jobs:
       - name: Unzip and Move Basemodel
         run: unzip baseline.zip -d ramp-code/ramp
 
-      - name: Install gdal
+      - name: Install GDAL system packages
         run: |
-          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
-          pip install GDAL==$(gdal-config --version)
+          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev && sudo apt-get -y autoremove && sudo apt-get clean
+
+      - name: Install GDAL Python bindings
+        run: |
+          echo "🔍 Installing GDAL Python bindings..."
+          export GDAL_VERSION=$(gdal-config --version)
+          echo "GDAL version: $GDAL_VERSION"
+          pip install GDAL==$GDAL_VERSION
+          echo "✅ GDAL Python bindings installed"
+
+      - name: Verify GDAL installation
+        run: |
+          echo "🔍 Verifying GDAL installation..."
+          python -c "
+          try:
+              from osgeo import gdal
+              print('✅ GDAL/osgeo import successful')
+              print(f'GDAL version: {gdal.VersionInfo()}')
+          except ImportError as e:
+              print(f'❌ GDAL import failed: {e}')
+              exit(1)
+          "
 
       - name: Install ramp dependecies
         run: |

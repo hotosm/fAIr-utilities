@@ -22,13 +22,39 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gdal-bin libgdal-dev python3-gdal
+          sudo apt-get install -y gdal-bin libgdal-dev
           sudo apt-get autoremove && sudo apt-get clean
+
+      - name: Install GDAL Python bindings
+        run: |
+          echo "🔍 Installing GDAL Python bindings..."
+          export GDAL_VERSION=$(gdal-config --version)
+          echo "GDAL version: $GDAL_VERSION"
+          pip install GDAL==$GDAL_VERSION
+          echo "✅ GDAL Python bindings installed"
+
+      - name: Verify GDAL installation
+        run: |
+          echo "🔍 Verifying GDAL installation..."
+          python -c "
+          try:
+              from osgeo import gdal
+              print('✅ GDAL/osgeo import successful')
+              print(f'GDAL version: {gdal.VersionInfo()}')
+          except ImportError as e:
+              print(f'❌ GDAL import failed: {e}')
+              exit(1)
+          "
 
       - name: Install build dependencies
         run: |
           pip install --upgrade pip setuptools wheel
           pip install -r requirements-build.txt
+
+      - name: Test GDAL installation
+        run: |
+          echo "🔍 Testing GDAL installation..."
+          python test_gdal_installation.py
 
       - name: Install package with robust script
         run: |
@@ -41,10 +67,22 @@ jobs:
           python -c "
           print('🚀 Starting basic migration test...')
 
-          # Test 1: Basic import
+          # Test 1: Basic import with error handling
           print('\\n🔍 Test 1: Basic Import')
-          import hot_fair_utilities as fair
-          print('✅ Basic import successful')
+          try:
+              import hot_fair_utilities as fair
+              print('✅ Basic import successful')
+          except ImportError as e:
+              print(f'❌ Import failed: {e}')
+              # Try to identify the specific issue
+              try:
+                  from osgeo import gdal
+                  print('✅ GDAL/osgeo is available')
+              except ImportError:
+                  print('❌ GDAL/osgeo import failed - this is the root cause')
+                  exit(1)
+              # Re-raise the original error if GDAL is fine
+              raise e
 
           # Test 2: Package availability
           print('\\n🔍 Test 2: Package Availability')

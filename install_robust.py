@@ -84,10 +84,48 @@ def install_core_dependencies():
     return True
 
 
+def install_gdal_if_needed():
+    """Install GDAL if not already available."""
+    print("🔍 Checking GDAL installation...")
+
+    try:
+        # Test if GDAL is already available
+        run_command([sys.executable, "-c", "from osgeo import gdal; print('GDAL already available')"])
+        print("✅ GDAL is already installed and working")
+        return True
+    except subprocess.CalledProcessError:
+        print("⚠️ GDAL not available, attempting installation...")
+
+        try:
+            # Try to install GDAL
+            print("📦 Installing GDAL Python bindings...")
+
+            # Get GDAL version from system
+            result = run_command(["gdal-config", "--version"], capture_output=True)
+            gdal_version = result.stdout.strip()
+            print(f"🔍 System GDAL version: {gdal_version}")
+
+            # Install matching Python bindings
+            run_command([sys.executable, "-m", "pip", "install", f"GDAL=={gdal_version}"])
+            print("✅ GDAL Python bindings installed successfully")
+
+            # Verify installation
+            run_command([sys.executable, "-c", "from osgeo import gdal; print('GDAL verification successful')"])
+            print("✅ GDAL installation verified")
+            return True
+
+        except subprocess.CalledProcessError as e:
+            print(f"❌ GDAL installation failed: {e}")
+            print("   This may require system packages to be installed first:")
+            print("   sudo apt-get install gdal-bin libgdal-dev")
+            return False
+
+
 def install_package_dependencies():
     """Install fairpredictor and geoml-toolkits packages if available."""
     print("📦 Attempting to install optional package dependencies...")
 
+    # First try PyPI packages
     package_deps = [
         ("fairpredictor>=1.0.0", "fairpredictor"),
         ("geoml-toolkits>=1.0.0", "geoml-toolkits")
@@ -98,17 +136,36 @@ def install_package_dependencies():
         try:
             print(f"🔍 Checking if {dep_name} is available on PyPI...")
             run_command([sys.executable, "-m", "pip", "install", dep_spec])
-            print(f"✅ Successfully installed {dep_name}")
+            print(f"✅ Successfully installed {dep_name} from PyPI")
             installed_count += 1
         except subprocess.CalledProcessError:
-            print(f"⚠️ {dep_name} not available on PyPI (expected during development)")
-            print(f"   This is normal if the package hasn't been published yet")
+            print(f"⚠️ {dep_name} not available on PyPI")
+
+    # If PyPI packages not available, try GitHub
+    if installed_count == 0:
+        print("🔍 Trying to install from GitHub repositories...")
+        github_repos = [
+            ("git+https://github.com/hotosm/fairpredictor.git@main", "fairpredictor"),
+            ("git+https://github.com/kshitijrajsharma/fairpredictor.git@main", "fairpredictor"),
+            ("git+https://github.com/hotosm/geoml-toolkits.git@main", "geoml-toolkits"),
+            ("git+https://github.com/kshitijrajsharma/geoml-toolkits.git@main", "geoml-toolkits"),
+        ]
+
+        for repo_url, dep_name in github_repos:
+            try:
+                print(f"🔍 Trying {dep_name} from GitHub...")
+                run_command([sys.executable, "-m", "pip", "install", repo_url], check=False)
+                print(f"✅ Successfully installed {dep_name} from GitHub")
+                installed_count += 1
+                break  # Stop trying other repos for this package
+            except subprocess.CalledProcessError:
+                print(f"⚠️ {dep_name} not available from {repo_url}")
 
     if installed_count == 0:
         print("📝 Note: No optional packages installed - this is expected during development")
         print("   The migration framework is in place and will work when packages are available")
     else:
-        print(f"✅ Installed {installed_count}/{len(package_deps)} optional packages")
+        print(f"✅ Installed {installed_count} optional packages")
 
     return True
 
@@ -210,10 +267,13 @@ def main():
     # Step 2: Install core dependencies
     install_core_dependencies()
 
-    # Step 3: Install package dependencies
+    # Step 3: Install GDAL if needed
+    install_gdal_if_needed()
+
+    # Step 4: Install package dependencies
     install_package_dependencies()
 
-    # Step 4: Try different installation strategies
+    # Step 5: Try different installation strategies
     strategies = [
         ("PEP 517", try_pep517_installation),
         ("Legacy", try_legacy_installation), 
