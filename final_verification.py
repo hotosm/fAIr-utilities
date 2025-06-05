@@ -25,31 +25,34 @@ def test_import_with_details(module_name, package_name=None):
 
 
 def test_tensorflow_keras_compatibility():
-    """Test TensorFlow and Keras compatibility."""
-    print("\n🔍 Testing TensorFlow/Keras compatibility...")
-    
+    """Test TensorFlow and tf.keras compatibility."""
+    print("\n🔍 Testing TensorFlow/tf.keras compatibility...")
+
     try:
         import tensorflow as tf
         print(f"✅ TensorFlow version: {tf.__version__}")
-        
-        # Test Keras integration
-        import tensorflow.keras as keras
-        print("✅ TensorFlow Keras integration working")
-        
+        print(f"✅ tf.keras version: {tf.keras.__version__}")
+
+        # Test tf.keras integration
+        print("✅ TensorFlow tf.keras integration working")
+
         # Test basic functionality
-        model = keras.Sequential([keras.layers.Dense(1, input_shape=(1,))])
-        print("✅ Basic Keras model creation successful")
-        
-        # Test if keras.utils.generic_utils exists (common issue)
-        try:
-            from keras.utils import generic_utils
-            print("✅ keras.utils.generic_utils available")
-        except (ImportError, AttributeError):
-            print("⚠️ keras.utils.generic_utils not available (may be expected)")
-        
+        model = tf.keras.Sequential([tf.keras.layers.Dense(1, input_shape=(1,))])
+        print("✅ Basic tf.keras model creation successful")
+
+        # Test model compilation
+        model.compile(optimizer='adam', loss='mse')
+        print("✅ tf.keras model compilation successful")
+
+        # Test if tf.__internal__ is available (but don't test specific functions)
+        if hasattr(tf, '__internal__'):
+            print("✅ tf.__internal__ is available")
+        else:
+            print("⚠️ tf.__internal__ not available (may be expected)")
+
         return True
     except Exception as e:
-        print(f"❌ TensorFlow/Keras compatibility test failed: {e}")
+        print(f"❌ TensorFlow/tf.keras compatibility test failed: {e}")
         return False
 
 

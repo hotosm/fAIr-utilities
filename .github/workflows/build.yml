@@ -50,27 +50,24 @@ jobs:
           pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
-      - name: Install TensorFlow and Keras with Python version compatibility
+      - name: Install TensorFlow with Python version compatibility
         run: |
-          echo "🔍 Installing TensorFlow and Keras compatible with Python version..."
+          echo "🔍 Installing TensorFlow compatible with Python version..."
           PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
           echo "Python version: $PYTHON_VERSION"
 
           if [[ "$PYTHON_VERSION" == "3.12" ]]; then
-            echo "Installing TensorFlow for Python 3.12..."
+            echo "Installing TensorFlow for Python 3.12 (includes tf.keras)..."
             pip install "tensorflow>=2.17.1,<3.0.0" --no-cache-dir
-            pip install "keras>=2.17.1,<3.0.0" --no-cache-dir
           elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
-            echo "Installing TensorFlow for Python 3.11..."
-            pip install "tensorflow>=2.15.0,<3.0.0" --no-cache-dir
-            pip install "keras>=2.15.0,<3.0.0" --no-cache-dir
+            echo "Installing TensorFlow for Python 3.11 (includes tf.keras)..."
+            pip install "tensorflow>=2.16.0,<3.0.0" --no-cache-dir
           else
-            echo "Installing TensorFlow for Python 3.10..."
-            pip install "tensorflow>=2.12.0,<3.0.0" --no-cache-dir
-            pip install "keras>=2.12.0,<3.0.0" --no-cache-dir
+            echo "Installing TensorFlow for Python 3.10 (includes tf.keras)..."
+            pip install "tensorflow>=2.15.0,<3.0.0" --no-cache-dir
           fi
 
-          echo "✅ TensorFlow and Keras installed successfully with compatible versions"
+          echo "✅ TensorFlow installed successfully (tf.keras included)"
 
       - name: Install matplotlib and segmentation-models
         run: |

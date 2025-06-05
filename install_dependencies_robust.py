@@ -84,15 +84,12 @@ def install_dependencies_with_fallback():
     if python_version == "3.12":
         numpy_version = "numpy>=1.26.0,<2.0.0"  # TensorFlow 2.17+ supports NumPy 2.x
         tf_version = "tensorflow>=2.17.1,<3.0.0"
-        keras_version = "keras>=2.17.1,<3.0.0"
     elif python_version == "3.11":
         numpy_version = "numpy>=1.22.0,<1.24.0"  # TensorFlow 2.15-2.16 requires NumPy <1.24
         tf_version = "tensorflow>=2.16.0,<3.0.0"
-        keras_version = "keras>=2.16.0,<3.0.0"
     else:  # Python 3.10
         numpy_version = "numpy>=1.22.0,<1.24.0"  # TensorFlow 2.15 requires NumPy <1.24
         tf_version = "tensorflow>=2.15.0,<3.0.0"
-        keras_version = "keras>=2.15.0,<3.0.0"
 
     # Install NumPy first
     try:
@@ -105,8 +102,7 @@ def install_dependencies_with_fallback():
 
     core_deps = [
         "matplotlib>=3.5.0,<4.0.0",
-        tf_version,
-        keras_version,
+        tf_version,  # TensorFlow includes Keras (tf.keras)
         "pandas>=2.0.0,<=2.2.3",
     ]
     

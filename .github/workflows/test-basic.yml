@@ -60,43 +60,72 @@ jobs:
 
           echo "✅ NumPy installed with TensorFlow compatibility"
 
-      - name: Install TensorFlow and Keras with Python version compatibility
+      - name: Install TensorFlow with Python version compatibility
         run: |
-          echo "🔍 Installing TensorFlow and Keras compatible with Python version..."
+          echo "🔍 Installing TensorFlow compatible with Python version..."
           PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
           echo "Python version: $PYTHON_VERSION"
 
           if [[ "$PYTHON_VERSION" == "3.12" ]]; then
-            echo "Installing TensorFlow for Python 3.12 (with NumPy 2.x support)..."
+            echo "Installing TensorFlow for Python 3.12 (includes tf.keras)..."
             pip install "tensorflow>=2.17.1,<3.0.0" --no-cache-dir
-            pip install "keras>=2.17.1,<3.0.0" --no-cache-dir
           elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
-            echo "Installing TensorFlow for Python 3.11..."
+            echo "Installing TensorFlow for Python 3.11 (includes tf.keras)..."
             pip install "tensorflow>=2.16.0,<3.0.0" --no-cache-dir
-            pip install "keras>=2.16.0,<3.0.0" --no-cache-dir
           else
-            echo "Installing TensorFlow for Python 3.10 (with NumPy <1.24 constraint)..."
+            echo "Installing TensorFlow for Python 3.10 (includes tf.keras)..."
             pip install "tensorflow>=2.15.0,<3.0.0" --no-cache-dir
-            pip install "keras>=2.15.0,<3.0.0" --no-cache-dir
           fi
 
-          echo "✅ TensorFlow and Keras installed successfully with compatible versions"
+          echo "✅ TensorFlow installed successfully (tf.keras included)"
 
-      - name: Verify NumPy and TensorFlow compatibility
+      - name: Verify TensorFlow and Keras API compatibility
         run: |
-          echo "🔍 Verifying NumPy and TensorFlow compatibility..."
+          echo "🔍 Verifying TensorFlow and Keras API compatibility..."
+          python -c "
+          import tensorflow as tf
+          print(f'TensorFlow version: {tf.__version__}')
+          print(f'Keras version (tf.keras): {tf.keras.__version__}')
+
+          # Check for common API issues
+          try:
+              # Test if tf.__internal__ has the correct attributes
+              if hasattr(tf, '__internal__'):
+                  print('✅ tf.__internal__ is available')
+                  # Don't test specific internal functions as they may change
+              else:
+                  print('⚠️ tf.__internal__ not available (may be expected)')
+
+              # Test basic tf.keras functionality
+              layer = tf.keras.layers.Dense(1)
+              print('✅ tf.keras.layers working correctly')
+
+              print('✅ TensorFlow and Keras API compatibility verified')
+          except Exception as e:
+              print(f'❌ API compatibility issue: {e}')
+              exit(1)
+          "
+
+      - name: Verify NumPy, TensorFlow, and Keras compatibility
+        run: |
+          echo "🔍 Verifying NumPy, TensorFlow, and Keras compatibility..."
           python -c "
           import numpy as np
           import tensorflow as tf
           print(f'NumPy version: {np.__version__}')
           print(f'TensorFlow version: {tf.__version__}')
+          print(f'Keras version (tf.keras): {tf.keras.__version__}')
 
           # Test basic operations
           x = np.array([1, 2, 3, 4])
           y = tf.constant(x)
           print(f'NumPy array: {x}')
           print(f'TensorFlow tensor: {y}')
-          print('✅ NumPy and TensorFlow compatibility verified')
+
+          # Test tf.keras functionality
+          model = tf.keras.Sequential([tf.keras.layers.Dense(1, input_shape=(1,))])
+          print('✅ tf.keras model creation successful')
+          print('✅ NumPy, TensorFlow, and Keras compatibility verified')
           "
 
       - name: Install matplotlib and segmentation-models

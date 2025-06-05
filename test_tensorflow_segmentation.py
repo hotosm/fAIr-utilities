@@ -46,12 +46,16 @@ def test_segmentation_models_import():
     try:
         import segmentation_models as sm
         print(f"✅ segmentation-models import successful - version: {sm.__version__}")
-        
+
         # Test that TensorFlow backend is working
         print("🔍 Testing segmentation-models with TensorFlow backend...")
         sm.set_framework('tf.keras')
-        print("✅ TensorFlow backend set successfully")
-        
+        print("✅ TensorFlow backend (tf.keras) set successfully")
+
+        # Test framework detection
+        framework = sm.framework()
+        print(f"✅ Current framework: {framework}")
+
         return True
     except ImportError as e:
         print(f"❌ segmentation-models import failed: {e}")
@@ -65,15 +69,19 @@ def test_tensorflow_keras():
     """Test TensorFlow Keras functionality."""
     print("🔍 Testing TensorFlow Keras...")
     try:
-        import tensorflow.keras as keras
-        print("✅ TensorFlow Keras import successful")
-        
+        import tensorflow as tf
+        print(f"✅ TensorFlow Keras (tf.keras) version: {tf.keras.__version__}")
+
         # Test basic Keras functionality
-        model = keras.Sequential([
-            keras.layers.Dense(1, input_shape=(1,))
+        model = tf.keras.Sequential([
+            tf.keras.layers.Dense(1, input_shape=(1,))
         ])
-        print("✅ Basic Keras model creation successful")
-        
+        print("✅ Basic tf.keras model creation successful")
+
+        # Test model compilation
+        model.compile(optimizer='adam', loss='mse')
+        print("✅ tf.keras model compilation successful")
+
         return True
     except ImportError as e:
         print(f"❌ TensorFlow Keras import failed: {e}")
