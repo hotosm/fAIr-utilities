@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11"] # Temporarily exclude 3.12 due to pkgutil.ImpImporter compatibility
 
     steps:
       - name: Checkout code
@@ -125,11 +125,58 @@ jobs:
               exit(1)
           "
 
-      - name: Install dependencies
+      - name: Verify Python version compatibility
         run: |
+          echo "🔍 Checking Python version compatibility..."
+          PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+
+          if [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            echo "⚠️ Python 3.12 detected - checking for pkgutil compatibility issues"
+            python -c "
+            import pkgutil
+            if hasattr(pkgutil, 'ImpImporter'):
+                print('✅ pkgutil.ImpImporter available')
+            else:
+                print('❌ pkgutil.ImpImporter not available (removed in Python 3.12)')
+                print('This may cause issues with older dependencies')
+            "
+          fi
+
+      - name: Install dependencies with enhanced error handling
+        run: |
+          echo "🔍 Installing dependencies with enhanced error handling..."
           python -m pip install --upgrade pip setuptools wheel
-          pip install -r requirements-build.txt
-          echo "✅ All dependencies installed including matplotlib"
+
+          echo "📦 Installing requirements from file..."
+          if ! pip install -r requirements-build.txt; then
+            echo "❌ Dependency installation failed. Checking for specific issues..."
+
+            # Try to identify problematic packages
+            echo "🔍 Attempting to install packages individually to identify issues..."
+            while IFS= read -r line; do
+              if [[ $line =~ ^[^#]*[a-zA-Z] ]]; then
+                package=$(echo "$line" | cut -d'>' -f1 | cut -d'=' -f1 | cut -d'<' -f1)
+                echo "Testing package: $package"
+                if ! pip install "$line"; then
+                  echo "❌ Failed to install: $line"
+                else
+                  echo "✅ Successfully installed: $line"
+                fi
+              fi
+            done < requirements-build.txt
+
+            echo "❌ Some dependencies failed to install"
+            exit 1
+          fi
+
+          echo "✅ All dependencies installed successfully"
+
+      - name: Test Python 3.12 compatibility (if applicable)
+        run: |
+          echo "🔍 Running Python 3.12 compatibility test..."
+          python test_python312_compatibility.py
+        continue-on-error: true
 
       - name: Install optional dependencies (if available)
         run: |

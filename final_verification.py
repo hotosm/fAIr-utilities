@@ -109,21 +109,72 @@ def test_gdal_functionality():
         return False
 
 
+def test_efficientnet_compatibility():
+    """Test EfficientNet compatibility with modern TensorFlow."""
+    print("\n🔍 Testing EfficientNet compatibility...")
+
+    efficientnet_working = False
+
+    # Test different EfficientNet implementations
+    implementations = [
+        ("tf.keras.applications.EfficientNetB0", "Built-in TensorFlow"),
+        ("keras_efficientnet_v2", "Keras EfficientNet V2"),
+        ("efficientnet", "Classic EfficientNet"),
+    ]
+
+    for impl_name, impl_desc in implementations:
+        try:
+            if impl_name == "tf.keras.applications.EfficientNetB0":
+                import tensorflow as tf
+                if hasattr(tf.keras.applications, 'EfficientNetB0'):
+                    print(f"✅ {impl_desc}: Available")
+                    efficientnet_working = True
+                else:
+                    print(f"⚠️ {impl_desc}: Not available")
+            elif impl_name == "keras_efficientnet_v2":
+                import keras_efficientnet_v2
+                print(f"✅ {impl_desc}: Available")
+                efficientnet_working = True
+            elif impl_name == "efficientnet":
+                import efficientnet
+                # Test if it works without keras.utils.generic_utils error
+                try:
+                    efficientnet.init_keras_custom_objects()
+                    print(f"✅ {impl_desc}: Available and working")
+                    efficientnet_working = True
+                except Exception as e:
+                    if "generic_utils" in str(e):
+                        print(f"❌ {impl_desc}: Available but incompatible (keras.utils.generic_utils)")
+                    else:
+                        print(f"⚠️ {impl_desc}: Available but error: {e}")
+        except ImportError:
+            print(f"⚠️ {impl_desc}: Not installed")
+        except Exception as e:
+            print(f"❌ {impl_desc}: Error - {e}")
+
+    if efficientnet_working:
+        print("✅ At least one EfficientNet implementation is working")
+    else:
+        print("⚠️ No working EfficientNet implementation found (may be expected)")
+
+    return True  # Always return True since EfficientNet is optional
+
+
 def test_optional_packages():
     """Test optional packages."""
     print("\n🔍 Testing optional packages...")
-    
+
     optional_packages = [
         ("fairpredictor", "fairpredictor"),
         ("geoml_toolkits", "geoml-toolkits"),
     ]
-    
+
     available_count = 0
     for module, package in optional_packages:
         success, error = test_import_with_details(module, package)
         if success:
             available_count += 1
-    
+
     print(f"\n📊 Optional packages available: {available_count}/{len(optional_packages)}")
     return True  # Always return True since these are optional
 
@@ -188,6 +239,7 @@ def main():
         ("GDAL Functionality", test_gdal_functionality),
         ("TensorFlow/Keras Compatibility", test_tensorflow_keras_compatibility),
         ("segmentation-models", test_segmentation_models),
+        ("EfficientNet Compatibility", test_efficientnet_compatibility),
         ("Optional Packages", test_optional_packages),
         ("hot_fair_utilities", test_hot_fair_utilities),
     ]

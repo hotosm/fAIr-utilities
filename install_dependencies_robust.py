@@ -121,13 +121,41 @@ def install_dependencies_with_fallback():
             except Exception:
                 print(f"❌ Complete failure for {dep_name}")
     
-    # Step 4: Install segmentation-models after TensorFlow
-    print("\n🤖 Step 4: Installing segmentation-models...")
+    # Step 4: Install computer vision models after TensorFlow
+    print("\n🤖 Step 4: Installing computer vision models...")
+
+    # Install segmentation-models
     try:
         run_command("pip install segmentation-models --no-cache-dir")
         print("✅ segmentation-models installed")
     except Exception as e:
         print(f"❌ segmentation-models installation failed: {e}")
+
+    # Install efficientnet with compatibility handling
+    try:
+        print("Installing efficientnet with compatibility...")
+        # Try different efficientnet packages
+        efficientnet_packages = [
+            "efficientnet<2.0.0",  # Classic efficientnet with version constraint
+            "keras-efficientnet-v2",  # Modern alternative
+        ]
+
+        efficientnet_installed = False
+        for package in efficientnet_packages:
+            try:
+                run_command(f"pip install '{package}' --no-cache-dir")
+                print(f"✅ {package} installed successfully")
+                efficientnet_installed = True
+                break
+            except Exception:
+                print(f"⚠️ Failed to install {package}")
+                continue
+
+        if not efficientnet_installed:
+            print("⚠️ No efficientnet package could be installed")
+
+    except Exception as e:
+        print(f"⚠️ efficientnet installation failed: {e}")
     
     # Step 5: Install remaining geospatial dependencies
     print("\n🌍 Step 5: Installing geospatial dependencies...")
