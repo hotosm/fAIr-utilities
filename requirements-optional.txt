@@ -1,0 +1,28 @@
+# Optional package dependencies for fAIr-utilities
+# These packages enhance functionality but are not required for core features
+
+# Migration target packages (install from Git if available)
+# fairpredictor>=0.0.21  # Available version instead of 1.0.0
+# geoml-toolkits>=0.0.1  # Available version instead of 1.0.0
+
+# Git repository URLs for development versions
+# Install with: pip install -r requirements-optional.txt
+
+# Fairpredictor - try multiple possible repositories
+# git+https://github.com/hotosm/fairpredictor.git@main
+# git+https://github.com/kshitijrajsharma/fairpredictor.git@main
+# git+https://github.com/fairpredictor/fairpredictor.git@main
+
+# Geoml-toolkits - try multiple possible repositories
+# git+https://github.com/hotosm/geoml-toolkits.git@main
+# git+https://github.com/kshitijrajsharma/geoml-toolkits.git@main
+# git+https://github.com/geoml-toolkits/geoml-toolkits.git@main
+
+# Note: All entries are commented out because:
+# 1. PyPI packages may not exist yet
+# 2. Git repositories may be private or not exist
+# 3. Installation should be attempted with continue-on-error in CI/CD
+
+# Usage in CI/CD:
+# pip install git+https://github.com/hotosm/fairpredictor.git@main || echo "fairpredictor not available"
+# pip install git+https://github.com/hotosm/geoml-toolkits.git@main || echo "geoml-toolkits not available"

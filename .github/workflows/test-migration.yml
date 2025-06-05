@@ -52,7 +52,7 @@ jobs:
           echo "🔍 Installing GDAL Python bindings..."
           export GDAL_VERSION=$(gdal-config --version)
           echo "GDAL version: $GDAL_VERSION"
-          pip install GDAL==$GDAL_VERSION
+          pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
       - name: Verify GDAL installation
@@ -68,10 +68,11 @@ jobs:
               exit(1)
           "
 
-      - name: Install build dependencies
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements-build.txt
+          echo "✅ All dependencies installed including matplotlib"
 
       - name: Install optional dependencies (if available)
         run: |

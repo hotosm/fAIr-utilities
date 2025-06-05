@@ -30,10 +30,11 @@ jobs:
           echo "🔍 Installing GDAL Python bindings..."
           export GDAL_VERSION=$(gdal-config --version)
           echo "GDAL version: $GDAL_VERSION"
-          pip install GDAL==$GDAL_VERSION
+          # Install specific GDAL version that works with Python 3.10
+          pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
-      - name: Verify GDAL installation
+      - name: Verify GDAL and matplotlib installation
         run: |
           echo "🔍 Verifying GDAL installation..."
           python -c "
@@ -46,15 +47,48 @@ jobs:
               exit(1)
           "
 
-      - name: Install build dependencies
-        run: |
-          pip install --upgrade pip setuptools wheel
-          pip install -r requirements-build.txt
+          echo "🔍 Verifying matplotlib installation..."
+          python -c "
+          try:
+              import matplotlib
+              print('✅ matplotlib import successful')
+              print(f'matplotlib version: {matplotlib.__version__}')
+          except ImportError as e:
+              print(f'❌ matplotlib import failed: {e}')
+              exit(1)
+          "
 
-      - name: Test GDAL installation
+      - name: Install dependencies
         run: |
-          echo "🔍 Testing GDAL installation..."
-          python test_gdal_installation.py
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements-build.txt
+          echo "✅ All dependencies installed including matplotlib"
+
+      - name: Install optional packages from Git (if available)
+        run: |
+          echo "🔍 Attempting to install optional packages from Git repositories..."
+
+          # Try fairpredictor from multiple possible repositories
+          echo "📦 Installing fairpredictor..."
+          pip install git+https://github.com/hotosm/fairpredictor.git@main || \
+          pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@main || \
+          pip install git+https://github.com/fairpredictor/fairpredictor.git@main || \
+          echo "⚠️ fairpredictor not available from Git repositories"
+
+          # Try geoml-toolkits from multiple possible repositories
+          echo "📦 Installing geoml-toolkits..."
+          pip install git+https://github.com/hotosm/geoml-toolkits.git@main || \
+          pip install git+https://github.com/kshitijrajsharma/geoml-toolkits.git@main || \
+          pip install git+https://github.com/geoml-toolkits/geoml-toolkits.git@main || \
+          echo "⚠️ geoml-toolkits not available from Git repositories"
+
+          echo "📝 Note: Optional packages installation completed (some may have failed - this is expected)"
+        continue-on-error: true
+
+      - name: Verify all dependencies
+        run: |
+          echo "🔍 Verifying all dependencies..."
+          python verify_dependencies.py
 
       - name: Install package with robust script
         run: |

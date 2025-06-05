@@ -71,7 +71,8 @@ def install_core_dependencies():
         "pandas>=2.0.0,<=2.2.3",
         "mercantile>=1.2.1,<2.0.0",
         "tqdm>=4.67.0,<5.0.0",
-        "Pillow>=9.1.0,<11.0.0"
+        "Pillow>=9.1.0,<11.0.0",
+        "matplotlib>=3.5.0,<4.0.0"
     ]
 
     for dep in core_deps:
@@ -97,16 +98,19 @@ def install_gdal_if_needed():
         print("⚠️ GDAL not available, attempting installation...")
 
         try:
-            # Try to install GDAL
+            # Check if gdal-config is available
+            try:
+                result = run_command(["gdal-config", "--version"], capture_output=True)
+                gdal_version = result.stdout.strip()
+                print(f"🔍 System GDAL version: {gdal_version}")
+            except subprocess.CalledProcessError:
+                print("❌ gdal-config not found. System GDAL packages not installed.")
+                print("   Install with: sudo apt-get install gdal-bin libgdal-dev")
+                return False
+
+            # Try to install GDAL Python bindings
             print("📦 Installing GDAL Python bindings...")
-
-            # Get GDAL version from system
-            result = run_command(["gdal-config", "--version"], capture_output=True)
-            gdal_version = result.stdout.strip()
-            print(f"🔍 System GDAL version: {gdal_version}")
-
-            # Install matching Python bindings
-            run_command([sys.executable, "-m", "pip", "install", f"GDAL=={gdal_version}"])
+            run_command([sys.executable, "-m", "pip", "install", f"GDAL=={gdal_version}", "--no-cache-dir"])
             print("✅ GDAL Python bindings installed successfully")
 
             # Verify installation
@@ -116,8 +120,10 @@ def install_gdal_if_needed():
 
         except subprocess.CalledProcessError as e:
             print(f"❌ GDAL installation failed: {e}")
-            print("   This may require system packages to be installed first:")
-            print("   sudo apt-get install gdal-bin libgdal-dev")
+            print("   Troubleshooting steps:")
+            print("   1. Install system packages: sudo apt-get install gdal-bin libgdal-dev")
+            print("   2. Check GDAL version: gdal-config --version")
+            print("   3. Install Python bindings: pip install GDAL==$(gdal-config --version)")
             return False
 
 

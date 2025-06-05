@@ -46,6 +46,7 @@ INSTALL_REQUIRES = [
     "mercantile>=1.2.1,<2.0.0",
     "tqdm>=4.67.0,<5.0.0",
     "rtree>=1.0.0,<2.0.0",
+    "matplotlib>=3.5.0,<4.0.0",
 
     # Computer vision dependencies (shared)
     "opencv-python-headless>=4.8.0,<=4.10.0.84",
@@ -60,9 +61,9 @@ INSTALL_REQUIRES = [
     "tensorflow>=2.10.0,<3.0.0",
 
     # Package dependencies (NEW: use actual packages when available)
-    # Note: These packages may not be on PyPI yet, so they're optional for now
-    # "fairpredictor>=1.0.0",  # Uncomment when available on PyPI
-    # "geoml-toolkits>=1.0.0",  # Uncomment when available on PyPI
+    # Note: Using available versions instead of 1.0.0
+    # "fairpredictor>=0.0.21",  # Use available version (uncomment when needed)
+    # "geoml-toolkits>=0.0.1",  # Use available version (uncomment when needed)
 
     # Additional dependencies for integration layer
     "aiohttp>=3.8.0,<4.0.0",
