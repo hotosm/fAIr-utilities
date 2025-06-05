@@ -63,6 +63,7 @@ def main():
         ("torch", "torch"),
         ("torchvision", "torchvision"),
         ("ultralytics", "ultralytics"),
+        ("tensorflow", "tensorflow"),
         ("segmentation_models", "segmentation-models"),
     ]
     

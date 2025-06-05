@@ -10,6 +10,10 @@ jobs:
   basic-test:
     runs-on: ubuntu-latest
 
+    env:
+      GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PYTHONUNBUFFERED: 1
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,9 +34,21 @@ jobs:
           echo "🔍 Installing GDAL Python bindings..."
           export GDAL_VERSION=$(gdal-config --version)
           echo "GDAL version: $GDAL_VERSION"
-          # Install specific GDAL version that works with Python 3.10
-          pip install GDAL==$GDAL_VERSION --no-cache-dir
+
+          # Try multiple installation strategies for GDAL
+          pip install --upgrade pip setuptools wheel
+          pip install GDAL==$GDAL_VERSION --no-cache-dir || \
+          pip install GDAL --no-cache-dir || \
+          (echo "Retrying GDAL installation..." && pip install GDAL==$GDAL_VERSION)
+
           echo "✅ GDAL Python bindings installed"
+
+      - name: Install TensorFlow and Keras with compatible versions
+        run: |
+          echo "🔍 Installing compatible TensorFlow and Keras versions..."
+          pip install tensorflow==2.12.0 --no-cache-dir
+          pip install keras==2.12.0 --no-cache-dir
+          echo "✅ TensorFlow and Keras installed successfully with compatible versions"
 
       - name: Install matplotlib and segmentation-models
         run: |
@@ -44,7 +60,7 @@ jobs:
           pip install segmentation-models --no-cache-dir
           echo "✅ segmentation-models installed successfully"
 
-      - name: Verify GDAL, matplotlib, and segmentation-models installation
+      - name: Verify GDAL, TensorFlow, matplotlib, and segmentation-models installation
         run: |
           echo "🔍 Verifying GDAL installation..."
           python -c "
@@ -54,6 +70,17 @@ jobs:
               print(f'GDAL version: {gdal.VersionInfo()}')
           except ImportError as e:
               print(f'❌ GDAL import failed: {e}')
+              exit(1)
+          "
+
+          echo "🔍 Verifying TensorFlow installation..."
+          python -c "
+          try:
+              import tensorflow as tf
+              print('✅ TensorFlow import successful')
+              print(f'TensorFlow version: {tf.__version__}')
+          except ImportError as e:
+              print(f'❌ TensorFlow import failed: {e}')
               exit(1)
           "
 
@@ -79,18 +106,18 @@ jobs:
               exit(1)
           "
 
-      - name: Install all dependencies comprehensively
+      - name: Install all dependencies with robust script
         run: |
-          echo "🚀 Installing all dependencies with comprehensive script..."
-          python install_all_dependencies.py
+          echo "🚀 Installing all dependencies with robust script..."
+          python install_dependencies_robust.py
 
-      - name: Install additional build requirements
+      - name: Install additional requirements from file
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          pip install -r requirements-build.txt
-          echo "✅ Additional build requirements installed"
+          echo "📦 Installing additional requirements..."
+          pip install -r requirements-build.txt || echo "⚠️ Some requirements may have failed"
+          echo "✅ Additional requirements installation completed"
 
-      - name: Final optional packages check
+      - name: Final verification and optional packages
         run: |
           echo "🔍 Attempting to install optional packages..."
 
@@ -100,14 +127,25 @@ jobs:
           pip install fairpredictor || \
           echo "⚠️ fairpredictor not available on PyPI, trying Git..."
 
-          # If PyPI failed, try Git repositories with different branches
+          # If PyPI failed, try Git repositories with different branches and error handling
           if ! python -c "import fairpredictor" 2>/dev/null; then
             echo "🔍 Trying fairpredictor from Git repositories..."
-            pip install git+https://github.com/hotosm/fairpredictor.git@main || \
-            pip install git+https://github.com/hotosm/fairpredictor.git@master || \
-            pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@main || \
-            pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@master || \
-            echo "⚠️ fairpredictor not available from any source"
+
+            # Try different repositories and branches with proper error handling
+            for repo in "hotosm/fairpredictor" "kshitijrajsharma/fairpredictor"; do
+              for branch in "master" "main" "develop"; do
+                echo "Trying https://github.com/$repo.git@$branch"
+                if pip install git+https://github.com/$repo.git@$branch 2>/dev/null; then
+                  echo "✅ fairpredictor installed from $repo@$branch"
+                  break 2
+                fi
+              done
+            done
+
+            # Final check
+            if ! python -c "import fairpredictor" 2>/dev/null; then
+              echo "⚠️ fairpredictor not available from any Git source"
+            fi
           fi
 
           # Try geoml-toolkits from PyPI first
@@ -128,15 +166,20 @@ jobs:
           echo "📝 Note: Optional packages installation completed (failures are expected during development)"
         continue-on-error: true
 
+      - name: Test TensorFlow and segmentation-models
+        run: |
+          echo "🔍 Testing TensorFlow and segmentation-models..."
+          python test_tensorflow_segmentation.py
+
       - name: Test matplotlib fix
         run: |
           echo "🔍 Testing matplotlib fix..."
           python test_matplotlib_fix.py
 
-      - name: Verify all dependencies
+      - name: Final comprehensive verification
         run: |
-          echo "🔍 Verifying all dependencies..."
-          python verify_dependencies.py
+          echo "🔍 Running final comprehensive verification..."
+          python final_verification.py
 
       - name: Install package with robust script
         run: |

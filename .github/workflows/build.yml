@@ -50,11 +50,21 @@ jobs:
           pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
-      - name: Install matplotlib
+      - name: Install TensorFlow
+        run: |
+          echo "🔍 Installing TensorFlow..."
+          pip install tensorflow --no-cache-dir
+          echo "✅ TensorFlow installed successfully"
+
+      - name: Install matplotlib and segmentation-models
         run: |
           echo "🔍 Installing matplotlib..."
           pip install matplotlib --no-cache-dir
           echo "✅ matplotlib installed successfully"
+
+          echo "🔍 Installing segmentation-models..."
+          pip install segmentation-models --no-cache-dir
+          echo "✅ segmentation-models installed successfully"
 
       - name: Verify GDAL and matplotlib installation
         run: |

@@ -57,6 +57,7 @@ def install_core_dependencies():
     
     core_deps = [
         "matplotlib",
+        "tensorflow",
         "segmentation-models",
         "numpy",
         "pandas",
@@ -166,6 +167,7 @@ def verify_installations():
     critical_imports = [
         ("osgeo.gdal", "GDAL"),
         ("matplotlib", "matplotlib"),
+        ("tensorflow", "tensorflow"),
         ("segmentation_models", "segmentation-models"),
         ("numpy", "numpy"),
         ("pandas", "pandas"),
