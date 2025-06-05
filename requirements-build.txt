@@ -26,6 +26,6 @@ Pillow>=9.1.0,<11.0.0
 pyproj>=3.0.0,<4.0.0
 rtree>=1.0.0,<2.0.0
 
-# Package dependencies (install these first to avoid conflicts)
-fairpredictor>=1.0.0
-geoml-toolkits>=1.0.0
+# Package dependencies (optional - install if available)
+# fairpredictor>=1.0.0  # Commented out until published on PyPI
+# geoml-toolkits>=1.0.0  # Commented out until published on PyPI

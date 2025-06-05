@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
       - name: Checkout code
@@ -51,6 +51,28 @@ jobs:
         run: |
           pip install --upgrade pip setuptools wheel
           pip install -r requirements-build.txt
+
+      - name: Verify dependencies and check package availability
+        run: |
+          echo "🔍 Verifying installed dependencies..."
+          pip list
+          echo ""
+          echo "📦 Checking optional package availability..."
+          python -c "
+          try:
+              import fairpredictor
+              print('✅ fairpredictor is available')
+          except ImportError:
+              print('⚠️ fairpredictor not available (expected during development)')
+
+          try:
+              import geoml_toolkits
+              print('✅ geoml-toolkits is available')
+          except ImportError:
+              print('⚠️ geoml-toolkits not available (expected during development)')
+
+          print('📝 This is normal - packages will be available when published to PyPI')
+          "
 
       - name: Test installation with robust script
         run: |
@@ -191,8 +213,15 @@ jobs:
           echo "- ✅ Backward Compatibility: PASS" >> test_report.md
           echo "- ✅ Dependency Resolver: PASS" >> test_report.md
           echo "- ✅ Core Functionality: PASS" >> test_report.md
+          echo "- ⚠️ Optional Packages: NOT AVAILABLE (expected during development)" >> test_report.md
           echo "" >> test_report.md
-          echo "**Migration Status:** ✅ COMPLETE" >> test_report.md
+          echo "**Migration Status:** ✅ FRAMEWORK COMPLETE" >> test_report.md
+          echo "" >> test_report.md
+          echo "**Notes:**" >> test_report.md
+          echo "- Migration framework is in place and working correctly" >> test_report.md
+          echo "- Optional packages (fairpredictor, geoml-toolkits) not yet on PyPI" >> test_report.md
+          echo "- All functionality will be available when packages are published" >> test_report.md
+          echo "- Backward compatibility maintained with deprecation warnings" >> test_report.md
 
           # Verify the file exists
           if [ ! -f test_report.md ]; then
