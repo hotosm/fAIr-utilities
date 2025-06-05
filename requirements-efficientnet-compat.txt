@@ -1,0 +1,36 @@
+# EfficientNet Compatibility Requirements
+# This file contains specific version constraints to resolve
+# keras.utils.generic_utils compatibility issues
+
+# Core TensorFlow/Keras with specific versions
+tensorflow>=2.15.0,<3.0.0
+# Note: Don't install separate keras - use tf.keras
+
+# EfficientNet with compatibility constraints
+# Option 1: Classic efficientnet with version constraint
+efficientnet>=1.1.0,<2.0.0
+
+# Option 2: Modern alternatives (uncomment if needed)
+# keras-efficientnet-v2>=1.0.0
+# tensorflow-hub>=0.15.0
+
+# Supporting dependencies with compatible versions
+numpy>=1.22.0,<1.24.0  # Compatible with TensorFlow 2.15+
+matplotlib>=3.7.0,<4.0.0
+Pillow>=10.0.0,<11.0.0
+
+# Optional: Pin specific versions if issues persist
+# keras==2.15.0  # Only if using separate keras (not recommended)
+# efficientnet==1.1.1  # Specific working version
+
+# Installation order recommendations:
+# 1. pip install tensorflow
+# 2. pip install numpy (with version constraint)
+# 3. pip install efficientnet (with version constraint)
+# 4. Apply compatibility patches if needed
+
+# Troubleshooting versions:
+# If keras.utils.generic_utils errors persist, try:
+# - efficientnet==1.1.1
+# - keras-efficientnet-v2 (modern alternative)
+# - tf.keras.applications.EfficientNetB0 (built-in, always works)

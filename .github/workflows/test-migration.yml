@@ -80,7 +80,7 @@ jobs:
 
           if [[ "$PYTHON_VERSION" == "3.12" ]]; then
             echo "Installing TensorFlow for Python 3.12 (includes tf.keras)..."
-            pip install "tensorflow>=2.17.1,<3.0.0" --no-cache-dir
+            pip install "tensorflow>=2.18.0,<3.0.0" --no-cache-dir
           elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
             echo "Installing TensorFlow for Python 3.11 (includes tf.keras)..."
             pip install "tensorflow>=2.16.0,<3.0.0" --no-cache-dir
@@ -90,6 +90,12 @@ jobs:
           fi
 
           echo "✅ TensorFlow installed successfully (tf.keras included)"
+
+      - name: Apply keras.utils.generic_utils compatibility fix
+        run: |
+          echo "🔧 Applying keras.utils.generic_utils compatibility fix..."
+          python fix_efficientnet_compatibility.py || echo "⚠️ Compatibility fix failed (may not be needed)"
+          echo "✅ Compatibility fix applied"
 
       - name: Install matplotlib and segmentation-models
         run: |
@@ -182,17 +188,45 @@ jobs:
         run: |
           echo "🔍 Attempting to install optional dependencies from GitHub..."
 
-          # Try to install fairpredictor from GitHub
-          echo "📦 Trying fairpredictor..."
-          pip install git+https://github.com/hotosm/fairpredictor.git@main || \
-          pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@main || \
-          echo "⚠️ fairpredictor not available from GitHub repos"
+          # Try to install fairpredictor from GitHub with multiple branch attempts
+          echo "📦 Trying fairpredictor with multiple branches..."
+          fairpredictor_installed=false
 
-          # Try to install geoml-toolkits from GitHub
-          echo "📦 Trying geoml-toolkits..."
-          pip install git+https://github.com/hotosm/geoml-toolkits.git@main || \
-          pip install git+https://github.com/kshitijrajsharma/geoml-toolkits.git@main || \
-          echo "⚠️ geoml-toolkits not available from GitHub repos"
+          for repo in "hotosm/fairpredictor" "kshitijrajsharma/fairpredictor"; do
+            for branch in "master" "main" "develop" "HEAD"; do
+              echo "  Trying https://github.com/$repo.git@$branch"
+              if pip install git+https://github.com/$repo.git@$branch 2>/dev/null; then
+                echo "✅ fairpredictor installed from $repo@$branch"
+                fairpredictor_installed=true
+                break 2
+              fi
+            done
+          done
+
+          if [ "$fairpredictor_installed" = false ]; then
+            echo "⚠️ fairpredictor not available from any GitHub repository"
+          fi
+
+          # Try to install geoml-toolkits from GitHub with multiple branch attempts
+          echo "📦 Trying geoml-toolkits with multiple branches..."
+          geoml_installed=false
+
+          for repo in "hotosm/geoml-toolkits" "kshitijrajsharma/geoml-toolkits"; do
+            for branch in "master" "main" "develop" "HEAD"; do
+              echo "  Trying https://github.com/$repo.git@$branch"
+              if pip install git+https://github.com/$repo.git@$branch 2>/dev/null; then
+                echo "✅ geoml-toolkits installed from $repo@$branch"
+                geoml_installed=true
+                break 2
+              fi
+            done
+          done
+
+          if [ "$geoml_installed" = false ]; then
+            echo "⚠️ geoml-toolkits not available from any GitHub repository"
+          fi
+
+          echo "📝 Note: Optional packages installation completed (failures are expected during development)"
         continue-on-error: true
 
       - name: Verify dependencies and check package availability

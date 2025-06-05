@@ -43,11 +43,11 @@ def test_tensorflow_keras_utils():
 def test_classic_efficientnet():
     """Test classic efficientnet package."""
     print("\n🔍 Testing classic efficientnet package...")
-    
+
     try:
         import efficientnet
         print("✅ efficientnet package imported successfully")
-        
+
         # Test initialization
         try:
             efficientnet.init_keras_custom_objects()
@@ -56,9 +56,25 @@ def test_classic_efficientnet():
         except Exception as e:
             print(f"❌ efficientnet initialization failed: {e}")
             if "generic_utils" in str(e):
-                print("   This is likely due to keras.utils.generic_utils deprecation")
+                print("   This is due to keras.utils.generic_utils deprecation")
+                print("   Attempting to apply compatibility fix...")
+
+                # Try to apply the fix
+                try:
+                    from fix_efficientnet_compatibility import apply_all_patches
+                    if apply_all_patches():
+                        # Retry after patch
+                        efficientnet.init_keras_custom_objects()
+                        print("✅ efficientnet working after compatibility patch")
+                        return True
+                    else:
+                        print("❌ Compatibility patch failed")
+                        return False
+                except Exception as patch_error:
+                    print(f"❌ Patch application failed: {patch_error}")
+                    return False
             return False
-            
+
     except ImportError:
         print("⚠️ Classic efficientnet package not available")
         return False

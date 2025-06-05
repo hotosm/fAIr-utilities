@@ -3,30 +3,56 @@
 ## ❌ **PROBLEM IDENTIFIED**
 
 ### **Error:**
+
 ```
 AttributeError: module 'keras.utils' has no attribute 'generic_utils'
 ```
 
+### **Specific Error Location:**
+
+```python
+# In efficientnet/__init__.py
+keras.utils.generic_utils.get_custom_objects().update(custom_objects)
+```
+
 ### **Root Cause:**
-- Classic `efficientnet` package uses deprecated `keras.utils.generic_utils`
-- `keras.utils.generic_utils` was removed in modern TensorFlow/Keras versions
-- This causes import failures when using the classic efficientnet library
+
+- Classic `efficientnet` package uses deprecated `keras.utils.generic_utils.get_custom_objects()`
+- Modern Keras uses `keras.utils.get_custom_objects()` directly
+- `keras.utils.generic_utils` module was removed in newer TensorFlow/Keras versions
+- This causes import failures when calling `efficientnet.init_keras_custom_objects()`
 
 ---
 
 ## ✅ **SOLUTIONS IMPLEMENTED**
 
-### **1. Multiple EfficientNet Implementation Support**
+### **1. Compatibility Patch System**
+
+We created a monkey-patch system to fix the `keras.utils.generic_utils` issue:
+
+```python
+# fix_efficientnet_compatibility.py
+class MockGenericUtils:
+    @staticmethod
+    def get_custom_objects():
+        from keras.utils import get_custom_objects
+        return get_custom_objects()
+
+# Apply patch
+keras.utils.generic_utils = MockGenericUtils()
+```
+
+### **2. Multiple EfficientNet Implementation Support**
 
 We now support multiple EfficientNet implementations with automatic fallback:
 
-| Implementation | Compatibility | Status | Recommendation |
-|----------------|---------------|--------|----------------|
-| `tf.keras.applications.EfficientNetB0` | ✅ Modern TF | Built-in | ⭐ **Recommended** |
-| `keras-efficientnet-v2` | ✅ Modern TF | External | ✅ **Good** |
-| `efficientnet<2.0.0` | ⚠️ Legacy | External | ⚠️ **Fallback** |
+| Implementation                         | Compatibility | Status   | Recommendation     |
+| -------------------------------------- | ------------- | -------- | ------------------ |
+| `tf.keras.applications.EfficientNetB0` | ✅ Modern TF  | Built-in | ⭐ **Recommended** |
+| `keras-efficientnet-v2`                | ✅ Modern TF  | External | ✅ **Good**        |
+| `efficientnet>=1.1.0,<2.0.0` + patch   | ✅ With patch | External | ✅ **Fixed**       |
 
-### **2. Installation Strategy**
+### **3. Installation Strategy**
 
 ```bash
 # Option 1: Use built-in TensorFlow EfficientNet (recommended)
@@ -42,6 +68,7 @@ pip install 'efficientnet<2.0.0'  # May have compatibility issues
 ### **3. Usage Patterns**
 
 #### **✅ Recommended: tf.keras.applications**
+
 ```python
 import tensorflow as tf
 
@@ -54,6 +81,7 @@ model = tf.keras.applications.EfficientNetB0(
 ```
 
 #### **✅ Alternative: keras-efficientnet-v2**
+
 ```python
 import keras_efficientnet_v2
 
@@ -66,6 +94,7 @@ model = keras_efficientnet_v2.EfficientNetV2B0(
 ```
 
 #### **⚠️ Legacy: Classic efficientnet (with issues)**
+
 ```python
 import efficientnet
 
@@ -84,6 +113,7 @@ except AttributeError as e:
 ## 🔧 **WORKFLOW INTEGRATION**
 
 ### **Installation in CI/CD**
+
 ```yaml
 - name: Install efficientnet with compatibility
   run: |
@@ -98,11 +128,11 @@ except AttributeError as e:
     python -c "
     # Test different EfficientNet implementations
     import tensorflow as tf
-    
+
     # Test built-in implementation (always available)
     if hasattr(tf.keras.applications, 'EfficientNetB0'):
         print('✅ tf.keras.applications.EfficientNetB0 available')
-    
+
     # Test external implementations
     try:
         import efficientnet
@@ -110,7 +140,7 @@ except AttributeError as e:
         print('✅ Classic efficientnet working')
     except:
         print('⚠️ Classic efficientnet not working')
-    
+
     try:
         import keras_efficientnet_v2
         print('✅ keras-efficientnet-v2 available')
@@ -125,7 +155,9 @@ except AttributeError as e:
 ## 🧪 **TESTING AND VERIFICATION**
 
 ### **Compatibility Test Script**
+
 We created `test_efficientnet_compatibility.py` that:
+
 - ✅ Tests `keras.utils.generic_utils` availability
 - ✅ Tests classic efficientnet package
 - ✅ Tests keras-efficientnet-v2 package
@@ -134,6 +166,7 @@ We created `test_efficientnet_compatibility.py` that:
 - ✅ Provides recommendations based on results
 
 ### **Running the Test**
+
 ```bash
 python test_efficientnet_compatibility.py
 ```
@@ -143,6 +176,7 @@ python test_efficientnet_compatibility.py
 ## 📋 **REQUIREMENTS CONFIGURATION**
 
 ### **requirements-build.txt**
+
 ```
 # EfficientNet with compatibility constraints
 efficientnet<2.0.0  # Classic implementation with version constraint
@@ -152,6 +186,7 @@ efficientnet<2.0.0  # Classic implementation with version constraint
 ```
 
 ### **Optional Dependencies**
+
 ```
 # For TensorFlow Hub models
 tensorflow-hub
@@ -165,17 +200,21 @@ keras-efficientnet-v2
 ## 🔍 **TROUBLESHOOTING**
 
 ### **Issue 1: keras.utils.generic_utils AttributeError**
+
 ```
 AttributeError: module 'keras.utils' has no attribute 'generic_utils'
 ```
 
 **Solution:**
+
 1. ✅ Use `tf.keras.applications.EfficientNetB0` (recommended)
 2. ✅ Install `keras-efficientnet-v2` instead
 3. ⚠️ Use `efficientnet<2.0.0` with version constraint
 
 ### **Issue 2: No EfficientNet Available**
+
 **Solution:**
+
 ```python
 import tensorflow as tf
 
@@ -188,7 +227,9 @@ model = tf.keras.applications.EfficientNetB0(
 ```
 
 ### **Issue 3: Version Conflicts**
+
 **Solution:**
+
 1. Update TensorFlow to latest version
 2. Use version constraints: `efficientnet<2.0.0`
 3. Consider alternative implementations
@@ -197,27 +238,30 @@ model = tf.keras.applications.EfficientNetB0(
 
 ## 📊 **COMPATIBILITY MATRIX**
 
-| TensorFlow Version | tf.keras.applications | keras-efficientnet-v2 | efficientnet<2.0.0 |
-|-------------------|----------------------|----------------------|-------------------|
-| 2.15.x | ✅ Available | ✅ Compatible | ⚠️ May have issues |
-| 2.16.x | ✅ Available | ✅ Compatible | ⚠️ May have issues |
-| 2.17.x+ | ✅ Available | ✅ Compatible | ❌ Likely incompatible |
+| TensorFlow Version | tf.keras.applications | keras-efficientnet-v2 | efficientnet<2.0.0     |
+| ------------------ | --------------------- | --------------------- | ---------------------- |
+| 2.15.x             | ✅ Available          | ✅ Compatible         | ⚠️ May have issues     |
+| 2.16.x             | ✅ Available          | ✅ Compatible         | ⚠️ May have issues     |
+| 2.17.x+            | ✅ Available          | ✅ Compatible         | ❌ Likely incompatible |
 
 ---
 
 ## 💡 **RECOMMENDATIONS**
 
 ### **For New Projects**
+
 1. ⭐ **Use tf.keras.applications.EfficientNetB0** (built-in, always compatible)
 2. ✅ Consider `keras-efficientnet-v2` for EfficientNet V2 models
 3. ❌ Avoid classic `efficientnet` package
 
 ### **For Existing Projects**
+
 1. 🔄 **Migrate to tf.keras.applications** for better compatibility
 2. 🔧 **Add fallback logic** to handle different implementations
 3. 🧪 **Test thoroughly** with your specific TensorFlow version
 
 ### **For CI/CD**
+
 1. ✅ **Install with fallback** strategy (multiple implementations)
 2. ✅ **Test compatibility** before proceeding
 3. ✅ **Use continue-on-error** for optional EfficientNet tests
@@ -227,6 +271,7 @@ model = tf.keras.applications.EfficientNetB0(
 ## ✅ **STATUS**
 
 **Current Status**: ✅ **RESOLVED WITH MULTIPLE SOLUTIONS**
+
 - ✅ tf.keras.applications.EfficientNetB0 always available
 - ✅ keras-efficientnet-v2 as modern alternative
 - ✅ Classic efficientnet with version constraints as fallback

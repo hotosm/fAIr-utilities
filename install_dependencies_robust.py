@@ -134,9 +134,10 @@ def install_dependencies_with_fallback():
     # Install efficientnet with compatibility handling
     try:
         print("Installing efficientnet with compatibility...")
-        # Try different efficientnet packages
+        # Try different efficientnet packages with specific versions
         efficientnet_packages = [
-            "efficientnet<2.0.0",  # Classic efficientnet with version constraint
+            "efficientnet>=1.1.0,<2.0.0",  # Classic with specific version range
+            "efficientnet==1.1.1",  # Specific known working version
             "keras-efficientnet-v2",  # Modern alternative
         ]
 
@@ -145,14 +146,33 @@ def install_dependencies_with_fallback():
             try:
                 run_command(f"pip install '{package}' --no-cache-dir")
                 print(f"✅ {package} installed successfully")
-                efficientnet_installed = True
-                break
+
+                # Test if it works
+                try:
+                    run_command([sys.executable, "-c", "import efficientnet; efficientnet.init_keras_custom_objects()"])
+                    print(f"✅ {package} working correctly")
+                    efficientnet_installed = True
+                    break
+                except Exception as test_error:
+                    print(f"⚠️ {package} installed but not working: {test_error}")
+                    if "generic_utils" in str(test_error):
+                        print("   Applying compatibility patch...")
+                        try:
+                            run_command([sys.executable, "fix_efficientnet_compatibility.py"])
+                            print("✅ Compatibility patch applied")
+                            efficientnet_installed = True
+                            break
+                        except Exception:
+                            print("❌ Compatibility patch failed")
+                            continue
+
             except Exception:
                 print(f"⚠️ Failed to install {package}")
                 continue
 
         if not efficientnet_installed:
-            print("⚠️ No efficientnet package could be installed")
+            print("⚠️ No efficientnet package could be installed or made to work")
+            print("   Consider using tf.keras.applications.EfficientNetB0 instead")
 
     except Exception as e:
         print(f"⚠️ efficientnet installation failed: {e}")

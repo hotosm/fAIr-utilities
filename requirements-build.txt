@@ -28,8 +28,9 @@ tensorflow>=2.15.0,<3.0.0
 segmentation-models>=1.0.1
 
 # Computer vision models (with compatibility constraints)
-efficientnet<2.0.0  # Older versions compatible with modern TensorFlow
-# keras-efficientnet-v2  # Alternative modern implementation
+# EfficientNet with specific version constraints for keras.utils.generic_utils compatibility
+efficientnet>=1.1.0,<2.0.0  # Specific version range for compatibility
+# keras-efficientnet-v2  # Alternative modern implementation (no generic_utils issues)
 
 # Additional build dependencies that might be needed
 pyproj>=3.0.0,<4.0.0

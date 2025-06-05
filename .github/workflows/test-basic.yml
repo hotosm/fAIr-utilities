@@ -79,14 +79,22 @@ jobs:
 
           echo "✅ TensorFlow installed successfully (tf.keras included)"
 
-      - name: Install efficientnet with compatibility
+      - name: Install and fix efficientnet compatibility
         run: |
-          echo "🔍 Installing compatible efficientnet version..."
-          # Install efficientnet version compatible with modern TensorFlow
+          echo "🔍 Installing and fixing efficientnet compatibility..."
+
+          # First, try to install compatible versions
+          echo "📦 Installing efficientnet with version constraints..."
           pip install 'efficientnet<2.0.0' --no-cache-dir || \
+          pip install 'efficientnet==1.1.1' --no-cache-dir || \
           pip install 'keras-efficientnet-v2' --no-cache-dir || \
-          echo "⚠️ efficientnet installation failed - continuing without it"
-          echo "✅ efficientnet installation completed"
+          echo "⚠️ efficientnet installation failed"
+
+          # Apply compatibility patches
+          echo "🔧 Applying efficientnet compatibility patches..."
+          python fix_efficientnet_compatibility.py || echo "⚠️ Compatibility patches failed"
+
+          echo "✅ efficientnet installation and compatibility fix completed"
 
       - name: Verify efficientnet compatibility
         run: |
