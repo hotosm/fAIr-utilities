@@ -156,45 +156,119 @@ def bbox2tiles(bbox_coords, zm_level, tile_size):
     return start, end
 
 
-def download_image(url, base_path, source_name):
-    response = requests.get(url)
-    image = response.content
-
-    url_splitted_list = url.split("/")
-    filename = f"{base_path}/{source_name}-{url_splitted_list[-2]}-{url_splitted_list[-1]}-{url_splitted_list[-3]}.png"
-
-    with open(filename, "wb") as f:
-        f.write(image)
-
-    # print(f"Downloaded: {url}")
-
-
 def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
     """Downloads imagery from start to end tile coordinate system
+
+    DEPRECATED: This function is deprecated. Use geoml_toolkits.download_tiles() instead.
+    This wrapper is maintained for backward compatibility.
 
     Args:
         start (list):[tile_x,tile_y]
         end (list): [tile_x,tile_y],
-        source (string): it should be eithre url string or maxar value
+        source (string): it should be either url string or maxar value
         zm_level : Zoom level
         base_path : Source where image will be downloaded
-
     """
+    import warnings
+    warnings.warn(
+        "tms2img is deprecated. Use 'from geoml_toolkits import download_tiles' instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
 
-    begin_x = start[0]  # this will be the beginning of the download loop for x
-    begin_y = start[1]  # this will be the beginning of the download loop for x
-    stop_x = end[0]  # this will be the end of the download loop for x
-    stop_y = end[1]  # this will be the end of the download loop for x
+    try:
+        from geoml_toolkits import download_tiles, TileSource
+
+        # Convert start/end coordinates to bbox
+        # Note: This is a simplified conversion - the original function had complex logic
+        # For full compatibility, users should migrate to geoml_toolkits directly
+
+        # Create TileSource based on source parameter
+        if source == "maxar":
+            connect_id = os.environ.get("MAXAR_CONNECT_ID")
+            if not connect_id:
+                raise ValueError("MAXAR_CONNECT_ID environment variable is required for Maxar source")
+
+            tile_source = TileSource(
+                name="maxar",
+                url=f"https://services.digitalglobe.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@jpg/{{z}}/{{x}}/{{y}}.jpg?connectId={connect_id}&flipy=true",
+                scheme="xyz"
+            )
+        else:
+            # Assume source is a URL template
+            tile_source = TileSource(
+                name="custom",
+                url=source,
+                scheme="xyz"
+            )
+
+        # Convert tile coordinates to approximate bbox
+        # This is a simplified conversion - for exact behavior, use geoml_toolkits directly
+        import mercantile
+
+        # Get bounds for the tile range
+        west_tile = mercantile.Tile(start[0], start[1], zm_level)
+        east_tile = mercantile.Tile(end[0], end[1], zm_level)
+
+        west_bounds = mercantile.bounds(west_tile)
+        east_bounds = mercantile.bounds(east_tile)
+
+        bbox = [
+            min(west_bounds.west, east_bounds.west),
+            min(west_bounds.south, east_bounds.south),
+            max(west_bounds.east, east_bounds.east),
+            max(west_bounds.north, east_bounds.north)
+        ]
+
+        # Use geoml_toolkits download_tiles function
+        import asyncio
+
+        async def download_wrapper():
+            return await download_tiles(
+                tms=tile_source,
+                zoom=zm_level,
+                bbox=bbox,
+                output_dir=base_path,
+                georeference=True
+            )
+
+        # Run the async function
+        return asyncio.run(download_wrapper())
+
+    except ImportError:
+        # Fallback to original implementation if geoml_toolkits is not available
+        print("Warning: geoml_toolkits not available, using legacy implementation")
+        _legacy_tms2img(start, end, zm_level, base_path, source)
+
+
+def _legacy_tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
+    """Legacy implementation of tms2img for backward compatibility."""
+
+    def download_image(url, base_path, source_name):
+        response = requests.get(url)
+        image = response.content
+
+        url_splitted_list = url.split("/")
+        filename = f"{base_path}/{source_name}-{url_splitted_list[-2]}-{url_splitted_list[-1]}-{url_splitted_list[-3]}.png"
+
+        with open(filename, "wb") as f:
+            f.write(image)
+
+    begin_x = start[0]
+    begin_y = start[1]
+    stop_x = end[0]
+    stop_y = end[1]
 
     print(f"Download starting from {start} to {end} using source {source} - {zm_level}")
 
-    start_x = begin_x  # starting loop from beginning
-    start_y = begin_y  # starting y loop from beginnig
-    source_name = "OAM"  # default
+    start_x = begin_x
+    start_y = begin_y
+    source_name = "OAM"
     download_urls = []
-    while start_x <= stop_x:  # download  x section while keeping y as c
+
+    while start_x <= stop_x:
         start_y = begin_y
-        while start_y >= stop_y:  # download  y section while keeping x as c
+        while start_y >= stop_y:
             download_path = [start_x, start_y]
             if source == "maxar":
                 try:
@@ -203,18 +277,13 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
                     raise ex
                 source_name = source
                 download_url = f"https://services.digitalglobe.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@jpg/{zm_level}/{download_path[0]}/{download_path[1]}.jpg?connectId={connect_id}&flipy=true"
-
-            # add multiple logic on supported sources here
             else:
-                # source should be url as string , like this :  https://tiles.openaerialmap.org/62dbd947d8499800053796ec/0/62dbd947d8499800053796ed/{z}/{x}/{y}
                 download_url = source.format(
                     x=download_path[0], y=download_path[1], z=zm_level
                 )
             download_urls.append(download_url)
-
-            start_y = start_y - 1  # decrease the y
-
-        start_x = start_x + 1  # increase the x
+            start_y = start_y - 1
+        start_x = start_x + 1
 
     # Use the ThreadPoolExecutor to download the images in parallel
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -224,12 +293,67 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
 
 def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
     """
+    DEPRECATED: This function is deprecated. Use geoml_toolkits.download_osm_data() instead.
+    This wrapper is maintained for backward compatibility.
+
     args :
         payload : Payload request for API URL
         API_URL : Raw data API URL
     Returns :
         geojson
     """
+    import warnings
+    warnings.warn(
+        "fetch_osm_data is deprecated. Use 'from geoml_toolkits import download_osm_data' instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+
+    try:
+        from geoml_toolkits import download_osm_data
+
+        # Try to extract parameters from payload for the new function
+        # This is a best-effort conversion - for full functionality, use geoml_toolkits directly
+
+        if 'geometry' in payload:
+            # Extract bbox from geometry if possible
+            geometry = payload['geometry']
+            if geometry.get('type') == 'Polygon':
+                coords = geometry['coordinates'][0]
+                lons = [coord[0] for coord in coords]
+                lats = [coord[1] for coord in coords]
+                bbox = [min(lons), min(lats), max(lons), max(lats)]
+            else:
+                raise ValueError("Only Polygon geometry is supported in this compatibility wrapper")
+        else:
+            raise ValueError("Payload must contain 'geometry' field")
+
+        # Extract other parameters
+        feature_type = payload.get('filters', {}).get('tags', {}).get('building', 'yes')
+        if feature_type == 'yes':
+            feature_type = 'building'
+
+        # Use geoml_toolkits download_osm_data function
+        import asyncio
+
+        async def download_wrapper():
+            return await download_osm_data(
+                bbox=bbox,
+                feature_type=feature_type,
+                api_url=API_URL
+            )
+
+        # Run the async function and return the result
+        return asyncio.run(download_wrapper())
+
+    except ImportError:
+        # Fallback to original implementation if geoml_toolkits is not available
+        print("Warning: geoml_toolkits not available, using legacy implementation")
+        return _legacy_fetch_osm_data(payload, API_URL)
+
+
+def _legacy_fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
+    """Legacy implementation of fetch_osm_data for backward compatibility."""
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
     task_response = requests.post(

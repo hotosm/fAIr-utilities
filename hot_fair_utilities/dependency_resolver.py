@@ -22,41 +22,52 @@ class DependencyResolver:
     """
     
     # Define compatible version ranges for shared dependencies
+    # Updated with actual compatibility requirements
     COMPATIBILITY_MATRIX = {
         'numpy': {
             'fair_utilities': '>=1.21.0,<2.0.0',
-            'fairpredictor': '>=1.20.0,<2.0.0',
+            'fairpredictor': '>=1.21.0,<2.0.0',
             'geoml_toolkits': '>=1.21.0,<2.0.0'
         },
         'pandas': {
             'fair_utilities': '>=2.0.0,<=2.2.3',
-            'fairpredictor': '>=1.5.0,<=2.2.3',
+            'fairpredictor': '>=2.0.0,<=2.2.3',
             'geoml_toolkits': '>=2.0.0,<=2.2.3'
         },
         'geopandas': {
             'fair_utilities': '>=0.12.0,<=0.14.4',
-            'fairpredictor': '>=0.11.0,<=0.14.4',
+            'fairpredictor': '>=0.12.0,<=0.14.4',
             'geoml_toolkits': '>=0.12.0,<=0.14.4'
         },
         'rasterio': {
             'fair_utilities': '>=1.3.0,<2.0.0',
-            'fairpredictor': '>=1.2.0,<2.0.0',
+            'fairpredictor': '>=1.3.0,<2.0.0',
             'geoml_toolkits': '>=1.3.0,<2.0.0'
         },
         'shapely': {
             'fair_utilities': '>=1.8.0,<3.0.0',
-            'fairpredictor': '>=1.7.0,<3.0.0',
+            'fairpredictor': '>=1.8.0,<3.0.0',
             'geoml_toolkits': '>=1.8.0,<3.0.0'
         },
         'torch': {
             'fair_utilities': '>=2.0.0,<=2.5.1',
-            'fairpredictor': '>=1.13.0,<=2.5.1',
+            'fairpredictor': '>=2.0.0,<=2.5.1',
             'geoml_toolkits': '>=2.0.0,<=2.5.1'
         },
         'ultralytics': {
             'fair_utilities': '>=8.0.0,<=8.3.26',
             'fairpredictor': '>=8.0.0,<=8.3.26',
             'geoml_toolkits': '>=8.0.0,<=8.3.26'
+        },
+        'opencv-python-headless': {
+            'fair_utilities': '>=4.8.0,<=4.10.0.84',
+            'fairpredictor': '>=4.8.0,<=4.10.0.84',
+            'geoml_toolkits': '>=4.8.0,<=4.10.0.84'
+        },
+        'aiohttp': {
+            'fair_utilities': '>=3.8.0,<4.0.0',
+            'fairpredictor': '>=3.8.0,<4.0.0',
+            'geoml_toolkits': '>=3.8.0,<4.0.0'
         }
     }
     

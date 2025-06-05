@@ -6,6 +6,13 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      test_migration:
+        description: "Test package migration"
+        required: false
+        default: "false"
+        type: boolean
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,8 +56,20 @@ jobs:
       - name: Install pytorch and ultralytics
         run: pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.3.26
 
+      - name: Install build dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements-build.txt
+
       - name: Install fair utilities
-        run: pip install -e .
+        run: |
+          # Use robust installation script with multiple fallback strategies
+          python install_robust.py
+
+      - name: Verify installation
+        run: |
+          # Test that the installation actually works
+          python test_installation.py
 
       - name: Run test ramp
         run: |

@@ -1,0 +1,31 @@
+# Build-time dependencies for fAIr-utilities
+# These packages are required during the build process
+
+# Core build tools
+pip>=21.0
+setuptools>=61.0.0
+wheel>=0.37.0
+
+# PEP 517 build dependencies
+tomli>=1.2.0;python_version<'3.11'
+Cython>=0.29.0
+
+# Essential dependencies needed during build
+numpy>=1.21.0,<2.0.0
+
+# Core geospatial dependencies that may be needed during build
+shapely>=1.8.0,<3.0.0
+geopandas>=0.12.0,<=0.14.4
+rasterio>=1.3.0,<2.0.0
+pandas>=2.0.0,<=2.2.3
+mercantile>=1.2.1,<2.0.0
+tqdm>=4.67.0,<5.0.0
+Pillow>=9.1.0,<11.0.0
+
+# Additional build dependencies that might be needed
+pyproj>=3.0.0,<4.0.0
+rtree>=1.0.0,<2.0.0
+
+# Package dependencies (install these first to avoid conflicts)
+fairpredictor>=1.0.0
+geoml-toolkits>=1.0.0

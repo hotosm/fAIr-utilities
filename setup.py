@@ -12,7 +12,13 @@ from setuptools import find_packages, setup
 def get_version():
     """Get version from pyproject.toml or use fallback."""
     try:
-        import tomli
+        # Try tomli first (for Python < 3.11)
+        try:
+            import tomli
+        except ImportError:
+            # Fallback to tomllib for Python 3.11+
+            import tomllib as tomli
+
         with open("pyproject.toml", "rb") as f:
             data = tomli.load(f)
             return data["project"]["version"]
@@ -53,10 +59,9 @@ INSTALL_REQUIRES = [
     "protobuf>=3.20.2,<5.0.0",
     "tensorflow>=2.10.0,<3.0.0",
 
-    # Package dependencies (NEW: use actual packages when available)
-    # Note: These packages may not be on PyPI yet, so they're optional
-    # "fairpredictor>=1.0.0",  # Uncomment when available on PyPI
-    # "geoml-toolkits>=1.0.0",  # Uncomment when available on PyPI
+    # Package dependencies (NEW: use actual packages)
+    "fairpredictor>=1.0.0",  # Use fairpredictor package directly
+    "geoml-toolkits>=1.0.0",  # Use geoml-toolkits package directly
 
     # Additional dependencies for integration layer
     "aiohttp>=3.8.0,<4.0.0",

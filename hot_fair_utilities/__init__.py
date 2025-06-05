@@ -27,11 +27,29 @@ try:
         PredictionPipeline
     )
     FAIRPREDICTOR_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: fairpredictor not available: {e}")
+except ImportError:
     FAIRPREDICTOR_AVAILABLE = False
-    # Provide fallback or stub functions
-    predict_with_tiles = None
+    # Provide informative stub functions
+    def predict_with_tiles(*args, **kwargs):
+        raise ImportError(
+            "fairpredictor package is required for this functionality. "
+            "Install with: pip install fairpredictor"
+        )
+
+    def download_model(*args, **kwargs):
+        raise ImportError(
+            "fairpredictor package is required for this functionality. "
+            "Install with: pip install fairpredictor"
+        )
+
+    def validate_model(*args, **kwargs):
+        raise ImportError(
+            "fairpredictor package is required for this functionality. "
+            "Install with: pip install fairpredictor"
+        )
+
+    ModelManager = None
+    PredictionPipeline = None
 
 # Import from geoml-toolkits package
 try:
@@ -44,14 +62,30 @@ try:
         OSMDataDownloader
     )
     GEOML_TOOLKITS_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: geoml-toolkits not available: {e}")
+except ImportError:
     GEOML_TOOLKITS_AVAILABLE = False
-    # Provide fallback or stub functions
-    download_tiles = None
-    download_osm_data = None
+    # Provide informative stub functions
+    def download_tiles(*args, **kwargs):
+        raise ImportError(
+            "geoml-toolkits package is required for this functionality. "
+            "Install with: pip install geoml-toolkits"
+        )
+
+    def download_osm_data(*args, **kwargs):
+        raise ImportError(
+            "geoml-toolkits package is required for this functionality. "
+            "Install with: pip install geoml-toolkits"
+        )
+
+    def orthogonalize_gdf(*args, **kwargs):
+        raise ImportError(
+            "geoml-toolkits package is required for this functionality. "
+            "Install with: pip install geoml-toolkits"
+        )
+
     VectorizeMasks = None
-    orthogonalize_gdf = None
+    TileDownloader = None
+    OSMDataDownloader = None
 
 # Configuration and monitoring (fAIr-utilities specific)
 from .config import (
