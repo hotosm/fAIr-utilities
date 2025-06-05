@@ -34,7 +34,17 @@ jobs:
           pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
-      - name: Verify GDAL and matplotlib installation
+      - name: Install matplotlib and segmentation-models
+        run: |
+          echo "🔍 Installing matplotlib..."
+          pip install matplotlib --no-cache-dir
+          echo "✅ matplotlib installed successfully"
+
+          echo "🔍 Installing segmentation-models..."
+          pip install segmentation-models --no-cache-dir
+          echo "✅ segmentation-models installed successfully"
+
+      - name: Verify GDAL, matplotlib, and segmentation-models installation
         run: |
           echo "🔍 Verifying GDAL installation..."
           python -c "
@@ -58,32 +68,70 @@ jobs:
               exit(1)
           "
 
-      - name: Install dependencies
+          echo "🔍 Verifying segmentation-models installation..."
+          python -c "
+          try:
+              import segmentation_models
+              print('✅ segmentation-models import successful')
+              print(f'segmentation-models version: {segmentation_models.__version__}')
+          except ImportError as e:
+              print(f'❌ segmentation-models import failed: {e}')
+              exit(1)
+          "
+
+      - name: Install all dependencies comprehensively
+        run: |
+          echo "🚀 Installing all dependencies with comprehensive script..."
+          python install_all_dependencies.py
+
+      - name: Install additional build requirements
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements-build.txt
-          echo "✅ All dependencies installed including matplotlib"
+          echo "✅ Additional build requirements installed"
 
-      - name: Install optional packages from Git (if available)
+      - name: Final optional packages check
         run: |
-          echo "🔍 Attempting to install optional packages from Git repositories..."
+          echo "🔍 Attempting to install optional packages..."
 
-          # Try fairpredictor from multiple possible repositories
+          # Try fairpredictor from PyPI first with available versions
           echo "📦 Installing fairpredictor..."
-          pip install git+https://github.com/hotosm/fairpredictor.git@main || \
-          pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@main || \
-          pip install git+https://github.com/fairpredictor/fairpredictor.git@main || \
-          echo "⚠️ fairpredictor not available from Git repositories"
+          pip install fairpredictor==0.0.21 || \
+          pip install fairpredictor || \
+          echo "⚠️ fairpredictor not available on PyPI, trying Git..."
 
-          # Try geoml-toolkits from multiple possible repositories
+          # If PyPI failed, try Git repositories with different branches
+          if ! python -c "import fairpredictor" 2>/dev/null; then
+            echo "🔍 Trying fairpredictor from Git repositories..."
+            pip install git+https://github.com/hotosm/fairpredictor.git@main || \
+            pip install git+https://github.com/hotosm/fairpredictor.git@master || \
+            pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@main || \
+            pip install git+https://github.com/kshitijrajsharma/fairpredictor.git@master || \
+            echo "⚠️ fairpredictor not available from any source"
+          fi
+
+          # Try geoml-toolkits from PyPI first
           echo "📦 Installing geoml-toolkits..."
-          pip install git+https://github.com/hotosm/geoml-toolkits.git@main || \
-          pip install git+https://github.com/kshitijrajsharma/geoml-toolkits.git@main || \
-          pip install git+https://github.com/geoml-toolkits/geoml-toolkits.git@main || \
-          echo "⚠️ geoml-toolkits not available from Git repositories"
+          pip install geoml-toolkits || \
+          echo "⚠️ geoml-toolkits not available on PyPI, trying Git..."
 
-          echo "📝 Note: Optional packages installation completed (some may have failed - this is expected)"
+          # If PyPI failed, try Git repositories with different branches
+          if ! python -c "import geoml_toolkits" 2>/dev/null; then
+            echo "🔍 Trying geoml-toolkits from Git repositories..."
+            pip install git+https://github.com/hotosm/geoml-toolkits.git@main || \
+            pip install git+https://github.com/hotosm/geoml-toolkits.git@master || \
+            pip install git+https://github.com/kshitijrajsharma/geoml-toolkits.git@main || \
+            pip install git+https://github.com/kshitijrajsharma/geoml-toolkits.git@master || \
+            echo "⚠️ geoml-toolkits not available from any source"
+          fi
+
+          echo "📝 Note: Optional packages installation completed (failures are expected during development)"
         continue-on-error: true
+
+      - name: Test matplotlib fix
+        run: |
+          echo "🔍 Testing matplotlib fix..."
+          python test_matplotlib_fix.py
 
       - name: Verify all dependencies
         run: |

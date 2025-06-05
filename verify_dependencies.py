@@ -63,6 +63,7 @@ def main():
         ("torch", "torch"),
         ("torchvision", "torchvision"),
         ("ultralytics", "ultralytics"),
+        ("segmentation_models", "segmentation-models"),
     ]
     
     cv_passed = 0

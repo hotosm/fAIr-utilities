@@ -47,6 +47,7 @@ INSTALL_REQUIRES = [
     "tqdm>=4.67.0,<5.0.0",
     "rtree>=1.0.0,<2.0.0",
     "matplotlib>=3.5.0,<4.0.0",
+    "segmentation-models>=1.0.0",
 
     # Computer vision dependencies (shared)
     "opencv-python-headless>=4.8.0,<=4.10.0.84",

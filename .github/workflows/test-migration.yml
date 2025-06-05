@@ -55,7 +55,17 @@ jobs:
           pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
-      - name: Verify GDAL installation
+      - name: Install matplotlib and segmentation-models
+        run: |
+          echo "🔍 Installing matplotlib..."
+          pip install matplotlib --no-cache-dir
+          echo "✅ matplotlib installed successfully"
+
+          echo "🔍 Installing segmentation-models..."
+          pip install segmentation-models --no-cache-dir
+          echo "✅ segmentation-models installed successfully"
+
+      - name: Verify GDAL and matplotlib installation
         run: |
           echo "🔍 Verifying GDAL installation..."
           python -c "
@@ -65,6 +75,17 @@ jobs:
               print(f'GDAL version: {gdal.VersionInfo()}')
           except ImportError as e:
               print(f'❌ GDAL import failed: {e}')
+              exit(1)
+          "
+
+          echo "🔍 Verifying matplotlib installation..."
+          python -c "
+          try:
+              import matplotlib
+              print('✅ matplotlib import successful')
+              print(f'matplotlib version: {matplotlib.__version__}')
+          except ImportError as e:
+              print(f'❌ matplotlib import failed: {e}')
               exit(1)
           "
 

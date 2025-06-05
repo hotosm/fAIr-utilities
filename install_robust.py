@@ -42,11 +42,12 @@ def install_build_dependencies():
     
     build_deps = [
         "pip>=21.0",
-        "setuptools>=61.0.0", 
+        "setuptools>=61.0.0",
         "wheel",
         "tomli>=1.2.0",
         "Cython>=0.29.0",
-        "numpy>=1.21.0,<2.0.0"
+        "numpy>=1.21.0,<2.0.0",
+        "matplotlib>=3.5.0,<4.0.0"
     ]
     
     for dep in build_deps:
