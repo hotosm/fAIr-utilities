@@ -9,7 +9,7 @@ on:
 jobs:
   basic-test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.9"
 
       - name: Install system dependencies
         run: |
@@ -40,28 +40,28 @@ jobs:
           echo "🔍 Testing basic functionality..."
           python -c "
           print('🚀 Starting basic migration test...')
-          
+
           # Test 1: Basic import
           print('\\n🔍 Test 1: Basic Import')
           import hot_fair_utilities as fair
           print('✅ Basic import successful')
-          
+
           # Test 2: Package availability
           print('\\n🔍 Test 2: Package Availability')
           print(f'📦 fairpredictor available: {fair.FAIRPREDICTOR_AVAILABLE}')
           print(f'📦 geoml-toolkits available: {fair.GEOML_TOOLKITS_AVAILABLE}')
-          
+
           # Test 3: Core functionality
           print('\\n🔍 Test 3: Core Functionality')
           bbox = fair.validate_bbox([0.0, 0.0, 1.0, 1.0])
           print(f'✅ Bbox validation: {bbox}')
-          
+
           config = fair.config
           print(f'✅ Configuration: max_downloads={config.max_concurrent_downloads}')
-          
+
           tiles = fair.bbox2tiles([0.0, 0.0, 1.0, 1.0], 10)
           print(f'✅ Bbox2tiles: {len(tiles)} tiles')
-          
+
           # Test 4: Stub functions (if packages not available)
           print('\\n🔍 Test 4: Stub Functions')
           if not fair.FAIRPREDICTOR_AVAILABLE:
@@ -74,7 +74,7 @@ jobs:
                       print(f'⚠️ Unexpected error: {e}')
           else:
               print('✅ fairpredictor available')
-          
+
           if not fair.GEOML_TOOLKITS_AVAILABLE:
               try:
                   fair.download_tiles()
@@ -85,7 +85,7 @@ jobs:
                       print(f'⚠️ Unexpected error: {e}')
           else:
               print('✅ geoml-toolkits available')
-          
+
           # Test 5: Required exports
           print('\\n🔍 Test 5: Required Exports')
           required = ['georeference', 'evaluate', 'predict', 'polygonize', 'vectorize', 'bbox2tiles', 'tms2img']
@@ -95,7 +95,7 @@ jobs:
               exit(1)
           else:
               print(f'✅ All {len(required)} required exports available')
-          
+
           print('\\n🎉 BASIC MIGRATION TEST SUCCESSFUL!')
           print('✅ Package migration is working correctly')
           print('📦 Ready for production use')
@@ -107,9 +107,9 @@ jobs:
           python -c "
           import warnings
           import hot_fair_utilities as fair
-          
+
           print('🔍 Testing deprecated functions...')
-          
+
           # Test deprecated function with warning capture
           with warnings.catch_warnings(record=True) as w:
               warnings.simplefilter('always')
@@ -125,7 +125,7 @@ jobs:
                   print(f'✅ Deprecation warning shown: {deprecation_warnings[0].message}')
               else:
                   print('⚠️ No deprecation warning (may be expected if packages missing)')
-          
+
           print('✅ Backward compatibility test passed')
           "
 
