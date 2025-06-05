@@ -43,12 +43,61 @@ jobs:
 
           echo "✅ GDAL Python bindings installed"
 
-      - name: Install TensorFlow and Keras with compatible versions
+      - name: Ensure NumPy compatibility for TensorFlow
         run: |
-          echo "🔍 Installing compatible TensorFlow and Keras versions..."
-          pip install tensorflow==2.12.0 --no-cache-dir
-          pip install keras==2.12.0 --no-cache-dir
+          echo "🔍 Installing NumPy with TensorFlow compatibility..."
+          PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+
+          # Install NumPy version compatible with TensorFlow
+          if [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            echo "Installing NumPy for Python 3.12 (TensorFlow 2.17+)..."
+            pip install "numpy>=1.26.0,<2.0.0" --no-cache-dir
+          else
+            echo "Installing NumPy for Python 3.10/3.11 (TensorFlow 2.12+)..."
+            pip install "numpy>=1.22.0,<1.24.0" --no-cache-dir
+          fi
+
+          echo "✅ NumPy installed with TensorFlow compatibility"
+
+      - name: Install TensorFlow and Keras with Python version compatibility
+        run: |
+          echo "🔍 Installing TensorFlow and Keras compatible with Python version..."
+          PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+
+          if [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            echo "Installing TensorFlow for Python 3.12 (with NumPy 2.x support)..."
+            pip install "tensorflow>=2.17.1,<3.0.0" --no-cache-dir
+            pip install "keras>=2.17.1,<3.0.0" --no-cache-dir
+          elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
+            echo "Installing TensorFlow for Python 3.11..."
+            pip install "tensorflow>=2.16.0,<3.0.0" --no-cache-dir
+            pip install "keras>=2.16.0,<3.0.0" --no-cache-dir
+          else
+            echo "Installing TensorFlow for Python 3.10 (with NumPy <1.24 constraint)..."
+            pip install "tensorflow>=2.15.0,<3.0.0" --no-cache-dir
+            pip install "keras>=2.15.0,<3.0.0" --no-cache-dir
+          fi
+
           echo "✅ TensorFlow and Keras installed successfully with compatible versions"
+
+      - name: Verify NumPy and TensorFlow compatibility
+        run: |
+          echo "🔍 Verifying NumPy and TensorFlow compatibility..."
+          python -c "
+          import numpy as np
+          import tensorflow as tf
+          print(f'NumPy version: {np.__version__}')
+          print(f'TensorFlow version: {tf.__version__}')
+
+          # Test basic operations
+          x = np.array([1, 2, 3, 4])
+          y = tf.constant(x)
+          print(f'NumPy array: {x}')
+          print(f'TensorFlow tensor: {y}')
+          print('✅ NumPy and TensorFlow compatibility verified')
+          "
 
       - name: Install matplotlib and segmentation-models
         run: |
@@ -165,6 +214,11 @@ jobs:
 
           echo "📝 Note: Optional packages installation completed (failures are expected during development)"
         continue-on-error: true
+
+      - name: Test NumPy and TensorFlow compatibility
+        run: |
+          echo "🔍 Testing NumPy and TensorFlow compatibility..."
+          python test_numpy_tensorflow_compatibility.py
 
       - name: Test TensorFlow and segmentation-models
         run: |

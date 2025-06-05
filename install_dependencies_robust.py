@@ -73,13 +73,40 @@ def install_dependencies_with_fallback():
         print("❌ All GDAL installation strategies failed")
         return False
     
-    # Step 3: Install core dependencies with specific versions
-    print("\n📦 Step 3: Installing core dependencies...")
+    # Step 3: Install NumPy first with TensorFlow compatibility
+    print("\n📦 Step 3: Installing NumPy with TensorFlow compatibility...")
+
+    # Detect Python version for TensorFlow compatibility
+    python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    print(f"Python version detected: {python_version}")
+
+    # Install NumPy first with correct version for TensorFlow compatibility
+    if python_version == "3.12":
+        numpy_version = "numpy>=1.26.0,<2.0.0"  # TensorFlow 2.17+ supports NumPy 2.x
+        tf_version = "tensorflow>=2.17.1,<3.0.0"
+        keras_version = "keras>=2.17.1,<3.0.0"
+    elif python_version == "3.11":
+        numpy_version = "numpy>=1.22.0,<1.24.0"  # TensorFlow 2.15-2.16 requires NumPy <1.24
+        tf_version = "tensorflow>=2.16.0,<3.0.0"
+        keras_version = "keras>=2.16.0,<3.0.0"
+    else:  # Python 3.10
+        numpy_version = "numpy>=1.22.0,<1.24.0"  # TensorFlow 2.15 requires NumPy <1.24
+        tf_version = "tensorflow>=2.15.0,<3.0.0"
+        keras_version = "keras>=2.15.0,<3.0.0"
+
+    # Install NumPy first
+    try:
+        print(f"Installing {numpy_version}...")
+        run_command(f"pip install '{numpy_version}' --no-cache-dir")
+        print(f"✅ NumPy installed with TensorFlow compatibility")
+    except Exception as e:
+        print(f"❌ Failed to install NumPy: {e}")
+        return False
+
     core_deps = [
         "matplotlib>=3.5.0,<4.0.0",
-        "tensorflow==2.12.0",
-        "keras==2.12.0",
-        "numpy>=1.21.0,<2.0.0",
+        tf_version,
+        keras_version,
         "pandas>=2.0.0,<=2.2.3",
     ]
     

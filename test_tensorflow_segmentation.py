@@ -14,13 +14,23 @@ def test_tensorflow_import():
     print("🔍 Testing TensorFlow import...")
     try:
         import tensorflow as tf
-        print(f"✅ TensorFlow import successful - version: {tf.__version__}")
-        
+        import sys
+
+        tf_version = tf.__version__
+        python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+
+        print(f"✅ TensorFlow import successful - version: {tf_version}")
+        print(f"🐍 Python version: {python_version}")
+
+        # Check version compatibility
+        if python_version == "3.12" and tf_version.startswith("2.12"):
+            print("⚠️ Warning: TensorFlow 2.12.x may not be fully compatible with Python 3.12")
+
         # Test basic TensorFlow functionality
         print("🔍 Testing basic TensorFlow functionality...")
         x = tf.constant([1, 2, 3, 4])
         print(f"✅ TensorFlow basic operations work: {x}")
-        
+
         return True
     except ImportError as e:
         print(f"❌ TensorFlow import failed: {e}")

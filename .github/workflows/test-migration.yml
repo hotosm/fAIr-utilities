@@ -55,11 +55,44 @@ jobs:
           pip install GDAL==$GDAL_VERSION --no-cache-dir
           echo "✅ GDAL Python bindings installed"
 
-      - name: Install TensorFlow
+      - name: Ensure NumPy compatibility for TensorFlow
         run: |
-          echo "🔍 Installing TensorFlow..."
-          pip install tensorflow --no-cache-dir
-          echo "✅ TensorFlow installed successfully"
+          echo "🔍 Installing NumPy with TensorFlow compatibility..."
+          PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+
+          # Install NumPy version compatible with TensorFlow
+          if [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            echo "Installing NumPy for Python 3.12 (TensorFlow 2.17+)..."
+            pip install "numpy>=1.26.0,<2.0.0" --no-cache-dir
+          else
+            echo "Installing NumPy for Python 3.10/3.11 (TensorFlow 2.15+)..."
+            pip install "numpy>=1.22.0,<1.24.0" --no-cache-dir
+          fi
+
+          echo "✅ NumPy installed with TensorFlow compatibility"
+
+      - name: Install TensorFlow and Keras with Python version compatibility
+        run: |
+          echo "🔍 Installing TensorFlow and Keras compatible with Python version..."
+          PYTHON_VERSION=$(python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+
+          if [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            echo "Installing TensorFlow for Python 3.12..."
+            pip install "tensorflow>=2.17.1,<3.0.0" --no-cache-dir
+            pip install "keras>=2.17.1,<3.0.0" --no-cache-dir
+          elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
+            echo "Installing TensorFlow for Python 3.11..."
+            pip install "tensorflow>=2.15.0,<3.0.0" --no-cache-dir
+            pip install "keras>=2.15.0,<3.0.0" --no-cache-dir
+          else
+            echo "Installing TensorFlow for Python 3.10..."
+            pip install "tensorflow>=2.12.0,<3.0.0" --no-cache-dir
+            pip install "keras>=2.12.0,<3.0.0" --no-cache-dir
+          fi
+
+          echo "✅ TensorFlow and Keras installed successfully with compatible versions"
 
       - name: Install matplotlib and segmentation-models
         run: |

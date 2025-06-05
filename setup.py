@@ -38,7 +38,7 @@ def get_long_description():
 INSTALL_REQUIRES = [
     # Core geospatial dependencies (shared)
     "shapely>=1.8.0,<3.0.0",
-    "numpy>=1.21.0,<2.0.0",
+    "numpy>=1.22.0,<1.24.0",  # Compatible with TensorFlow 2.12-2.15
     "Pillow>=9.1.0,<11.0.0",
     "geopandas>=0.12.0,<=0.14.4",
     "pandas>=2.0.0,<=2.2.3",
@@ -59,7 +59,7 @@ INSTALL_REQUIRES = [
     # ML model dependencies (existing)
     "ramp-fair==0.1.2",
     "protobuf>=3.20.2,<5.0.0",
-    "tensorflow>=2.10.0,<3.0.0",
+    "tensorflow>=2.12.0,<3.0.0",  # Compatible with Python 3.10+
 
     # Package dependencies (NEW: use actual packages when available)
     # Note: Using available versions instead of 1.0.0

@@ -11,7 +11,8 @@ tomli>=1.2.0;python_version<'3.11'
 Cython>=0.29.0
 
 # Essential dependencies needed during build
-numpy>=1.21.0,<2.0.0
+# NumPy version must be compatible with TensorFlow requirements
+numpy>=1.22.0,<1.24.0
 
 # Core geospatial dependencies that may be needed during build
 shapely>=1.8.0,<3.0.0
@@ -22,8 +23,8 @@ mercantile>=1.2.1,<2.0.0
 tqdm>=4.67.0,<5.0.0
 Pillow>=9.1.0,<11.0.0
 matplotlib>=3.5.0,<4.0.0
-tensorflow==2.12.0
-keras==2.12.0
+tensorflow>=2.17.1,<3.0.0
+keras>=2.17.1,<3.0.0
 segmentation-models>=1.0.0
 
 # Additional build dependencies that might be needed
