@@ -288,10 +288,17 @@ def get_yolo_iou_metrics(model_path):
     )  ### B and M denotes bounding box and mask respectively
     # print(metrics)
     iou_accuracy = 1 / (
-        1 / model_val_metrics["metrics/precision(M)"]
-        + 1 / model_val_metrics["metrics/recall(M)"]
+        1 / model_val_metrics["metrics/precision(M)"] if model_val_metrics["metrics/precision(M)"] != 0 else 0
+        + 1 / model_val_metrics["metrics/recall(M)"] if model_val_metrics["metrics/recall(M)"] != 0 else 0
         - 1
     )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
+
+
+    # iou_accuracy = 1 / (
+    #     1 / model_val_metrics["metrics/precision(M)"]
+    #     + 1 / model_val_metrics["metrics/recall(M)"]
+    #     - 1
+    # )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
     final_accuracy = iou_accuracy * 100
     del model_val  # release model reference
     gc.collect()   # trigger cleanup of file handles

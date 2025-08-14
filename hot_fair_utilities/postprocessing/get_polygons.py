@@ -20,6 +20,9 @@ def get_polygons(
 
     """
     bldg_extract = BuildingExtract(kernel_opening, simplify_threshold)
+    print(
+        f"Extract tiles from  directory {pred_masks_path} \n"
+    )
     tiles = list(tiles_from_directory(pred_masks_path))
 
     for tile, path in tqdm(tiles, unit="mask"):

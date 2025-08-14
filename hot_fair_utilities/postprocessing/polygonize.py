@@ -33,9 +33,11 @@ def polygonize(input_path: str, output_path: str, remove_inputs: False) -> None:
     base_path = Path(output_path).parents[0]
     base_path.mkdir(exist_ok=True, parents=True)
 
+    if os.path.exists("temp-labels.geojson"):
+        os.remove("temp-labels.geojson")
     get_polygons(input_path, "temp-labels.geojson", kernel_opening=1)
     merge_polygons("temp-labels.geojson", output_path, distance_threshold=0.6)
-    os.remove("temp-labels.geojson")
+    # os.remove("temp-labels.geojson")
 
     if remove_inputs:
         # Get a list of all .tif files in the directory
