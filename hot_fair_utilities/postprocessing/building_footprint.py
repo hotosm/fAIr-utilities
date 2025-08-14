@@ -68,6 +68,9 @@ class BuildingExtract(object):
             feature = make_valid(
                 unary_union([make_valid(Polygon(ring)) for ring in rings])
             )
+            print(
+                f"Type of feature {type(feature)} \n"
+            )
 
             if type(feature) == MultiPolygon:
                 for polygon in feature.geoms:

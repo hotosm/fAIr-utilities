@@ -1,0 +1,24 @@
+name: fairutils
+services:
+    fairutils:
+        ipc: host
+        stdin_open: true
+        tty: true
+        privileged: true
+        # devices:
+        #    - /dev/dri
+        build:
+            context: .
+            shm_size: '2gb'
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities:
+                              - gpu
+        ports:
+            - 8888:8888
+        image: fairutils
+        #command: bash

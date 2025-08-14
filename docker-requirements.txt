@@ -1,0 +1,28 @@
+setuptools==70.0.0
+packaging==22.0
+mercantile == 1.2.1
+ramp-fair==0.1.2
+Shapely==1.8.0
+numpy
+gdal
+Pillow==9.0.1
+geopandas>=0.14.0,<=0.14.5
+pandas==1.5.3
+rasterio 
+tqdm==4.62.3
+Rtree
+opencv-python<=4.5.5.64
+opencv-python-headless<=4.7.0.68
+bumpver
+black
+isort
+build
+twine
+protobuf==3.20.2
+# torch==1.12.1
+# torchvision==0.13.1
+# ultralytics==8.1.6
+# onnx==1.17.0
+# onnxslim>=0.1.56
+# onnxruntime-gpu
+onnxruntime-gpu==1.1.17
