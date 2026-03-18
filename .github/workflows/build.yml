@@ -60,6 +60,7 @@ jobs:
           pip install numpy==1.26.4
           C_INCLUDE_PATH=/usr/include CPLUS_INCLUDE_PATH=/usr/include pip install "GDAL==$(gdal-config --version)"
           pip install "rtree>=1.0.0"
+          export PYTHONPATH="${PWD}/ramp-code:${PYTHONPATH}"
           python test_ramp.py
 
       - name: Run test yolo

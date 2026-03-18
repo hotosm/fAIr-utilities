@@ -659,6 +659,8 @@ def build_contact_df(df, contact_spacing, reference_im, meters, geom_col):
     df = df.copy()
     df["t_index"] = range(len(df))
     expanded = buffer_geometries(df, buffer=contact_spacing, reference_im=reference_im)
+    if expanded.crs is None and df.crs is not None:
+        expanded = expanded.set_crs(df.crs, allow_override=True)
     joined = expanded.overlay(df, how="intersection")
     joined = joined[joined["t_index_1"] != joined["t_index_2"]]
     joined = joined[~joined.is_empty]
