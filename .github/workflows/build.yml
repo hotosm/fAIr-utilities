@@ -58,7 +58,7 @@ jobs:
         run: |
           pip uninstall -y gdal
           pip install numpy==1.26.4
-          pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
+          C_INCLUDE_PATH=/usr/include CPLUS_INCLUDE_PATH=/usr/include pip install "GDAL==$(gdal-config --version)"
           python test_ramp.py
 
       - name: Run test yolo
