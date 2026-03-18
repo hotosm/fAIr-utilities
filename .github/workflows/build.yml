@@ -59,10 +59,9 @@ jobs:
           sudo apt-get update && sudo apt-get -y install --no-install-recommends build-essential libc6-dev
           pip uninstall -y gdal || true
           pip install wheel 'setuptools>=67'
-          export C_INCLUDE_PATH="/usr/include:/usr/include/x86_64-linux-gnu:/usr/include/gdal"
-          export CPLUS_INCLUDE_PATH="/usr/include:/usr/include/x86_64-linux-gnu:/usr/include/gdal"
           pip install "numpy==1.26.4" --no-cache-dir
           pip install --no-binary GDAL "GDAL[numpy]==$(gdal-config --version)" "numpy==1.26.4" --no-build-isolation --no-cache-dir --force-reinstall
+          python -c "from osgeo import gdal_array; print('GDAL array bindings OK')"
           pip install "rtree>=1.0.0"
           export PYTHONPATH="${PWD}/ramp-code:${PYTHONPATH}"
           python test_ramp.py
