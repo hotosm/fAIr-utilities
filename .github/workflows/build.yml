@@ -33,7 +33,7 @@ jobs:
 
       - name: Install gdal
         run: |
-          sudo apt-get update && sudo apt-get -y install build-essential gdal-bin libgdal-dev libspatialindex-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
+          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev libspatialindex-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
           pip install GDAL==$(gdal-config --version)
 
       - name: Install ramp dependecies
@@ -56,10 +56,11 @@ jobs:
 
       - name: Run test ramp
         run: |
+          sudo apt-get update && sudo apt-get -y install --no-install-recommends build-essential libc6-dev
           pip uninstall -y gdal || true
           pip install wheel 'setuptools>=67'
-          export C_INCLUDE_PATH=/usr/include:/usr/include/gdal
-          export CPLUS_INCLUDE_PATH=/usr/include:/usr/include/gdal
+          export C_INCLUDE_PATH="/usr/include:/usr/include/x86_64-linux-gnu:/usr/include/gdal"
+          export CPLUS_INCLUDE_PATH="/usr/include:/usr/include/x86_64-linux-gnu:/usr/include/gdal"
           pip install "numpy==1.26.4" --no-cache-dir
           pip install --no-binary GDAL "GDAL[numpy]==$(gdal-config --version)" "numpy==1.26.4" --no-build-isolation --no-cache-dir --force-reinstall
           pip install "rtree>=1.0.0"
