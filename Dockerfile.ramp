@@ -1,0 +1,53 @@
+FROM tensorflow/tensorflow:2.9.2-gpu-jupyter
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
+WORKDIR /app
+
+COPY pyproject.toml setup.py README.md LICENSE ./
+COPY hot_fair_utilities ./hot_fair_utilities
+COPY docker/solaris ./docker/solaris
+
+RUN python -m pip install --upgrade pip "setuptools>=70" wheel "packaging>=24"
+RUN pip install "GDAL==$(gdal-config --version)"
+# Shapely 1.8 expects GEOS under sys.prefix/lib. TF image uses system Python (no /opt/conda).
+RUN PYTHON_LIB=$(python -c "import sys; print(sys.prefix + '/lib')") \
+    && mkdir -p "$PYTHON_LIB" \
+    && ln -sf /usr/lib/x86_64-linux-gnu/libgeos_c.so "$PYTHON_LIB/libgeos_c.so" \
+    && ln -sf /usr/lib/x86_64-linux-gnu/libgeos.so "$PYTHON_LIB/libgeos.so"
+# ramp-fair uses legacy setup.py; pip's build isolation pulls old packaging that lacks
+# canonicalize_version(strip_trailing_zero=...). Install with --no-build-isolation so
+# it uses our upgraded setuptools/packaging.
+RUN pip install --no-build-isolation ramp-fair==0.1.2
+# Vendored solaris (PyPI solaris conflicts with TensorFlow 2.x).
+# Use regular install (not -e) so solaris lives in site-packages; -e would link to
+# /app/docker/solaris which gets overwritten by -v mount at runtime.
+RUN pip install --no-deps ./docker/solaris
+RUN pip install -e ".[ramp,dev]"
+
+# ramp-code: scripts (make_train_val_split_lists, move_chips_from_csv) + ramp.utils.file_utils.
+# Cloned to /opt so it survives -v mount of /app. prepare_data.py expects RAMP_HOME/ramp-code/scripts/.
+RUN git clone --depth 1 https://github.com/hotosm/ramp-code-fair.git /opt/ramp-code
+# RAMP base model checkpoint: required for training (saved_model_path: ramp-code/ramp/checkpoint.tf).
+RUN pip install gdown \
+    && gdown --fuzzy "https://drive.google.com/file/d/1YQsY61S_rGfJ_f6kLQq4ouYE2l3iRe1k/view?usp=sharing" -O /tmp/checkpoint.tf.zip \
+    && unzip /tmp/checkpoint.tf.zip -d /opt/ramp-code/ramp \
+    && rm /tmp/checkpoint.tf.zip \
+    && pip uninstall -y gdown \
+    && pip uninstall -y gdown
+ENV RAMP_HOME=/opt
+ENV PYTHONPATH=/opt/ramp-code
+
+CMD ["python", "-c", "from hot_fair_utilities.inference.evaluate import evaluate; print('RAMP image ready')"]

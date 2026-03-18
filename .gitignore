@@ -17,8 +17,14 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.venv-yolo/
+.venv-ramp/
 
 ramp-code/
 .ipynb_checkpoints
 ramp-data/
+
+# Excluded from Docker image; validated E2E only via volume mount
+tests/
+runs/
 

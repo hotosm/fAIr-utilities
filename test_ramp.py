@@ -11,9 +11,9 @@ print(
 )
 print(os.getcwd())
 os.environ.update(os.environ)
-# Add a new environment variable to the operating system
-os.environ["RAMP_HOME"] = os.getcwd()
-# Print the environment variables to verify that the new variable was added
+# RAMP_HOME: use env value if set (e.g. Docker sets /opt); else cwd for local runs with ramp-code
+if "RAMP_HOME" not in os.environ:
+    os.environ["RAMP_HOME"] = os.getcwd()
 print(os.environ["RAMP_HOME"])
 
 start_time = time.time()

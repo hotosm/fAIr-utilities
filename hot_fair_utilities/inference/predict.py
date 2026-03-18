@@ -6,13 +6,15 @@ from pathlib import Path
 
 # Third party imports
 import numpy as np
-import torch
-from tensorflow import keras
-from ultralytics import YOLO
 
 from ..georeferencing import georeference
 from ..utils import remove_files
 from .utils import initialize_model, open_images, save_mask
+
+# torch, keras and ultralytics are NOT imported at module level.
+# They are imported lazily inside predict() based on checkpoint type so that
+# this module can be loaded in a YOLO-only or RAMP-only environment without
+# requiring both frameworks to be installed.
 
 BATCH_SIZE = 8
 IMAGE_SIZE = 256
@@ -48,9 +50,15 @@ def predict(
             "data/predictions/4"
         )
     """
+    is_yolo = checkpoint_path.endswith(".pt")
+    device = None
+    if is_yolo:
+        import torch
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     start = time.time()
     print(f"Using : {checkpoint_path}")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = initialize_model(checkpoint_path, device=device)
     print(f"It took {round(time.time()-start)} sec to load model")
     start = time.time()
@@ -58,7 +66,21 @@ def predict(
     os.makedirs(prediction_path, exist_ok=True)
     image_paths = glob(f"{input_path}/*.png") + glob(f"{input_path}/*.tif")
 
-    if isinstance(model, keras.Model):
+    if is_yolo:
+        for idx in range(0, len(image_paths), BATCH_SIZE):
+            batch = image_paths[idx : idx + BATCH_SIZE]
+            for i, r in enumerate(
+                model.predict(batch, conf=confidence, imgsz=IMAGE_SIZE, verbose=False)
+            ):
+                if hasattr(r, "masks") and r.masks is not None:
+                    preds = r.masks.data.max(dim=0)[0].detach().cpu().numpy()
+                else:
+                    preds = np.zeros((IMAGE_SIZE, IMAGE_SIZE), dtype=np.float32)
+
+                save_mask(preds, str(f"{prediction_path}/{Path(batch[i]).stem}.png"))
+    else:
+        from tensorflow import keras  # type: ignore[reportMissingImports]
+
         for i in range((len(image_paths) + BATCH_SIZE - 1) // BATCH_SIZE):
             image_batch = image_paths[BATCH_SIZE * i : BATCH_SIZE * (i + 1)]
             images = open_images(image_batch)
@@ -67,44 +89,16 @@ def predict(
             preds = model.predict(images)
             preds = np.argmax(preds, axis=-1)
             preds = np.expand_dims(preds, axis=-1)
-            preds = np.where(
-                preds > confidence, 1, 0
-            )  # Filter out low confidence predictions
+            preds = np.where(preds > confidence, 1, 0)
 
             for idx, path in enumerate(image_batch):
-                save_mask(
-                    preds[idx],
-                    str(f"{prediction_path}/{Path(path).stem}.png"),
-                )
-    elif isinstance(model, YOLO):
-        for idx in range(0, len(image_paths), BATCH_SIZE):
-            batch = image_paths[idx : idx + BATCH_SIZE]
-            for i, r in enumerate(
-                model.predict(batch, conf=confidence, imgsz=IMAGE_SIZE, verbose=False)
-            ):
-                if hasattr(r, "masks") and r.masks is not None:
-                    preds = (
-                        r.masks.data.max(dim=0)[0].detach().cpu().numpy()
-                    )  # Combine masks and convert to numpy
+                save_mask(preds[idx], str(f"{prediction_path}/{Path(path).stem}.png"))
 
-                else:
-                    preds = np.zeros(
-                        (
-                            IMAGE_SIZE,
-                            IMAGE_SIZE,
-                        ),
-                        dtype=np.float32,
-                    )  # Default if no masks
-
-                save_mask(preds, str(f"{prediction_path}/{Path(batch[i]).stem}.png"))
-    else:
-        raise RuntimeError("Loaded model is not supported")
+        keras.backend.clear_session()
 
     print(
         f"It took {round(time.time()-start)} sec to predict with {confidence} Confidence Threshold"
     )
-    if isinstance(model, keras.Model):
-        keras.backend.clear_session()
     del model
     start = time.time()
 
