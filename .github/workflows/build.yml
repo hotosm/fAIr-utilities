@@ -33,7 +33,7 @@ jobs:
 
       - name: Install gdal
         run: |
-          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
+          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev libspatialindex-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
           pip install GDAL==$(gdal-config --version)
 
       - name: Install ramp dependecies
@@ -59,6 +59,7 @@ jobs:
           pip uninstall -y gdal
           pip install numpy==1.26.4
           C_INCLUDE_PATH=/usr/include CPLUS_INCLUDE_PATH=/usr/include pip install "GDAL==$(gdal-config --version)"
+          pip install "rtree>=1.0.0"
           python test_ramp.py
 
       - name: Run test yolo
