@@ -21,7 +21,7 @@ just run ramp
 just run yolo
 ```
 
-`just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. No `ramp-code` clone is required.
+`just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. 
 
 ## Docker workflow
 
