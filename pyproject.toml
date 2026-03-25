@@ -9,7 +9,7 @@ maintainers = [
     { name = "Kshitij Raj Sharma", email = "krschap@proton.me" },
 ]
 dependencies = [
-    "gdal==3.8.4",
+    "gdal>=3.6,<4",
     "geopandas>=0.14,<2",
     "matplotlib>=3.10.8",
     "mercantile>=1.2.1",

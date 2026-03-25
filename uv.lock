@@ -1116,7 +1116,7 @@ typecheck = [
 
 [package.metadata]
 requires-dist = [
-    { name = "gdal", specifier = "==3.8.4" },
+    { name = "gdal", specifier = ">=3.6,<4" },
     { name = "geopandas", specifier = ">=0.14,<2" },
     { name = "keras", marker = "python_full_version == '3.11.*' and extra == 'ramp'", specifier = "<3" },
     { name = "matplotlib", specifier = ">=3.10.8" },
