@@ -853,6 +853,11 @@ version = "3.8.4"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/21/6f/7f76d6ff3673fa18e9edd8d76679968d682f937cded93311f82fa172697f/GDAL-3.8.4.tar.gz", hash = "sha256:7c51e0ae7a7ccf43ad9e4bf435176baa9276653dfa16fd167c3632f6e7275207", size = 802459, upload-time = "2024-02-18T15:35:29.047Z" }
 
+[package.optional-dependencies]
+numpy = [
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+]
+
 [[package]]
 name = "geopandas"
 version = "0.14.4"
@@ -1077,7 +1082,9 @@ dependencies = [
 
 [package.optional-dependencies]
 ramp = [
+    { name = "gdal", extra = ["numpy"], marker = "python_full_version == '3.11.*'" },
     { name = "keras", marker = "python_full_version == '3.11.*'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "ramp-fair", marker = "python_full_version == '3.11.*'" },
     { name = "scikit-fmm", marker = "python_full_version == '3.11.*'" },
     { name = "segmentation-models", marker = "python_full_version == '3.11.*'" },
@@ -1117,11 +1124,13 @@ typecheck = [
 [package.metadata]
 requires-dist = [
     { name = "gdal", specifier = ">=3.6,<4" },
+    { name = "gdal", extras = ["numpy"], marker = "python_full_version == '3.11.*' and extra == 'ramp'", specifier = ">=3.6,<4" },
     { name = "geopandas", specifier = ">=0.14,<2" },
     { name = "keras", marker = "python_full_version == '3.11.*' and extra == 'ramp'", specifier = "<3" },
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "mercantile", specifier = ">=1.2.1" },
     { name = "numpy", specifier = ">=1.26" },
+    { name = "numpy", marker = "python_full_version == '3.11.*' and extra == 'ramp'", specifier = "<2" },
     { name = "onnx", marker = "python_full_version >= '3.12' and extra == 'yolo'", specifier = ">=1.19.1" },
     { name = "onnxruntime", marker = "python_full_version >= '3.12' and extra == 'yolo'", specifier = ">=1.23.2" },
     { name = "onnxslim", marker = "python_full_version >= '3.12' and extra == 'yolo'", specifier = ">=0.1.68" },

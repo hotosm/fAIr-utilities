@@ -27,6 +27,8 @@ dependencies = [
 
 [project.optional-dependencies]
 ramp = [
+    "numpy<2 ; python_version == '3.11'",
+    "gdal[numpy]>=3.6,<4 ; python_version == '3.11'",
     "keras<3 ; python_version == '3.11'",
     "shapely<2 ; python_version == '3.11'",
     "ramp-fair==0.1.2 ; python_version == '3.11'",
