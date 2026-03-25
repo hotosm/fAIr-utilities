@@ -74,7 +74,7 @@ build-backend = "uv_build"
 default-groups = ["dev"]
 
 [tool.uv.sources]
-solaris = [{ path = "./docker/solaris", extra = "ramp" }]
+solaris = [{ git = "https://github.com/kshitijrajsharma/solaris", rev = "f2968ef855af0b508f338aad7ebc651bea6cd667", extra = "ramp" }]
 
 [tool.uv.extra-build-dependencies]
 gdal = [

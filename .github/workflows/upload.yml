@@ -18,10 +18,6 @@ jobs:
           python-version: "3.13"
           enable-cache: true
 
-      - name: Remove solaris
-        run: |
-          sudo rm -rf docker
-
       - name: Build package
         run: uv build
 
