@@ -20,7 +20,7 @@ jobs:
           enable-cache: true
 
       - name: Sync lint dependencies
-        run: uv sync --group lint
+        run: uv sync --group lint --no-install-project
 
       - name: Run lint
         run: |
