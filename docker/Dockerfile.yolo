@@ -15,7 +15,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
-    gdal-bin \
     libgdal-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
@@ -24,16 +23,16 @@ COPY pyproject.toml uv.lock README.md /app/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     bash -euxo pipefail -c ' \
-    if [ "$FLAVOR" = "cpu" ]; then export UV_TORCH_BACKEND="cpu"; fi; \
-    uv sync --frozen --no-dev --extra yolo --no-install-project --no-editable \
+    if [ "$FLAVOR" = "gpu" ]; then EXTRA="yolo-gpu"; else EXTRA="yolo-cpu"; fi; \
+    uv sync --frozen --no-dev --extra "$EXTRA" --no-install-project --no-editable \
     '
 
 COPY . /app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     bash -euxo pipefail -c ' \
-    if [ "$FLAVOR" = "cpu" ]; then export UV_TORCH_BACKEND="cpu"; fi; \
-    uv sync --frozen --no-dev --extra yolo --no-editable \
+    if [ "$FLAVOR" = "gpu" ]; then EXTRA="yolo-gpu"; else EXTRA="yolo-cpu"; fi; \
+    uv sync --frozen --no-dev --extra "$EXTRA" --no-editable \
     '
 
 FROM python:3.13-slim-trixie AS runtime
@@ -53,7 +52,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     gdal-bin \
-    libgl1 \
     libglib2.0-0 \
     libspatialindex8 \
     && rm -rf /var/lib/apt/lists/*

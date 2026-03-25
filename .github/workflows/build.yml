@@ -44,10 +44,10 @@ jobs:
       - uses: ./.github/actions/setup-gdal
 
       - name: Sync yolo test dependencies
-        run: uv sync --extra yolo --group test
+        run: uv sync --extra yolo-cpu --group test
 
       - name: Run yolo test
-        run: uv run --no-sync --extra yolo python test_yolo.py
+        run: uv run --no-sync --extra yolo-cpu python test_yolo.py
 
   test-ramp:
     runs-on: ubuntu-latest
