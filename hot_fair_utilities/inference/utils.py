@@ -1,17 +1,19 @@
 from typing import List
 
 import numpy as np
-import torch
 from PIL import Image
-from tensorflow import keras
-from ultralytics import YOLO
 
+# torch, keras and ultralytics are NOT imported at module level.
+# initialize_model and open_images import only the framework they need
+# so that this module works in YOLO-only or RAMP-only environments.
 
 IMAGE_SIZE = 256
 
 
 def open_images(paths: List[str]) -> np.ndarray:
-    """Open images from some given paths."""
+    """Open images from some given paths (Keras / RAMP path)."""
+    from tensorflow import keras
+
     images = []
     for path in paths:
         image = keras.preprocessing.image.load_img(
@@ -31,14 +33,19 @@ def save_mask(mask: np.ndarray, filename: str) -> None:
 
 
 def initialize_model(path, device=None):
-    """Loads either keras or yolo model."""
-    if not isinstance(path, str):  # probably loaded model
+    """Loads either a Keras (RAMP) or YOLO model from a checkpoint path."""
+    if not isinstance(path, str):
         return path
 
-    if path.endswith('.pt'):  # YOLO
+    if path.endswith(".pt"):
+        import torch
+        from ultralytics import YOLO
+
         if not device:
-            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = YOLO(path).to(device)
     else:
+        from tensorflow import keras
+
         model = keras.models.load_model(path)
     return model

@@ -13,13 +13,15 @@ from glob import glob
 from typing import Tuple
 
 # Third party imports
-# Third-party imports
 import geopandas
 import matplotlib.pyplot as plt
 import pandas as pd
 import requests
-import ultralytics
 from shapely.geometry import box
+
+# ultralytics is NOT imported at module level; it is imported lazily inside
+# get_yolo_iou_metrics() and export_model_to_onnx() so that utils.py can be
+# loaded in a RAMP-only environment without requiring PyTorch/ultralytics.
 
 IMAGE_SIZE = 256
 
@@ -281,6 +283,7 @@ def compute_iou_chart_from_yolo_results(results_csv_path, results_output_chart_p
 
 
 def get_yolo_iou_metrics(model_path):
+    import ultralytics
 
     model_val = ultralytics.YOLO(model_path)
     model_val_metrics = (
@@ -299,6 +302,8 @@ def get_yolo_iou_metrics(model_path):
 
 
 def export_model_to_onnx(model_path):
+    import ultralytics
+
     model = ultralytics.YOLO(model_path)
     model.export(format="onnx", imgsz=[256, 256])
     # model.export(format='tflite')

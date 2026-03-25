@@ -18,18 +18,57 @@ keywords = [
     "postprocessing", "stitching","training"
 ]
 dependencies = [
-    "shapely==1.8.0", "numpy", 
-    "Pillow==9.1.0", "geopandas>=0.12.0,<=0.14.4", "pandas>=2.0.0,<=2.2.3" , 
-    "rasterio", "mercantile==1.2.1", "tqdm==4.67.0", 
-    "rtree","opencv-python-headless<=4.10.0.84",
-    "torch>=2.0.0,<=2.5.1", "torchvision>=0.10.0,<=0.20.1", "torchaudio>=2.0.0,<=2.5.1","ultralytics>=8.0.0,<=8.3.26",
-    "ramp-fair==0.1.2", "protobuf==3.20.2"
+    # Geo / data stack shared by all images (matches production requirements.txt)
+    "gdal",
+    "shapely==1.8.0",
+    "numpy<2",
+    "Pillow==9.0.1",
+    "geopandas>=0.12.0,<=0.14.5",
+    "fiona>=1.9,<1.10",  # Fiona 1.10+ removed fiona.path; GeoPandas 0.13.x/0.14.0-0.14.3 need it
+    "pandas==1.5.3",
+    "rasterio",
+    "mercantile==1.2.1",
+    "tqdm>=4.64.0",
+    "rtree",
+    "opencv-python-headless<=4.7.0.68",
+    "PyYAML",
+    # utils.py (shared by predict, clip_labels, bbox2tiles/tms2img): download_image, fetch_osm_data, compute_iou_chart
+    "requests",
+    "matplotlib",
+    # torch, ultralytics, ramp-fair and protobuf are NOT base deps.
+    # Install the matching extra for your use case:
+    #   RAMP image : pip install .[ramp]
+    #   YOLO image : pip install .[yolo]
+    #   Both       : pip install .[ramp,yolo]
 ]
 requires-python = ">=3.7"
 
     [project.optional-dependencies]
+    # RAMP / TensorFlow stack (RAMP training, Keras inference, multimask preprocessing)
+    ramp = [
+        "ramp-fair==0.1.2",
+        "protobuf==3.20.2",
+        "segmentation-models==1.0.1",  # RAMP training (run_training.py)
+        "scikit-fmm",  # ramp-fair sdt_mask_utils (undeclared dep)
+        "albumentations>=1.0.0",  # ramp-fair data_generator (undeclared dep)
+        # solaris: use vendored docker/solaris (PyPI solaris conflicts with TF 2.x)
+        # from docker/ramp/docker-requirements.txt (ramp-fair undeclared deps):
+        "imgaug>=0.4.0",
+        "h5py",
+        "munch",
+        "imageio",
+    ]
+    # YOLO / PyTorch stack (YOLO training, YOLO inference)
+    yolo = [
+        "torch>=2.0.0,<=2.5.1",
+        "torchvision>=0.10.0,<=0.20.1",
+        "torchaudio>=2.0.0,<=2.5.1",
+        "ultralytics>=8.0.0,<=8.3.26",
+        # Use headless opencv only (no libGL/GUI deps); base has opencv-python-headless
+        "opencv-python-headless<4.10",
+    ]
     build = ["build", "twine"]
-    dev   = ["black", "bumpver", "isort"]
+    dev   = ["black", "bumpver", "isort", "pytest"]
 
     [project.urls]
     repository    = "https://github.com/hotosm/fAIr-utilities"
@@ -47,6 +86,11 @@ push            = false
         'current_version = "{version}"',
         'version = "{version}"',
     ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
 
 [tool.isort]
 profile                   = "black"

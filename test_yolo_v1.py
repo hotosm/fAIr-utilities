@@ -41,7 +41,8 @@ with print_time("preprocessing"):
         rasterize=True,
         rasterize_options=["binary"],
         georeference_images=True,
-        multimasks=True,  # new arg
+        # TF-free multimask generation is now vendored under preprocessing.
+        multimasks=True,
     )
 
 yolo_data_dir = f"{base_path}/yolo_v1"

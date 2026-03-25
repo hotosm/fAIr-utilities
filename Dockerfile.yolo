@@ -1,0 +1,34 @@
+FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
+WORKDIR /app
+
+COPY pyproject.toml setup.py README.md LICENSE ./
+COPY hot_fair_utilities ./hot_fair_utilities
+
+RUN python -m pip install --upgrade pip setuptools wheel
+
+# GDAL Python bindings must match system libgdal (apt installs 3.4.x).
+# Installing first prevents pip from pulling latest GDAL 3.12 which requires libgdal 3.12+.
+RUN pip install "GDAL==$(gdal-config --version)"
+# Shapely 1.8 expects GEOS under sys.prefix/lib. Use dynamic path for base-image compatibility.
+RUN PYTHON_LIB=$(python -c "import sys; print(sys.prefix + '/lib')") \
+    && mkdir -p "$PYTHON_LIB" \
+    && ln -sf /usr/lib/x86_64-linux-gnu/libgeos_c.so "$PYTHON_LIB/libgeos_c.so" \
+    && ln -sf /usr/lib/x86_64-linux-gnu/libgeos.so "$PYTHON_LIB/libgeos.so"
+RUN pip install -e ".[yolo,dev]"
+
+CMD ["python", "-c", "from hot_fair_utilities.preprocessing.multimasks_from_polygons import multimasks_from_polygons; print('YOLO image ready')"]
