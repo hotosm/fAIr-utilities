@@ -74,11 +74,7 @@ def train(
         weights = download_path
         print(f"Weights file downloaded to {weights}")
 
-    back = (
-        "n"
-        if "yolov8n" in weights
-        else "s" if "yolov8s" in weights else "m" if "yolov8m" in weights else "?"
-    )
+    back = "n" if "yolov8n" in weights else "s" if "yolov8s" in weights else "m" if "yolov8m" in weights else "?"
     data_scn = dataset_yaml_path
     dataset = data_scn.split("/")[-3]
     kwargs = HYPERPARAM_CHANGES
@@ -98,16 +94,13 @@ def train(
 
     model.train(
         data=data_scn,
-        project=os.path.join(
-            output_path, "checkpoints"
-        ),  # Using the environment variable with fallback
+        project=os.path.join(output_path, "checkpoints"),  # Using the environment variable with fallback
         name=name,
         epochs=int(epochs),
         batch=int(batch_size),
         resume=resume,
         verbose=True,
         deterministic=False,
-        save_dir=os.path.join(output_path),
         device=[int(i) for i in gpu.split(",")] if "," in gpu else gpu,
         **kwargs,
     )
@@ -116,14 +109,10 @@ def train(
     # print(model.val())
     compute_iou_chart_from_yolo_results(
         results_csv_path=os.path.join(output_path, "checkpoints", name, "results.csv"),
-        results_output_chart_path=os.path.join(
-            output_path, "checkpoints", name, "iou_chart.png"
-        ),
+        results_output_chart_path=os.path.join(output_path, "checkpoints", name, "iou_chart.png"),
     )
 
-    output_model_path = os.path.join(
-        os.path.join(output_path, "checkpoints"), name, "weights", "best.pt"
-    )
+    output_model_path = os.path.join(os.path.join(output_path, "checkpoints"), name, "weights", "best.pt")
 
     iou_model_accuracy = get_yolo_iou_metrics(output_model_path)
     export_model_to_onnx(output_model_path)

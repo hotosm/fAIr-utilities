@@ -1,62 +1,113 @@
-[build-system]
-requires      = ["setuptools>=61.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "hot-fair-utilities"
 version = "2.0.12"
-description = "Utilities for AI - Assisted Mapping fAIr"
+description = "Utilities for AI assisted mapping workflows"
 readme = "README.md"
-authors = [{ name = "Hot Tech Team", email = "sysadmin@hotosm.org" }]
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
-classifiers = [
-    "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3",
-]
-keywords = [
-    "preprocessing", "inference", 
-    "postprocessing", "stitching","training"
+maintainers = [
+    { name = "Kshitij Raj Sharma", email = "krschap@proton.me" },
 ]
 dependencies = [
-    "shapely==1.8.0", "numpy", 
-    "Pillow==9.1.0", "geopandas>=0.12.0,<=0.14.4", "pandas>=2.0.0,<=2.2.3" , 
-    "rasterio", "mercantile==1.2.1", "tqdm==4.67.0", 
-    "rtree","opencv-python-headless<=4.10.0.84",
-    "torch>=2.0.0,<=2.5.1", "torchvision>=0.10.0,<=0.20.1", "torchaudio>=2.0.0,<=2.5.1","ultralytics>=8.0.0,<=8.3.26",
-    "ramp-fair==0.1.2", "protobuf==3.20.2"
+    "gdal>=3.6,<4",
+    "geopandas>=0.14,<2",
+    "matplotlib>=3.10.8",
+    "mercantile>=1.2.1",
+    "numpy>=1.26",
+    "opencv-python-headless<4.9 ; python_version < '3.13'",
+    "opencv-python-headless>=4.13.0.92 ; python_version >= '3.13'",
+    "pandas>=2.3.3",
+    "pillow>=12.1.1",
+    "rasterio>=1.4.4",
+    "requests>=2.32.5",
+    "rtree>=1.4.1",
+    "shapely>=1.8,<3",
+    "tqdm>=4.67.3",
 ]
-requires-python = ">=3.7"
 
-    [project.optional-dependencies]
-    build = ["build", "twine"]
-    dev   = ["black", "bumpver", "isort"]
+[project.optional-dependencies]
+ramp = [
+    "numpy<2 ; python_version == '3.11'",
+    "gdal[numpy]>=3.6,<4 ; python_version == '3.11'",
+    "keras<3 ; python_version == '3.11'",
+    "shapely<2 ; python_version == '3.11'",
+    "ramp-fair==0.1.2 ; python_version == '3.11'",
+    "scikit-fmm ; python_version == '3.11'",
+    "segmentation-models ; python_version == '3.11'",
+    "solaris ; python_version == '3.11'",
+    "tensorflow==2.15.1 ; python_version == '3.11'",
+]
+yolo = [
+    "onnx>=1.19.1 ; python_version >= '3.12'",
+    "onnxruntime>=1.23.2 ; python_version >= '3.12'",
+    "onnxslim>=0.1.68 ; python_version >= '3.12'",
+    "torch>=2.11.0",
+    "ultralytics>=8.4.27",
+]
 
-    [project.urls]
-    repository    = "https://github.com/hotosm/fAIr-utilities"
+[dependency-groups]
+lint = [
+    "pre-commit>=4.3.0",
+    "ruff>=0.15.7",
+]
+typecheck = [
+    "ty>=0.0.25",
+]
+test = [
+    "pytest>=9.0.2",
+]
+release = [
+    "commitizen>=4.13.9",
+]
+dev = [
+	{ include-group = "lint" },
+	{ include-group = "typecheck" },
+	{ include-group = "test" },
+	{ include-group = "release" },
+]
 
-[tool.bumpver]
-current_version = "1.0.51"
-version_pattern = "MAJOR.MINOR.PATCH"
-commit_message  = "bump version {old_version} -> {new_version}"
-commit          = true
-tag             = true
-push            = false
+[build-system]
+requires = ["uv_build>=0.11.1,<0.12"]
+build-backend = "uv_build"
 
-    [tool.bumpver.file_patterns]
-    "pyproject.toml" = [
-        'current_version = "{version}"',
-        'version = "{version}"',
-    ]
+[tool.uv]
+default-groups = ["dev"]
 
-[tool.isort]
-profile                   = "black"
-import_heading_stdlib     = "Standard library imports"
-import_heading_thirdparty = "Third party imports"
-import_heading_firstparty = "Reader imports"
+[tool.uv.sources]
+solaris = [{ path = "./docker/solaris", extra = "ramp" }]
+
+[tool.uv.extra-build-dependencies]
+gdal = [
+    "numpy==1.26.4",
+    "setuptools>=67",
+    "wheel",
+]
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "hot_fair_utilities"
+source-include = ["hot_fair_utilities/training/ramp/ramp_config_base.json"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 210
+exclude = [
+	"docker",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.ty.src]
+exclude = ["docker"]
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
+version_provider = "uv"
+version_scheme = "pep440"
 tag_format = "v$version"
-version_scheme = "semver"
-version_provider = "pep621"
 update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"

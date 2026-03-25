@@ -1,9 +1,10 @@
 # Third party imports
+import os
+
 from geopandas import GeoSeries, read_file
 from shapely.geometry import MultiPolygon, Polygon
 from shapely.validation import make_valid
 from tqdm import tqdm
-import os
 
 from .utils import UndirectedGraph, make_index, project, union
 
@@ -43,18 +44,14 @@ def merge_polygons(polygons_path, new_polygons_path, distance_threshold):
     for i, shape in enumerate(tqdm(shapes, desc="Building graph", unit="shapes")):
         embiggened = buffered(shape)
         graph.add_edge(i, i)
-        nearest = [
-            j for j in idx.intersection(embiggened.bounds, objects=False) if i != j
-        ]
+        nearest = [j for j in idx.intersection(embiggened.bounds, objects=False) if i != j]
 
         for t in nearest:
             if embiggened.intersects(shapes[t]):
                 graph.add_edge(i, t)
 
     components = list(graph.components())
-    assert sum([len(v) for v in components]) == len(
-        shapes
-    ), "components capture all shape indices"
+    assert sum([len(v) for v in components]) == len(shapes), "components capture all shape indices"
 
     features = []
 
@@ -64,11 +61,11 @@ def merge_polygons(polygons_path, new_polygons_path, distance_threshold):
 
         feature = make_valid(merged)
 
-        if type(feature) == MultiPolygon:
+        if isinstance(feature, MultiPolygon):
             for polygon in feature.geoms:
-                if type(polygon) == Polygon and polygon.area > 0:
+                if isinstance(polygon, Polygon) and polygon.area > 0:
                     features.append(polygon)
-        elif type(feature) == Polygon:
+        elif isinstance(feature, Polygon):
             features.append(feature)
 
     gs = GeoSeries(features).set_crs(SOURCE_CRS)

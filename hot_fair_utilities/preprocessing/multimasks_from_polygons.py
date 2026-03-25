@@ -1,8 +1,9 @@
 # Patched from ramp-code.scripts.multi_masks_from_polygons created for ramp project by carolyn.johnston@dev.global
 
 # Standard library imports
-from pathlib import Path
 import os
+from pathlib import Path
+
 # Third party imports
 import geopandas as gpd
 import rasterio as rio
@@ -16,7 +17,6 @@ from solaris.utils.core import _check_rasterio_im_load
 from solaris.utils.geo import get_crs
 from solaris.vector.mask import crs_is_metric
 from tqdm import tqdm
-
 
 
 def get_rasterio_shape_and_transform(image_path):
@@ -70,16 +70,11 @@ def multimasks_from_polygons(
     # these will have the same base filenames as the chip files,
     # with a mask.tif extension in place of the .tif extension.
 
-    mask_paths = [
-        construct_mask_filepath(out_mask_dir, chip_path) for chip_path in chip_paths
-    ]
+    mask_paths = [construct_mask_filepath(out_mask_dir, chip_path) for chip_path in chip_paths]
 
     # construct a list of full paths to the mask files
     json_chip_mask_zips = zip(label_paths, chip_paths, mask_paths)
-    for json_path, chip_path, mask_path in tqdm(
-        json_chip_mask_zips, desc="Multimasks for input"
-    ):
-
+    for json_path, chip_path, mask_path in tqdm(json_chip_mask_zips, desc="Multimasks for input"):
         # We will run this on very large directories, and some label files might fail to process.
         # We want to be able to resume mask creation from where we left off.
         if Path(mask_path).is_file():
@@ -131,7 +126,6 @@ def multimasks_from_polygons(
             out_type="uint8",
             meters=meters,
         )
-
 
         # convert onehot_multi_mask to a sparse encoded mask
         # of shape (1,H,W) for compatibility with rasterio writer

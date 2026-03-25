@@ -7,9 +7,7 @@ from .building_footprint import BuildingExtract
 from .utils import tiles_from_directory
 
 
-def get_polygons(
-    pred_masks_path, polygons_path, kernel_opening=20, simplify_threshold=0.01
-):
+def get_polygons(pred_masks_path, polygons_path, kernel_opening=20, simplify_threshold=0.01):
     """Generate GeoJSON polygons from predicted masks.
 
     Args:

@@ -1,7 +1,9 @@
 # Third-party imports
 # Third party imports
-import geopandas
 import os
+
+import geopandas
+
 
 def reproject_labels_to_epsg3857(input_path: str, output_path: str) -> None:
     """Convert a GeoJSON file with labels from EPSG:4326 to EPSG:3857.
@@ -14,5 +16,5 @@ def reproject_labels_to_epsg3857(input_path: str, output_path: str) -> None:
         output_path: Path to the GeoJSON file where the output data will go.
     """
 
-    labels_gdf = geopandas.read_file(os.path.relpath(input_path), driver='GeoJSON').set_crs("EPSG:4326")
+    labels_gdf = geopandas.read_file(os.path.relpath(input_path), driver="GeoJSON").set_crs("EPSG:4326")
     labels_gdf.to_crs("EPSG:3857").to_file(output_path, driver="GeoJSON")

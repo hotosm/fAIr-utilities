@@ -15,9 +15,7 @@ TOLERANCE = 0.5
 AREA_THRESHOLD = 5
 
 
-def vectorize(
-    input_path: str, output_path: str, tolerance: float = 0.5, area_threshold: float = 5
-) -> None:
+def vectorize(input_path: str, output_path: str, tolerance: float = 0.5, area_threshold: float = 5) -> None:
     """Polygonize raster tiles from the input path.
 
     Note that as input, we are expecting GeoTIF images with EPSG:3857 as
@@ -51,11 +49,7 @@ def vectorize(
 
     areas = [poly.area for poly in polygons]
     max_area, median_area = np.max(areas), np.median(areas)
-    polygons = [
-        Polygon(poly.exterior.coords)
-        for poly in polygons
-        if poly.area != max_area and poly.area / median_area > area_threshold
-    ]
+    polygons = [Polygon(poly.exterior.coords) for poly in polygons if poly.area != max_area and poly.area / median_area > area_threshold]
 
     gs = gpd.GeoSeries(polygons, crs=kwargs["crs"]).simplify(tolerance)
     gs = remove_overlapping_polygons(gs)

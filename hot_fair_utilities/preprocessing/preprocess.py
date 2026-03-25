@@ -64,12 +64,9 @@ def preprocess(
     # Check if rasterizing options are valid
     assert epsg in (4326, 3857), "Projection not supported"
     if rasterize:
-        assert (
-            rasterize_options is not None
-            and isinstance(rasterize_options, list)
-            and 0 < len(rasterize_options) <= 2
-            and len(rasterize_options) == len(set(rasterize_options))
-        ), "Please provide a list with rasterizing options"
+        assert rasterize_options is not None and isinstance(rasterize_options, list) and 0 < len(rasterize_options) <= 2 and len(rasterize_options) == len(set(rasterize_options)), (
+            "Please provide a list with rasterizing options"
+        )
 
         for option in rasterize_options:
             assert option in (
@@ -97,11 +94,7 @@ def preprocess(
         output_path,
         rasterize,
         rasterize_options,
-        all_geojson_file=(
-            f"{output_path}/corrected_labels.geojson"
-            if epsg == 4326
-            else f"{output_path}/labels_epsg3857.geojson"
-        ),
+        all_geojson_file=(f"{output_path}/corrected_labels.geojson" if epsg == 4326 else f"{output_path}/labels_epsg3857.geojson"),
         epsg=epsg,
     )
 
@@ -112,9 +105,7 @@ def preprocess(
     if multimasks:
         from .multimasks_from_polygons import multimasks_from_polygons
 
-        assert os.path.isdir(
-            f"{output_path}/chips"
-        ), "Chips do not exist. Set georeference_images=True."
+        assert os.path.isdir(f"{output_path}/chips"), "Chips do not exist. Set georeference_images=True."
         multimasks_from_polygons(
             f"{output_path}/labels",
             f"{output_path}/chips",

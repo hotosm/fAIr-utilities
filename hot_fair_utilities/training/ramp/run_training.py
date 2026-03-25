@@ -1,41 +1,21 @@
 # Standard library imports
+import copy
+import importlib
 import os
 
-# Third party imports
-import tensorflow as tf
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ.setdefault("SM_FRAMEWORK", "tf.keras")
 
-# Assert that the version of the library is greater than or equal to 2.9.2
-assert tf.__version__ <= "2.9.2"  # tested up to 2.9.2
-
-# Standard library imports
-
-# Standard library imports
 import datetime
 import json
-import os
 from pathlib import Path
 from time import perf_counter
+from typing import Any, cast
 
-# Third party imports
-import tensorflow as tf
-from matplotlib import pyplot as plt
-from tensorflow import keras
-
-# Note: this suppresses warning and other less urgent messages,
-# and only allows errors to be printed.
-# Comment this out if you are having mysterious problems, so you can see all messages.
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
-
-class RaiseError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-# Third party imports
-
-# Third party imports
 import segmentation_models as sm
+
+# Third party imports
+from matplotlib import pyplot as plt
 from ramp.data_mgmt.data_generator import (
     test_batches_from_gtiff_dirs,
     training_batches_from_gtiff_dirs,
@@ -47,12 +27,23 @@ from ramp.training import (
     model_constructors,
     optimizer_constructors,
 )
-
-# import ramp dependencies.
 from ramp.training.augmentation_constructors import get_augmentation_fn
 from ramp.utils.misc_ramp_utils import get_num_files
 
 from .config import RAMP_CONFIG
+
+tf = cast(Any, importlib.import_module("tensorflow"))
+keras = tf.keras
+
+# Assert that the version of the library is greater than or equal to 2.9.2
+assert tf.__version__ <= "2.9.2"  # tested up to 2.9.2
+
+
+class RaiseError(Exception):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.message = message
+
 
 # Segmentation Models: using `keras` framework.
 sm.set_framework("tf.keras")
@@ -74,9 +65,7 @@ def apply_feedback(
         os.makedirs(output_path)
 
     # Update the fine-tuning configuration
-    fine_tuning_cfg = manage_fine_tuning_config(
-        output_path, num_epochs, batch_size, freeze_layers, multimasks
-    )
+    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers, multimasks)
 
     # Set the path of the pre-trained model in the configuration
     fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
@@ -85,13 +74,11 @@ def apply_feedback(
     run_main_train_code(fine_tuning_cfg)
 
 
-def manage_fine_tuning_config(
-    output_path, num_epochs, batch_size, freeze_layers, multimasks=False
-):
+def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers, multimasks=False):
 
     dst_path = os.path.join(output_path, "ramp_fair_config_finetune.json")
 
-    data = RAMP_CONFIG
+    data = copy.deepcopy(cast(dict[str, Any], RAMP_CONFIG))
 
     # Modify the content of the data dictionary datasets
     data["datasets"]["train_img_dir"] = f"{output_path}/chips"
@@ -167,9 +154,7 @@ def run_main_train_code(cfg):
         model_path = Path(working_ramp_home) / cfg["saved_model"]["saved_model_path"]
         print(f"Model: importing saved model {str(model_path)}")
         the_model = tf.keras.models.load_model(model_path)
-        assert (
-            the_model is not None
-        ), f"the saved model was not constructed: {model_path}"
+        assert the_model is not None, f"the saved model was not constructed: {model_path}"
 
         if cfg["freeze_layers"]:
             num_layers_to_freeze = 4  # freeze lower layers
@@ -180,7 +165,7 @@ def run_main_train_code(cfg):
                     layer.trainable = True
 
         if not cfg["saved_model"]["save_optimizer_state"]:
-            # If you don't want to save the original state of training, recompile the model.
+            # Recompile without restoring optimizer state from the saved model.
             the_model.compile(optimizer=optimizer, loss=loss_fn, metrics=[the_metrics])
 
             # the_model.compile(optimizer = optimizer,
@@ -192,7 +177,7 @@ def run_main_train_code(cfg):
         get_model_fn = getattr(model_constructors, get_model_fn_name)
         the_model = get_model_fn(cfg)
 
-        assert the_model is not None, f"the model was not constructed: {model_path}"
+        assert the_model is not None, "the model was not constructed"
         the_model.compile(optimizer=optimizer, loss=loss_fn, metrics=the_metrics)
 
     print(the_model)
@@ -242,15 +227,11 @@ def run_main_train_code(cfg):
             transforms=aug,
         )
     else:
-        train_batches = training_batches_from_gtiff_dirs(
-            train_img_dir, train_mask_dir, batch_size, input_img_shape, output_img_shape
-        )
+        train_batches = training_batches_from_gtiff_dirs(train_img_dir, train_mask_dir, batch_size, input_img_shape, output_img_shape)
 
     assert train_batches is not None, "training batches were not constructed"
 
-    val_batches = test_batches_from_gtiff_dirs(
-        val_img_dir, val_mask_dir, batch_size, input_img_shape, output_img_shape
-    )
+    val_batches = test_batches_from_gtiff_dirs(val_img_dir, val_mask_dir, batch_size, input_img_shape, output_img_shape)
 
     assert val_batches is not None, "validation batches were not constructed"
 
@@ -260,12 +241,8 @@ def run_main_train_code(cfg):
     if not discard_experiment:
         # get model checkpoint callback
         if cfg["model_checkpts"]["use_model_checkpts"]:
-            get_model_checkpt_callback_fn_name = cfg["model_checkpts"][
-                "get_model_checkpt_callback_fn_name"
-            ]
-            get_model_checkpt_callback_fn = getattr(
-                callback_constructors, get_model_checkpt_callback_fn_name
-            )
+            get_model_checkpt_callback_fn_name = cfg["model_checkpts"]["get_model_checkpt_callback_fn_name"]
+            get_model_checkpt_callback_fn = getattr(callback_constructors, get_model_checkpt_callback_fn_name)
             callbacks_list.append(get_model_checkpt_callback_fn(cfg))
 
         # get tensorboard callback
@@ -276,15 +253,9 @@ def run_main_train_code(cfg):
 
         # get tensorboard model prediction logging callback
         if cfg["prediction_logging"]["use_prediction_logging"]:
-            assert cfg["tensorboard"][
-                "use_tb"
-            ], "Tensorboard logging must be turned on to enable prediction logging"
-            get_prediction_logging_fn_name = cfg["prediction_logging"][
-                "get_prediction_logging_fn_name"
-            ]
-            get_prediction_logging_fn = getattr(
-                callback_constructors, get_prediction_logging_fn_name
-            )
+            assert cfg["tensorboard"]["use_tb"], "Tensorboard logging must be turned on to enable prediction logging"
+            get_prediction_logging_fn_name = cfg["prediction_logging"]["get_prediction_logging_fn_name"]
+            get_prediction_logging_fn = getattr(callback_constructors, get_prediction_logging_fn_name)
             callbacks_list.append(get_prediction_logging_fn(the_model, cfg))
 
     # free up RAM
@@ -295,24 +266,17 @@ def run_main_train_code(cfg):
 
         # get cyclic learning scheduler callback
     if cfg["cyclic_learning_scheduler"]["use_clr"]:
-        assert not cfg["early_stopping"][
-            "use_early_stopping"
-        ], "cannot use early_stopping with cycling_learning_scheduler"
-        get_clr_callback_fn_name = cfg["cyclic_learning_scheduler"][
-            "get_clr_callback_fn_name"
-        ]
+        assert not cfg["early_stopping"]["use_early_stopping"], "cannot use early_stopping with cycling_learning_scheduler"
+        get_clr_callback_fn_name = cfg["cyclic_learning_scheduler"]["get_clr_callback_fn_name"]
         get_clr_callback_fn = getattr(callback_constructors, get_clr_callback_fn_name)
         callbacks_list.append(get_clr_callback_fn(cfg))
 
     ## Main training block ##
     n_epochs = cfg["num_epochs"]
-    print(
-        f"Starting Training with {n_epochs} epochs , {batch_size} batch size , {steps_per_epoch} steps per epoch , {validation_steps} validation steps......"
-    )
+    print(f"Starting Training with {n_epochs} epochs, {batch_size} batch size, {steps_per_epoch} steps per epoch, {validation_steps} validation steps")
     if validation_steps <= 0:
-        raise RaiseError(
-            "Not enough data for training, Increase image or Try reducing batchsize/epochs"
-        )
+        raise RaiseError("Not enough data for training. Increase images or reduce batch size")
+    assert the_model is not None, "model must be initialized before fitting"
     # FIXME : Make checkpoint
     start = perf_counter()
     history = the_model.fit(
@@ -324,7 +288,7 @@ def run_main_train_code(cfg):
         callbacks=callbacks_list,
     )
     end = perf_counter()
-    print(f"Training Finished , Time taken to train : {end-start} seconds")
+    print(f"Training Finished , Time taken to train : {end - start} seconds")
 
     # plot the training and validation accuracy and loss at each epoch
     print("Generating graphs ....")

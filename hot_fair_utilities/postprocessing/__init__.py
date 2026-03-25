@@ -1,2 +1,2 @@
-from .polygonize import polygonize
-from .vectorize import vectorize
+from .polygonize import polygonize as polygonize
+from .vectorize import vectorize as vectorize

@@ -34,9 +34,7 @@ def yolo_format(
         None
     """
     # Verify the sum of the splits
-    assert (
-        train_split + val_split + test_split == 1
-    ), "The sum of the splits must be equal to 1"
+    assert train_split + val_split + test_split == 1, "The sum of the splits must be equal to 1"
 
     print(f"Train-val-test split: {train_split}-{val_split}-{test_split}")
 
@@ -165,18 +163,15 @@ def find_files(data_folders):
     lwps.sort()
 
     # Assert that the the number files for each type are the same
-    assert len(cwps) == len(
-        lwps
-    ), f"Number of {len(cwps)} tif files and {len(lwps) }label files do not match"
+    assert len(cwps) == len(lwps), f"Number of {len(cwps)} tif files and {len(lwps)}label files do not match"
 
     # Function to check that the filenames match
     for n, cwp in enumerate(cwps):
         c = os.path.basename(cwp).replace(".tif", "")
-        l = os.path.basename(lwps[n]).replace(".geojson", "")
+        label_name = os.path.basename(lwps[n]).replace(".geojson", "")
 
-        assert c == l, f"Chip and label filenames do not match: {c} != {l}"
+        assert c == label_name, f"Chip and label filenames do not match: {c} != {label_name}"
 
         base_folders.append(cwp.split("/")[1])
 
-    return cwps, lwps, base_folders
     return cwps, lwps, base_folders

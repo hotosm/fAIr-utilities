@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.11.1
+    hooks:
+      - id: uv-lock
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.7
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        types_or: [python, pyi]
+
+  - repo: local
+    hooks:
+      - id: ty-check
+        name: ty check
+        entry: uv run --group typecheck --extra yolo ty check hot_fair_utilities/georeferencing.py hot_fair_utilities/inference/predict.py hot_fair_utilities/inference/utils.py hot_fair_utilities/training/yolo_v8/train.py
+        language: system
+        pass_filenames: false
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.13.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]

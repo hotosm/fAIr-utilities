@@ -63,15 +63,10 @@ def get_geo_data(iwp):
     """
     # Open the image file in binary mode ('rb') for reading Exif data
     with rasterio.open(iwp) as src:
-
         if src.crs is None:
-            raise ValueError(
-                "No CRS found in the image file. Please check the file and try again."
-            )
+            raise ValueError("No CRS found in the image file. Please check the file and try again.")
         elif src.bounds is None:
-            raise ValueError(
-                "No bounds found in the image file. Please check the file and try again."
-            )
+            raise ValueError("No bounds found in the image file. Please check the file and try again.")
 
         # Convert the bounds to the expected format
         transformer = Transformer.from_crs(src.crs, "EPSG:4326")
@@ -111,9 +106,7 @@ def check_and_clamp(values):
     # Iterate over each sublist in the list
     for sublist in values:
         # Use a list comprehension to check and clamp each value in the sublist
-        clamped_sublist = [
-            [max(0, min(1, value)) for value in pair] for pair in sublist
-        ]
+        clamped_sublist = [[max(0, min(1, value)) for value in pair] for pair in sublist]
 
         # Add the processed sublist to the clamped_values list
         clamped_values.append(clamped_sublist)
@@ -166,19 +159,14 @@ def convert_coordinates(coordinates, geo_dict):
             if geo_dict["crs"] == "EPSG:4326":
                 # Convert the coordinates for the EPSG:4326
                 coordinates[i][j] = [
-                    round(
-                        (coordinates[i][j][0] - geo_dict["left"]) / geo_dict["width"], 6
-                    ),
-                    round(
-                        (geo_dict["top"] - coordinates[i][j][1]) / geo_dict["height"], 6
-                    ),
+                    round((coordinates[i][j][0] - geo_dict["left"]) / geo_dict["width"], 6),
+                    round((geo_dict["top"] - coordinates[i][j][1]) / geo_dict["height"], 6),
                 ]
             else:
                 # Convert the coordinates for not EPSG:4326
                 coordinates[i][j] = [
                     round(
-                        (coordinates[i][j][0] - geo_dict["bottom"])
-                        / geo_dict["height"],
+                        (coordinates[i][j][0] - geo_dict["bottom"]) / geo_dict["height"],
                         6,
                     ),
                     round(
@@ -190,18 +178,10 @@ def convert_coordinates(coordinates, geo_dict):
     coordinates = check_and_clamp(coordinates)
 
     # Make sure that the coordinates are within the expected range
-    assert (
-        max(flatten_list(coordinates)) <= 1
-    ), "The maximum coordinate value is greater than 1"
-    assert (
-        min(flatten_list(coordinates)) >= 0
-    ), "The minimum coordinate value is less than 0"
+    assert max(flatten_list(coordinates)) <= 1, "The maximum coordinate value is greater than 1"
+    assert min(flatten_list(coordinates)) >= 0, "The minimum coordinate value is less than 0"
 
     return coordinates
-
-
-
-
 
 
 def write_yolo_file(iwp, folder, output_path, class_index=0):
@@ -221,7 +201,7 @@ def write_yolo_file(iwp, folder, output_path, class_index=0):
     lwp = iwp.replace(".tif", ".geojson").replace("chips", "labels")
 
     # Create the YOLO label filename with path from the chip filename with path
-    ywp = os.path.join(output_path,'labels',folder, os.path.basename(iwp).replace(".tif", ".txt"))
+    ywp = os.path.join(output_path, "labels", folder, os.path.basename(iwp).replace(".tif", ".txt"))
     # Create the YOLO label folder if it does not exist
     os.makedirs(os.path.dirname(ywp), exist_ok=True)
 
@@ -256,9 +236,7 @@ def write_yolo_file(iwp, folder, output_path, class_index=0):
             with open(ywp, "a+") as file:
                 # Move the file pointer to the start of the file to check its contents.
                 file.seek(0)  # Go to the beginning of the file
-                first_character = file.read(
-                    1
-                )  # Read the first character to determine if the file is empty
+                first_character = file.read(1)  # Read the first character to determine if the file is empty
 
                 # If the first character does not exist, the file is empty
                 if not first_character:
