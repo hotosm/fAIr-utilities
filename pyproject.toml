@@ -37,6 +37,17 @@ ramp = [
     "solaris ; python_version == '3.11'",
     "tensorflow==2.15.1 ; python_version == '3.11'",
 ]
+ramp-gpu = [
+    "numpy<2 ; python_version == '3.11'",
+    "gdal[numpy]>=3.6,<4 ; python_version == '3.11'",
+    "keras<3 ; python_version == '3.11'",
+    "shapely<2 ; python_version == '3.11'",
+    "ramp-fair==0.1.2 ; python_version == '3.11'",
+    "scikit-fmm ; python_version == '3.11'",
+    "segmentation-models ; python_version == '3.11'",
+    "solaris ; python_version == '3.11'",
+    "tensorflow[and-cuda]==2.15.1 ; python_version == '3.11'",
+]
 yolo = [
     "onnx>=1.19.1 ; python_version >= '3.12'",
     "onnxruntime>=1.23.2 ; python_version >= '3.12'",
@@ -74,7 +85,10 @@ build-backend = "uv_build"
 default-groups = ["dev"]
 
 [tool.uv.sources]
-solaris = [{ git = "https://github.com/kshitijrajsharma/solaris", rev = "f2968ef855af0b508f338aad7ebc651bea6cd667", extra = "ramp" }]
+solaris = [
+    { git = "https://github.com/kshitijrajsharma/solaris", rev = "f2968ef855af0b508f338aad7ebc651bea6cd667", extra = "ramp" },
+    { git = "https://github.com/kshitijrajsharma/solaris", rev = "f2968ef855af0b508f338aad7ebc651bea6cd667", extra = "ramp-gpu" },
+]
 
 [tool.uv.extra-build-dependencies]
 gdal = [
