@@ -26,8 +26,7 @@ just run yolo
 ## Docker workflow
 
 ```bash
-docker build -t fairutils .
-docker run -it --rm --gpus=all -p 8888:8888 fairutils
+TBF
 ```
 
 Use `bash` as the container command if you want an interactive shell.
