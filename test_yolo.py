@@ -2,7 +2,6 @@
 import os
 import time
 import warnings
-import ultralytics
 
 os.environ.update(os.environ)
 os.environ["RAMP_HOME"] = os.getcwd()
@@ -10,8 +9,8 @@ os.environ["RAMP_HOME"] = os.getcwd()
 
 # Reader imports
 from hot_fair_utilities import polygonize, predict, preprocess
-from hot_fair_utilities.preprocessing.yolo_v8_v2.yolo_format import yolo_format
-from hot_fair_utilities.training.yolo_v8_v2.train import train as train_yolo
+from hot_fair_utilities.preprocessing.yolo_v8.yolo_format import yolo_format
+from hot_fair_utilities.training.yolo_v8.train import train as train_yolo
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -41,7 +40,7 @@ with print_time("preprocessing"):
         rasterize_options=["binary"],
         georeference_images=True,
         multimasks=False,
-        epsg=4326
+        epsg=4326,
     )
 
 yolo_data_dir = f"{base_path}/yolo_v2"
@@ -51,20 +50,19 @@ with print_time("yolo conversion"):
         output_path=yolo_data_dir,
     )
 
-output_model_path,output_model_iou_accuracy = train_yolo(
+output_model_path, output_model_iou_accuracy = train_yolo(
     data=f"{base_path}",
-    weights=f"{os.getcwd()}/yolov8s_v2-seg.pt", 
+    weights=f"{os.getcwd()}/yolov8s_v2-seg.pt",
     # gpu="cpu",
     epochs=2,
     batch_size=16,
     pc=2.0,
     output_path=yolo_data_dir,
-    dataset_yaml_path=os.path.join(yolo_data_dir,'yolo_dataset.yaml')
+    dataset_yaml_path=os.path.join(yolo_data_dir, "yolo_dataset.yaml"),
 )
 print(output_model_iou_accuracy)
 
 prediction_output = f"{base_path}/prediction/output"
-# model_path = f"{output_path}/weights/best.pt"
 with print_time("inference"):
     predict(
         checkpoint_path=output_model_path,
@@ -80,4 +78,4 @@ with print_time("polygonization"):
         remove_inputs=False,
     )
 
-print(f"\n Total Process Completed in : {time.time()-start_time} sec")
+print(f"\n Total Process Completed in : {time.time() - start_time} sec")

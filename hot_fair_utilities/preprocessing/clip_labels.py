@@ -12,6 +12,8 @@ from tqdm import tqdm
 
 from ..utils import get_bounding_box
 
+gdal.UseExceptions()
+
 
 def clip_labels(
     input_path: str,
@@ -47,12 +49,9 @@ def clip_labels(
     # Check if rasterizing options are valid and create the directories
     # for the output
     if rasterize:
-        assert (
-            rasterize_options is not None
-            and isinstance(rasterize_options, list)
-            and 0 < len(rasterize_options) <= 2
-            and len(rasterize_options) == len(set(rasterize_options))
-        ), "Please provide a list with rasterizing options"
+        assert rasterize_options is not None and isinstance(rasterize_options, list) and 0 < len(rasterize_options) <= 2 and len(rasterize_options) == len(set(rasterize_options)), (
+            "Please provide a list with rasterizing options"
+        )
 
         for option in rasterize_options:
             assert option in (
@@ -73,9 +72,7 @@ def clip_labels(
     os.makedirs(output_geojson_path, exist_ok=True)
 
     # Clipping GeoJSON labels
-    for path in tqdm(
-        glob(f"{input_path}/*.png"), desc=f"Clipping labels for {Path(input_path).stem}"
-    ):
+    for path in tqdm(glob(f"{input_path}/*.png"), desc=f"Clipping labels for {Path(input_path).stem}"):
         filename = Path(path).stem
         if all_geojson_file:
             geojson_file_all_labels = all_geojson_file
@@ -95,11 +92,8 @@ def clip_labels(
         if len(gdf_clipped) > 0:
             gdf_clipped.to_file(clipped_geojson_file, driver="GeoJSON")
         else:
-            schema = {"geometry": "Polygon", "properties": {"id": "int"}}
-            crs = f"EPSG:{epsg}"
-            gdf_clipped.to_file(
-                clipped_geojson_file, schema=schema, crs=crs, driver="GeoJSON"
-            )
+            with open(clipped_geojson_file, "w", encoding="utf-8") as output_file:
+                output_file.write('{"type":"FeatureCollection","name":"labels","features":[]}')
 
         # Rasterizing
         if rasterize:

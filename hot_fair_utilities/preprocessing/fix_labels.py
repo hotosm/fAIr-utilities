@@ -1,7 +1,9 @@
 # Third party imports
+import os
+
 import geopandas
 from shapely.validation import explain_validity, make_valid
-import os
+
 
 def remove_self_intersection(row):
     """Fix self-intersections in the polygons.

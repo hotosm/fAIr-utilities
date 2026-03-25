@@ -1,7 +1,7 @@
 # Standard library imports
 import concurrent.futures
-import io
 import gc
+import io
 import json
 import math
 import os
@@ -15,10 +15,8 @@ from typing import Tuple
 # Third party imports
 # Third-party imports
 import geopandas
-import matplotlib.pyplot as plt
 import pandas as pd
 import requests
-import ultralytics
 from shapely.geometry import box
 
 IMAGE_SIZE = 256
@@ -203,9 +201,7 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
             # add multiple logic on supported sources here
             else:
                 # source should be url as string , like this :  https://tiles.openaerialmap.org/62dbd947d8499800053796ec/0/62dbd947d8499800053796ed/{z}/{x}/{y}
-                download_url = source.format(
-                    x=download_path[0], y=download_path[1], z=zm_level
-                )
+                download_url = source.format(x=download_path[0], y=download_path[1], z=zm_level)
             download_urls.append(download_url)
 
             start_y = start_y - 1  # decrease the y
@@ -218,7 +214,7 @@ def tms2img(start: list, end: list, zm_level, base_path, source="maxar"):
             executor.submit(download_image, url, base_path, source_name)
 
 
-def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/v1"):
+def fetch_osm_data(payload: dict[str, object], API_URL: str = "https://api-prod.raw-data.hotosm.org/v1"):
     """
     args :
         payload : Payload request for API URL
@@ -228,9 +224,7 @@ def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/
     """
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
-    task_response = requests.post(
-        url=f"{API_URL}/snapshot/", data=json.dumps(payload), headers=headers
-    )
+    task_response = requests.post(url=f"{API_URL}/snapshot/", data=json.dumps(payload), headers=headers)
 
     task_response.raise_for_status()
     result = task_response.json()
@@ -240,9 +234,7 @@ def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/
     while not stop_loop:
         check_result = requests.get(url=f"{API_URL}{task_track_url}")
         check_result.raise_for_status()
-        res = (
-            check_result.json()
-        )  # status will tell current status of your task after it turns to success it will give result
+        res = check_result.json()
         if res["status"] == "SUCCESS" or res["status"] == "FAILED":
             stop_loop = True
         time.sleep(1)  # check each second
@@ -257,18 +249,11 @@ def fetch_osm_data(payload: json, API_URL="https://api-prod.raw-data.hotosm.org/
     return my_export_geojson
 
 
-# Third party imports
-import matplotlib.pyplot as plt
-import pandas as pd
-
-
 def compute_iou_chart_from_yolo_results(results_csv_path, results_output_chart_path):
 
     data = pd.read_csv(results_csv_path)
 
-    data["IoU(M)"] = 1 / (
-        1 / data["metrics/precision(M)"] + 1 / data["metrics/recall(M)"] - 1
-    )
+    data["IoU(M)"] = 1 / (1 / data["metrics/precision(M)"] + 1 / data["metrics/recall(M)"] - 1)
     chart = data.plot(
         x="epoch",
         y="IoU(M)",
@@ -281,24 +266,21 @@ def compute_iou_chart_from_yolo_results(results_csv_path, results_output_chart_p
 
 
 def get_yolo_iou_metrics(model_path):
+    import ultralytics
 
     model_val = ultralytics.YOLO(model_path)
-    model_val_metrics = (
-        model_val.val().results_dict
-    )  ### B and M denotes bounding box and mask respectively
+    model_val_metrics = model_val.val().results_dict  ### B and M denotes bounding box and mask respectively
     # print(metrics)
-    iou_accuracy = 1 / (
-        1 / model_val_metrics["metrics/precision(M)"]
-        + 1 / model_val_metrics["metrics/recall(M)"]
-        - 1
-    )  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
+    iou_accuracy = 1 / (1 / model_val_metrics["metrics/precision(M)"] + 1 / model_val_metrics["metrics/recall(M)"] - 1)  # ref here https://github.com/ultralytics/ultralytics/issues/9984#issuecomment-2422551315
     final_accuracy = iou_accuracy * 100
     del model_val  # release model reference
-    gc.collect()   # trigger cleanup of file handles
+    gc.collect()  # trigger cleanup of file handles
     return final_accuracy
 
 
 def export_model_to_onnx(model_path):
+    import ultralytics
+
     model = ultralytics.YOLO(model_path)
     model.export(format="onnx", imgsz=[256, 256])
     # model.export(format='tflite')
@@ -307,11 +289,8 @@ def export_model_to_onnx(model_path):
     return True
 
 
-
 def check4checkpoint(name, weights, output_path, remove_old=False):
-    ckpt = os.path.join(
-        os.path.join(output_path, "checkpoints"), name, "weights", "last.pt"
-    )
+    ckpt = os.path.join(os.path.join(output_path, "checkpoints"), name, "weights", "last.pt")
     if os.path.exists(ckpt):
         if remove_old:
             os.remove(ckpt)

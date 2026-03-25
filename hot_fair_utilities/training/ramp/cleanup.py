@@ -30,7 +30,6 @@ def extract_highest_accuracy_model(output_path):
     highest_accuracy = 0
     highest_accuracy_entry = None
     for entry in os.listdir(latest_entry_path):
-
         parts = entry.split("_")
 
         accuracy = parts[-1][:-3]  # remove .tf

@@ -1,1 +1,2 @@
-from .train import train, run_feedback
+from .train import run_feedback as run_feedback
+from .train import train as train

@@ -10,8 +10,10 @@ from tqdm import tqdm
 
 from .utils import get_bounding_box
 
+gdal.UseExceptions()
 
-def georeference(input_path: str, output_path: str, is_mask=False,epsg=3857) -> None:
+
+def georeference(input_path: str, output_path: str, is_mask=False, epsg=3857) -> None:
     """Perform georeferencing and remove the fourth band from images (if any).
 
     CRS of the georeferenced images will be EPSG:3857 ('WGS 84 / Pseudo-Mercator').
@@ -30,15 +32,13 @@ def georeference(input_path: str, output_path: str, is_mask=False,epsg=3857) -> 
     """
     os.makedirs(output_path, exist_ok=True)
 
-    for path in tqdm(
-        glob(f"{input_path}/*.png"), desc=f"Georeferencing for {Path(input_path).stem}"
-    ):
+    for path in tqdm(glob(f"{input_path}/*.png"), desc=f"Georeferencing for {Path(input_path).stem}"):
         filename = Path(path).stem
         in_file = f"{input_path}/{filename}.png"
         out_file = f"{output_path}/{filename}.tif"
 
         # Get bounding box in EPSG:3857
-        x_min, y_min, x_max, y_max = get_bounding_box(filename,epsg=epsg)
+        x_min, y_min, x_max, y_max = get_bounding_box(filename, epsg=epsg)
 
         # Use one band for masks and the first three bands for images
         bands = [1] if is_mask else [1, 2, 3]

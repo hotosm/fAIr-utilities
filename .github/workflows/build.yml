@@ -8,59 +8,85 @@ on:
       - master
   workflow_dispatch:
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.9
+      - uses: actions/checkout@v4
 
-      - name: Remove solaris
-        run: sudo rm -rf ./docker ./weights
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Sync lint dependencies
+        run: uv sync --group lint
+
+      - name: Run lint
+        run: |
+          uv run --no-sync ruff check .
+          uv run --no-sync ruff format --check .
+
+  test-yolo:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install gdal system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install gdal-bin libgdal-dev python3-gdal
+          sudo apt-get -y autoremove
+          sudo apt-get clean
+
+      - name: Sync yolo test dependencies
+        run: uv sync --extra yolo --group test
+
+      - name: Run yolo test
+        run: uv run --no-sync --extra yolo python test_yolo.py
+
+  test-ramp:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Install gdal system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install gdal-bin libgdal-dev python3-gdal
+          sudo apt-get -y autoremove
+          sudo apt-get clean
 
       - name: Clone Ramp
-        run: git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
-
-      - name: Install gdown
-        run: pip install gdown
-
-      - name: Download Basemodel
-        run: wget https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp/baseline.zip
-
-      - name: Unzip and Move Basemodel
-        run: unzip baseline.zip -d ramp-code/ramp
-
-      - name: Install gdal
         run: |
-          sudo apt-get update && sudo apt-get -y install gdal-bin libgdal-dev python3-gdal && sudo apt-get -y autoremove && sudo apt-get clean
-          pip install GDAL==$(gdal-config --version)
+          if [ ! -d ramp-code ]; then
+            git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
+          fi
 
-      - name: Install ramp dependecies
+      - name: Download and unpack ramp baseline
         run: |
-          cd ramp-code && cd colab && make install
-      - name: Navigate to home dir
-        run: |
-          cd ../.. 
-          ls
-      - name: Install tensorflow
-        run: pip install tensorflow==2.9.2
+          if [ ! -d ramp-code/ramp/checkpoint.tf ]; then
+            wget -q https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp/baseline.zip -O baseline.zip
+            unzip -oq baseline.zip -d ramp-code/ramp
+            rm -f baseline.zip
+          fi
 
-      - name: Install pytorch and ultralytics
-        run: pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --extra-index-url https://download.pytorch.org/whl/cu113 ultralytics==8.3.26
+      - name: Sync ramp test dependencies
+        run: uv sync --extra ramp --group test
 
-      - name: Install fair utilities
-        run: pip install -e .
-
-      - name: Run test ramp
-        run: |
-          pip uninstall -y gdal
-          pip install numpy==1.26.4
-          pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
-          python test_ramp.py
-
-      - name: Run test yolo
-        run: |
-          python test_yolo_v1.py
-          python test_yolo_v2.py
+      - name: Run ramp test
+        run: uv run --no-sync --extra ramp --with ./docker/solaris python test_ramp.py

@@ -48,9 +48,7 @@ def train(
     supported_models = ["ramp"]
 
     # Use the assert keyword to raise an AssertionError if the input model string is not in the list of supported models
-    assert any(
-        model.lower() in supported_model for supported_model in supported_models
-    ), "Model is not in the list of supported models "
+    assert any(model.lower() in supported_model for supported_model in supported_models), "Model is not in the list of supported models "
 
     # Export the environment variables from the operating system
     os.environ.update(os.environ)
@@ -60,9 +58,7 @@ def train(
         # Print the environment variables to verify that the new variable was added
         print("Starting to prepare data for training")
         split_training_2_validation(input_path, output_path, multimasks)
-        cfg = manage_fine_tuning_config(
-            output_path, epoch_size, batch_size, freeze_layers, multimasks
-        )
+        cfg = manage_fine_tuning_config(output_path, epoch_size, batch_size, freeze_layers, multimasks)
         print("Data is ready for training")
         run_main_train_code(cfg)
         print("extracting highest accuracy model")

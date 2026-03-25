@@ -1,22 +1,19 @@
+import importlib
 from typing import List
 
 import numpy as np
-import torch
 from PIL import Image
-from tensorflow import keras
-from ultralytics import YOLO
-
 
 IMAGE_SIZE = 256
 
 
 def open_images(paths: List[str]) -> np.ndarray:
     """Open images from some given paths."""
+    keras = importlib.import_module("tensorflow").keras
+
     images = []
     for path in paths:
-        image = keras.preprocessing.image.load_img(
-            path, target_size=(IMAGE_SIZE, IMAGE_SIZE)
-        )
+        image = keras.preprocessing.image.load_img(path, target_size=(IMAGE_SIZE, IMAGE_SIZE))
         image = np.array(image.getdata()).reshape(IMAGE_SIZE, IMAGE_SIZE, 3) / 255.0
         images.append(image)
 
@@ -30,15 +27,21 @@ def save_mask(mask: np.ndarray, filename: str) -> None:
     result.save(filename)
 
 
-def initialize_model(path, device=None):
+def initialize_model(path: str, device=None):
     """Loads either keras or yolo model."""
     if not isinstance(path, str):  # probably loaded model
         return path
 
-    if path.endswith('.pt'):  # YOLO
+    if path.endswith(".pt"):
+        import torch
+        from ultralytics import YOLO
+
         if not device:
-            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = YOLO(path).to(device)
     else:
+        keras = importlib.import_module("tensorflow").keras
+
         model = keras.models.load_model(path)
+
     return model

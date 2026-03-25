@@ -26,16 +26,12 @@ class BuildingExtract(object):
         if hierarchy is None:
             return
 
-        assert (
-            len(hierarchy) == 1
-        ), "always single hierarchy for all polygons in multipolygon"
+        assert len(hierarchy) == 1, "always single hierarchy for all polygons in multipolygon"
         hierarchy = hierarchy[0]
 
         assert len(multipolygons) == len(hierarchy), "polygons and hierarchy in sync"
 
-        polygons = [
-            simplify(polygon, self.simplify_threshold) for polygon in multipolygons
-        ]
+        polygons = [simplify(polygon, self.simplify_threshold) for polygon in multipolygons]
 
         # All child ids in hierarchy tree, keyed by root id.
         features = collections.defaultdict(set)
@@ -65,15 +61,13 @@ class BuildingExtract(object):
             for child in children:
                 rings.append(featurize(tile, polygons[child], mask.shape[:2]))
 
-            feature = make_valid(
-                unary_union([make_valid(Polygon(ring)) for ring in rings])
-            )
+            feature = make_valid(unary_union([make_valid(Polygon(ring)) for ring in rings]))
 
-            if type(feature) == MultiPolygon:
+            if isinstance(feature, MultiPolygon):
                 for polygon in feature.geoms:
-                    if type(polygon) == Polygon and polygon.area > 0:
+                    if isinstance(polygon, Polygon) and polygon.area > 0:
                         self.features.append(polygon)
-            elif type(feature) == Polygon:
+            elif isinstance(feature, Polygon):
                 self.features.append(feature)
 
     def save(self, out):

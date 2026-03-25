@@ -13,9 +13,7 @@ except ImportError:
     print("Ramp eval metrics are not available, Possibly ramp is not installed")
 
 
-def evaluate(
-    test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verbose=False
-):
+def evaluate(test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verbose=False):
     """
     Calculate precision/recall/F1-score based on intersection-over-union accuracy evaluation protocol defined by RAMP.
 
