@@ -69,7 +69,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.11"
-          enable-cache: false
+          enable-cache: true
 
       - name: Install gdal system dependencies
         run: |
@@ -96,4 +96,4 @@ jobs:
         run: uv sync --extra ramp --group test
 
       - name: Run ramp test
-        run: uv run --no-sync --extra ramp python test_ramp.py
+        run: RAMP_HOME="$PWD" uv run --no-sync --extra ramp python test_ramp.py
