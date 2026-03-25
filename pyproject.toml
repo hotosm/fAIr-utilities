@@ -53,6 +53,7 @@ yolo-cpu = [
     "onnxruntime>=1.23.2 ; python_version >= '3.12'",
     "onnxslim>=0.1.68 ; python_version >= '3.12'",
     "torch>=2.11.0",
+    "torchvision>=0.26.0",
     "ultralytics>=8.4.27",
 ]
 yolo-gpu = [
@@ -60,6 +61,7 @@ yolo-gpu = [
     "onnxruntime>=1.23.2 ; python_version >= '3.12'",
     "onnxslim>=0.1.68 ; python_version >= '3.12'",
     "torch>=2.11.0",
+    "torchvision>=0.26.0",
     "ultralytics>=8.4.27",
 ]
 
@@ -103,6 +105,10 @@ solaris = [
     { git = "https://github.com/kshitijrajsharma/solaris", branch = "main", extra = "ramp-gpu" },
 ]
 torch = [
+    { index = "pytorch-cpu", extra = "yolo-cpu" },
+    { index = "pytorch-cu130", extra = "yolo-gpu" },
+]
+torchvision = [
     { index = "pytorch-cpu", extra = "yolo-cpu" },
     { index = "pytorch-cu130", extra = "yolo-gpu" },
 ]
