@@ -23,33 +23,23 @@ just run yolo
 
 `just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. 
 
-## Docker workflow
+## Docker images
 
-Build:
+Modes and image tags:
 
-```bash
-for model in ramp yolo; do
-	for flavor in cpu gpu; do
-		if [ "$flavor" = "cpu" ]; then
-			tag="fair-utilities:${model}"
-		else
-			tag="fair-utilities:${model}-gpu"
-		fi
-		docker build -f "docker/Dockerfile.${model}" --build-arg "FLAVOR=${flavor}" -t "$tag" .
-	done
-done
-```
+- `ramp` + `cpu` -> `fair-utilities:ramp`
+- `ramp` + `gpu` -> `fair-utilities:ramp-gpu`
+- `yolo` + `cpu` -> `fair-utilities:yolo`
+- `yolo` + `gpu` -> `fair-utilities:yolo-gpu`
 
-Run:
+Build commands:
 
 ```bash
-docker run --rm fair-utilities:ramp
-docker run --rm fair-utilities:yolo
-docker run --rm --gpus all fair-utilities:ramp-gpu
-docker run --rm --gpus all fair-utilities:yolo-gpu
+docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=cpu -t fair-utilities:ramp .
+docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=gpu -t fair-utilities:ramp-gpu .
+docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=cpu -t fair-utilities:yolo .
+docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=gpu -t fair-utilities:yolo-gpu .
 ```
-
-Notes: two Dockerfiles only (`ramp`, `yolo`), GPU requires NVIDIA Container Toolkit, Ramp image fetches baseline checkpoint at build time, and YOLO uses flavor-specific torch extras (`yolo-cpu`, `yolo-gpu`) with pinned PyTorch indexes.
 
 ## Notebook test workflow
 
