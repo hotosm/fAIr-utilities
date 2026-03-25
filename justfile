@@ -25,13 +25,10 @@ _ensure-ramp-assets:
 	#!/usr/bin/env bash
 	set -euo pipefail
 
-	if [[ ! -d ramp-code ]]; then
-		git clone https://github.com/kshitijrajsharma/ramp-code-fAIr.git ramp-code
-	fi
-
-	if [[ ! -d ramp-code/ramp/checkpoint.tf ]]; then
+	if [[ ! -d ramp-data/baseline/checkpoint.tf ]]; then
+		mkdir -p ramp-data/baseline
 		wget -q https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp/baseline.zip -O baseline.zip
-		unzip -oq baseline.zip -d ramp-code/ramp
+		unzip -oq baseline.zip -d ramp-data/baseline
 		rm -f baseline.zip
 	fi
 

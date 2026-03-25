@@ -63,7 +63,7 @@ RAMP_CONFIG = {
     },
     "saved_model": {
         "use_saved_model": True,
-        "saved_model_path": "ramp-code/ramp/checkpoint.tf",
+        "saved_model_path": "ramp-data/baseline/checkpoint.tf",
         "save_optimizer_state": False,
     },
     "augmentation": {

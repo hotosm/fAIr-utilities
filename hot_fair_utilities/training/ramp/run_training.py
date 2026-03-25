@@ -49,7 +49,7 @@ class RaiseError(Exception):
 sm.set_framework("tf.keras")
 
 
-# this variable must be defined. It is the parent of the 'ramp-code' directory.
+# this variable must be defined. It is the project root used to resolve relative paths.
 working_ramp_home = os.environ["RAMP_HOME"]
 
 
