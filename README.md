@@ -25,11 +25,30 @@ just run yolo
 
 ## Docker workflow
 
+Build images:
+
 ```bash
-TBF
+docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=cpu -t fair-utilities:ramp .
+docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=gpu -t fair-utilities:ramp-gpu .
+docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=cpu -t fair-utilities:yolo .
+docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=gpu -t fair-utilities:yolo-gpu .
 ```
 
-Use `bash` as the container command if you want an interactive shell.
+Run sample workflows in containers:
+
+```bash
+docker run --rm fair-utilities:ramp
+docker run --rm fair-utilities:yolo
+docker run --rm --gpus all fair-utilities:ramp-gpu
+docker run --rm --gpus all fair-utilities:yolo-gpu
+```
+
+Notes:
+
+- All images are multi-stage builds using `uv` Docker images as the builder stage.
+- Only two Dockerfiles are maintained: one for Ramp and one for YOLO.
+- Ramp images download the baseline checkpoint into `ramp-data/baseline` during image build.
+- GPU images require NVIDIA Container Toolkit and a compatible host driver.
 
 ## Notebook test workflow
 
