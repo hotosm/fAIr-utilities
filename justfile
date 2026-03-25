@@ -35,7 +35,7 @@ run target:
 
 		uv python install 3.11
 		uv sync --python 3.11 --extra ramp --group test
-		RAMP_HOME="$PWD" uv run --no-sync --python 3.11 --extra ramp --with ./docker/solaris python test_ramp.py
+		RAMP_HOME="$PWD" uv run --no-sync --python 3.11 --extra ramp python test_ramp.py
 	elif [[ "{{target}}" == "yolo" ]]; then
 		uv sync --extra yolo --group test
 		uv run --no-sync --extra yolo python test_yolo.py
