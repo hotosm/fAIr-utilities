@@ -1,19 +1,15 @@
 import os
-import sys
 import time
-import types
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 # Third party imports
 import tensorflow as tf
 
-from hot_fair_utilities import polygonize, predict, preprocess
+from hot_fair_utilities import patch_tf_experimental_layers, polygonize, predict, preprocess
 from hot_fair_utilities.training.ramp import train
 
-experimental_layers_module = types.ModuleType("tensorflow.keras.layers.experimental")
-setattr(experimental_layers_module, "preprocessing", getattr(tf, "keras").layers)
-sys.modules["tensorflow.keras.layers.experimental"] = experimental_layers_module
+patch_tf_experimental_layers()
 
 
 def main() -> None:

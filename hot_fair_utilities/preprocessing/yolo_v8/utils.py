@@ -1,47 +1,11 @@
 # Standard library imports
-
-# Standard library imports
 import json
 import os
 
 # Third party imports
-import cv2
 import rasterio
 from PIL import Image
 from pyproj import Transformer
-from tqdm import tqdm
-
-
-def check_shapes(iwps):
-    """
-    Check the shapes of image files and store them in a dictionary.
-
-    Parameters:
-    iwps (list): A list of image files with paths.
-
-    Returns:
-    tuple: A tuple containing two elements:
-        - shapes_dict (dict): A dictionary where the keys are the image shapes and the values are the counts.
-        - shapes (list): A list of the shapes of the chip files in the same order as the input list.
-    """
-    # Create a dictionary to store the shape of the chip files
-    shapes_dict = {}
-    shapes = []
-
-    for iwp in tqdm(iwps):
-        # Read the chip file
-        shape = cv2.imread(iwp, -1).shape
-
-        # Store the shape in the dictionary
-        if str(shape) in shapes_dict:
-            shapes_dict[str(shape)] += 1
-        else:
-            shapes_dict[str(shape)] = 1
-
-        shapes.append(shape)
-
-    # Return the dictionary
-    return shapes_dict, shapes
 
 
 def get_geo_data(iwp):

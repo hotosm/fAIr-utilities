@@ -53,27 +53,6 @@ sm.set_framework("tf.keras")
 working_ramp_home = os.environ["RAMP_HOME"]
 
 
-def apply_feedback(
-    pretrained_model_path,
-    output_path,
-    num_epochs,
-    batch_size,
-    freeze_layers,
-    multimasks=False,
-):
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-
-    # Update the fine-tuning configuration
-    fine_tuning_cfg = manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers, multimasks)
-
-    # Set the path of the pre-trained model in the configuration
-    fine_tuning_cfg["saved_model"]["saved_model_path"] = pretrained_model_path
-    fine_tuning_cfg["saved_model"]["use_saved_model"] = True
-
-    run_main_train_code(fine_tuning_cfg)
-
-
 def manage_fine_tuning_config(output_path, num_epochs, batch_size, freeze_layers, multimasks=False):
 
     dst_path = os.path.join(output_path, "ramp_fair_config_finetune.json")

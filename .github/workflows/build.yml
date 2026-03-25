@@ -19,12 +19,7 @@ jobs:
           python-version: "3.13"
           enable-cache: true
 
-      - name: Install gdal system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install gdal-bin libgdal-dev python3-gdal
-          sudo apt-get -y autoremove
-          sudo apt-get clean
+      - uses: ./.github/actions/setup-gdal
 
       - name: Sync lint dependencies
         run: uv sync --group lint
@@ -46,12 +41,7 @@ jobs:
           python-version: "3.13"
           enable-cache: true
 
-      - name: Install gdal system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install gdal-bin libgdal-dev python3-gdal
-          sudo apt-get -y autoremove
-          sudo apt-get clean
+      - uses: ./.github/actions/setup-gdal
 
       - name: Sync yolo test dependencies
         run: uv sync --extra yolo --group test
@@ -71,12 +61,7 @@ jobs:
           python-version: "3.11"
           enable-cache: true
 
-      - name: Install gdal system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install gdal-bin libgdal-dev python3-gdal
-          sudo apt-get -y autoremove
-          sudo apt-get clean
+      - uses: ./.github/actions/setup-gdal
 
       - name: Clone Ramp
         run: |
