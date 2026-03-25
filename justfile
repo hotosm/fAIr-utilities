@@ -2,6 +2,7 @@ set shell := ["bash", "-cu"]
 
 setup:
 	uv sync --group dev
+	uv run --no-sync pre-commit install
 
 lint:
 	uv sync --group lint
