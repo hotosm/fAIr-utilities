@@ -86,8 +86,8 @@ default-groups = ["dev"]
 
 [tool.uv.sources]
 solaris = [
-    { git = "https://github.com/kshitijrajsharma/solaris", rev = "f2968ef855af0b508f338aad7ebc651bea6cd667", extra = "ramp" },
-    { git = "https://github.com/kshitijrajsharma/solaris", rev = "f2968ef855af0b508f338aad7ebc651bea6cd667", extra = "ramp-gpu" },
+    { git = "https://github.com/kshitijrajsharma/solaris", branch = "main", extra = "ramp" },
+    { git = "https://github.com/kshitijrajsharma/solaris", branch = "main", extra = "ramp-gpu" },
 ]
 
 [tool.uv.extra-build-dependencies]

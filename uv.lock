@@ -1182,8 +1182,8 @@ requires-dist = [
     { name = "shapely", specifier = ">=1.8,<3" },
     { name = "shapely", marker = "python_full_version == '3.11.*' and extra == 'ramp'", specifier = "<2" },
     { name = "shapely", marker = "python_full_version == '3.11.*' and extra == 'ramp-gpu'", specifier = "<2" },
-    { name = "solaris", marker = "python_full_version == '3.11.*' and extra == 'ramp'", git = "https://github.com/kshitijrajsharma/solaris?rev=f2968ef855af0b508f338aad7ebc651bea6cd667" },
-    { name = "solaris", marker = "python_full_version == '3.11.*' and extra == 'ramp-gpu'", git = "https://github.com/kshitijrajsharma/solaris?rev=f2968ef855af0b508f338aad7ebc651bea6cd667" },
+    { name = "solaris", marker = "python_full_version == '3.11.*' and extra == 'ramp'", git = "https://github.com/kshitijrajsharma/solaris?branch=main" },
+    { name = "solaris", marker = "python_full_version == '3.11.*' and extra == 'ramp-gpu'", git = "https://github.com/kshitijrajsharma/solaris?branch=main" },
     { name = "tensorflow", marker = "python_full_version == '3.11.*' and extra == 'ramp'", specifier = "==2.15.1" },
     { name = "tensorflow", extras = ["and-cuda"], marker = "python_full_version == '3.11.*' and extra == 'ramp-gpu'", specifier = "==2.15.1" },
     { name = "torch", marker = "extra == 'yolo'", specifier = ">=2.11.0" },
@@ -3902,7 +3902,7 @@ wheels = [
 [[package]]
 name = "solaris"
 version = "0.4.0"
-source = { git = "https://github.com/kshitijrajsharma/solaris?rev=f2968ef855af0b508f338aad7ebc651bea6cd667#f2968ef855af0b508f338aad7ebc651bea6cd667" }
+source = { git = "https://github.com/kshitijrajsharma/solaris?branch=main#f2968ef855af0b508f338aad7ebc651bea6cd667" }
 dependencies = [
     { name = "affine", marker = "python_full_version == '3.11.*'" },
     { name = "albumentations", marker = "python_full_version == '3.11.*'" },
