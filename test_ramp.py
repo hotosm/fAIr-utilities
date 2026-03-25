@@ -38,7 +38,7 @@ def main() -> None:
     final_accuracy, final_model_path = train(
         input_path=preprocess_output,
         output_path=f"{base_path}/train",
-        epoch_size=2,
+        epoch_size=1,
         batch_size=2,
         model="ramp",
         model_home=os.environ["RAMP_HOME"],
