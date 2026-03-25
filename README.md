@@ -11,8 +11,6 @@ Utilities for AI-assisted mapping workflows in fAIr.
 ## Local installation
 
 ```bash
-git clone https://github.com/hotosm/fAIr-utilities.git
-cd fAIr-utilities
 just setup
 ```
 
