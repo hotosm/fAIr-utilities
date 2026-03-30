@@ -22,7 +22,6 @@ ramp-code/
 .ipynb_checkpoints
 ramp-data/
 
-docker/
 .ruff_cache/
 .ty/
 .pytest_cache/

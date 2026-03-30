@@ -1,0 +1,70 @@
+# syntax=docker/dockerfile:1.7
+
+FROM ghcr.io/astral-sh/uv:python3.11-trixie-slim AS builder
+
+ARG FLAVOR=cpu
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON=3.11 \
+    UV_PYTHON_DOWNLOADS=0 \
+    DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    git \
+    libgdal-dev \
+    pkg-config \
+    unzip \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml uv.lock README.md /app/
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    bash -euxo pipefail -c ' \
+    if [ "$FLAVOR" = "gpu" ]; then EXTRA="ramp-gpu"; else EXTRA="ramp"; fi; \
+    uv sync --frozen --no-dev --extra "$EXTRA" --no-install-project --no-editable \
+    '
+
+COPY . /app
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    bash -euxo pipefail -c ' \
+    if [ "$FLAVOR" = "gpu" ]; then EXTRA="ramp-gpu"; else EXTRA="ramp"; fi; \
+    uv sync --frozen --no-dev --extra "$EXTRA" --no-editable \
+    '
+
+RUN mkdir -p /app/ramp-data/baseline \
+    && wget -q https://api-prod.fair.hotosm.org/api/v1/workspace/download/ramp/baseline.zip -O /tmp/baseline.zip \
+    && unzip -oq /tmp/baseline.zip -d /app/ramp-data/baseline \
+    && rm -f /tmp/baseline.zip
+
+FROM python:3.11-slim-trixie AS runtime
+
+ARG FLAVOR=cpu
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    DEBIAN_FRONTEND=noninteractive \
+    MPLBACKEND=Agg \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    RAMP_HOME=/app \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    gdal-bin \
+    libglib2.0-0 \
+    libspatialindex8 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app /app
+
+CMD ["python", "test_ramp.py"]

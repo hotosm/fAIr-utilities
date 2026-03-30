@@ -21,15 +21,25 @@ just run ramp
 just run yolo
 ```
 
-`just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. No `ramp-code` clone is required.
+`just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. 
 
-## Docker workflow
+## Docker images
+
+Modes and image tags:
+
+- `ramp` + `cpu` -> `fair-utilities:ramp`
+- `ramp` + `gpu` -> `fair-utilities:ramp-gpu`
+- `yolo` + `cpu` -> `fair-utilities:yolo`
+- `yolo` + `gpu` -> `fair-utilities:yolo-gpu`
+
+Build commands:
 
 ```bash
-TBF
+docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=cpu -t fair-utilities:ramp .
+docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=gpu -t fair-utilities:ramp-gpu .
+docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=cpu -t fair-utilities:yolo .
+docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=gpu -t fair-utilities:yolo-gpu .
 ```
-
-Use `bash` as the container command if you want an interactive shell.
 
 ## Notebook test workflow
 

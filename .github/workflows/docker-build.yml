@@ -1,0 +1,48 @@
+name: Docker Build Check
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    name: Build ${{ matrix.image_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image_name: ramp
+            dockerfile: docker/Dockerfile.ramp
+            flavor: cpu
+          - image_name: ramp-gpu
+            dockerfile: docker/Dockerfile.ramp
+            flavor: gpu
+          - image_name: yolo
+            dockerfile: docker/Dockerfile.yolo
+            flavor: cpu
+          - image_name: yolo-gpu
+            dockerfile: docker/Dockerfile.yolo
+            flavor: gpu
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          build-args: |
+            FLAVOR=${{ matrix.flavor }}
+          push: false
+          tags: hotosm/fair-utilities:${{ matrix.image_name }}-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

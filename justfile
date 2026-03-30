@@ -47,8 +47,8 @@ ramp-gpu:
 	just _run-ramp ramp-gpu
 
 yolo:
-	uv sync --extra yolo --group test
-	uv run --no-sync --extra yolo python test_yolo.py
+	uv sync --extra yolo-cpu --group test
+	uv run --no-sync --extra yolo-cpu python test_yolo.py
 
 run target='':
 	#!/usr/bin/env bash
