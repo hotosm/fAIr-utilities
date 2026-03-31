@@ -1,6 +1,6 @@
-# Standard library imports
 import copy
 import importlib
+import logging
 import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -13,8 +13,6 @@ from time import perf_counter
 from typing import Any, cast
 
 import segmentation_models as sm
-
-# Third party imports
 from matplotlib import pyplot as plt
 from ramp.data_mgmt.data_generator import (
     test_batches_from_gtiff_dirs,
@@ -31,6 +29,8 @@ from ramp.training.augmentation_constructors import get_augmentation_fn
 from ramp.utils.misc_ramp_utils import get_num_files
 
 from .config import RAMP_CONFIG
+
+log = logging.getLogger(__name__)
 
 tf = cast(Any, importlib.import_module("tensorflow"))
 keras = tf.keras
@@ -113,9 +113,9 @@ def run_main_train_code(cfg):
         get_metrics_fn_names = cfg["metrics"]["get_metrics_fn_names"]
         get_metrics_fn_parms = cfg["metrics"]["metrics_fn_parms"]
 
-        for get_mf_name, mf_parms in zip(get_metrics_fn_names, get_metrics_fn_parms):
+        for get_mf_name, mf_parms in zip(get_metrics_fn_names, get_metrics_fn_parms, strict=True):
             get_metric_fn = getattr(metric_constructors, get_mf_name)
-            print(f"Metric constructor function: {get_metric_fn.__name__}")
+            log.info("Metric constructor: %s", get_metric_fn.__name__)
             metric_fn = get_metric_fn(mf_parms)
             the_metrics.append(metric_fn)
 
@@ -131,7 +131,7 @@ def run_main_train_code(cfg):
     if cfg["saved_model"]["use_saved_model"]:
         # load (construct) the model
         model_path = Path(working_ramp_home) / cfg["saved_model"]["saved_model_path"]
-        print(f"Model: importing saved model {str(model_path)}")
+        log.info("Importing saved model %s", model_path)
         the_model = tf.keras.models.load_model(model_path)
         assert the_model is not None, f"the saved model was not constructed: {model_path}"
 
@@ -159,7 +159,7 @@ def run_main_train_code(cfg):
         assert the_model is not None, "the model was not constructed"
         the_model.compile(optimizer=optimizer, loss=loss_fn, metrics=the_metrics)
 
-    print(the_model)
+    log.info("Model: %s", the_model)
     cfg["datasets"]
 
     #### define data directories ####
@@ -169,7 +169,7 @@ def run_main_train_code(cfg):
     val_mask_dir = Path(working_ramp_home) / cfg["datasets"]["val_mask_dir"]
 
     #### get the augmentation transform ####
-    # aug = None
+    aug = None
     if cfg["augmentation"]["use_aug"]:
         aug = get_augmentation_fn(cfg)
 
@@ -206,7 +206,9 @@ def run_main_train_code(cfg):
             transforms=aug,
         )
     else:
-        train_batches = training_batches_from_gtiff_dirs(train_img_dir, train_mask_dir, batch_size, input_img_shape, output_img_shape)
+        train_batches = training_batches_from_gtiff_dirs(
+            train_img_dir, train_mask_dir, batch_size, input_img_shape, output_img_shape
+        )
 
     assert train_batches is not None, "training batches were not constructed"
 
@@ -245,14 +247,22 @@ def run_main_train_code(cfg):
 
         # get cyclic learning scheduler callback
     if cfg["cyclic_learning_scheduler"]["use_clr"]:
-        assert not cfg["early_stopping"]["use_early_stopping"], "cannot use early_stopping with cycling_learning_scheduler"
+        assert not cfg["early_stopping"]["use_early_stopping"], (
+            "cannot use early_stopping with cycling_learning_scheduler"
+        )
         get_clr_callback_fn_name = cfg["cyclic_learning_scheduler"]["get_clr_callback_fn_name"]
         get_clr_callback_fn = getattr(callback_constructors, get_clr_callback_fn_name)
         callbacks_list.append(get_clr_callback_fn(cfg))
 
     ## Main training block ##
     n_epochs = cfg["num_epochs"]
-    print(f"Starting Training with {n_epochs} epochs, {batch_size} batch size, {steps_per_epoch} steps per epoch, {validation_steps} validation steps")
+    log.info(
+        "Starting training: %d epochs, batch %d, %d steps/epoch, %d val steps",
+        n_epochs,
+        batch_size,
+        steps_per_epoch,
+        validation_steps,
+    )
     if validation_steps <= 0:
         raise RaiseError("Not enough data for training. Increase images or reduce batch size")
     assert the_model is not None, "model must be initialized before fitting"
@@ -267,10 +277,9 @@ def run_main_train_code(cfg):
         callbacks=callbacks_list,
     )
     end = perf_counter()
-    print(f"Training Finished , Time taken to train : {end - start} seconds")
+    log.info("Training finished in %.1f seconds", end - start)
 
-    # plot the training and validation accuracy and loss at each epoch
-    print("Generating graphs ....")
+    log.info("Generating training graphs")
     if not os.path.exists(cfg["graph_location"]):
         os.mkdir(cfg["graph_location"])
 
@@ -295,4 +304,4 @@ def run_main_train_code(cfg):
     plt.legend()
     plt.savefig(f"{cfg['graph_location']}/training_accuracy.png")
     plt.clf()
-    print(f"Graph generated at : {cfg['graph_location']}")
+    log.info("Graph saved to %s", cfg["graph_location"])

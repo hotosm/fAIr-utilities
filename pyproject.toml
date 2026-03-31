@@ -1,6 +1,6 @@
 [project]
 name = "hot-fair-utilities"
-version = "2.0.12"
+version = "3.0.0"
 description = "Utilities for AI assisted mapping workflows"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -10,25 +10,27 @@ maintainers = [
 ]
 dependencies = [
     "gdal>=3.6,<4",
-    "geopandas>=0.14,<2",
+    "geomltoolkits>=2.0.2",
+    "geopandas>=0.14,<1 ; python_version == '3.11'",
+    "geopandas>=1.0,<2 ; python_version != '3.11'",
     "matplotlib>=3.10.8",
     "mercantile>=1.2.1",
     "numpy>=1.26",
-    "opencv-python-headless<4.9 ; python_version < '3.13'",
-    "opencv-python-headless>=4.13.0.92 ; python_version >= '3.13'",
+    "opencv-python-headless>=4.10",
     "pandas>=2.3.3",
     "pillow>=12.1.1",
     "rasterio>=1.4.4",
     "requests>=2.32.5",
-    "rtree>=1.4.1",
-    "shapely>=1.8,<3",
-    "tqdm>=4.67.3",
+    "rich>=14.0",
 ]
 
 [project.optional-dependencies]
+predict = [
+    "fairpredictor>=0.5.0",
+]
 ramp = [
     "numpy<2 ; python_version == '3.11'",
-    "gdal[numpy]>=3.6,<4 ; python_version == '3.11'",
+    "gdal[numpy]>=3.8,<4 ; python_version == '3.11'",
     "keras<3 ; python_version == '3.11'",
     "shapely<2 ; python_version == '3.11'",
     "ramp-fair==0.1.2 ; python_version == '3.11'",
@@ -39,7 +41,7 @@ ramp = [
 ]
 ramp-gpu = [
     "numpy<2 ; python_version == '3.11'",
-    "gdal[numpy]>=3.6,<4 ; python_version == '3.11'",
+    "gdal[numpy]>=3.8,<4 ; python_version == '3.11'",
     "keras<3 ; python_version == '3.11'",
     "shapely<2 ; python_version == '3.11'",
     "ramp-fair==0.1.2 ; python_version == '3.11'",
@@ -125,7 +127,7 @@ explicit = true
 
 [tool.uv.extra-build-dependencies]
 gdal = [
-    "numpy==1.26.4",
+    "numpy>=1.26",
     "setuptools>=67",
     "wheel",
 ]
@@ -137,13 +139,19 @@ source-include = ["hot_fair_utilities/training/ramp/ramp_config_base.json"]
 
 [tool.ruff]
 target-version = "py310"
-line-length = 210
+line-length = 120
 exclude = [
 	"docker",
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
+select = ["E", "F", "I", "W", "UP", "B", "SIM", "RUF"]
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.ty.rules]
+unresolved-import = "ignore"
 
 [tool.ty.src]
 exclude = ["docker"]

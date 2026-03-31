@@ -19,7 +19,7 @@ repos:
     hooks:
       - id: ty-check
         name: ty check
-        entry: uv run --group typecheck --extra yolo-cpu ty check hot_fair_utilities/georeferencing.py hot_fair_utilities/inference/predict.py hot_fair_utilities/inference/utils.py hot_fair_utilities/training/yolo_v8/train.py
+        entry: uv run --group typecheck ty check hot_fair_utilities/
         language: system
         pass_filenames: false
 
