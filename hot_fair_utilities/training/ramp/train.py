@@ -1,9 +1,11 @@
-# Standard library imports
+import logging
 import os
 
 from .cleanup import extract_highest_accuracy_model
 from .prepare_data import split_training_2_validation
 from .run_training import manage_fine_tuning_config, run_main_train_code
+
+log = logging.getLogger(__name__)
 
 
 def train(
@@ -24,15 +26,11 @@ def train(
         output_path: Path of the working dir for training
         epoch_size: Epoch size to be used for training
         batch_size: Batch size to be used for training
-        model : Choose Model, Options supported are , ramp
-        model_home : Model Home directory which contains necessary file in order to run model
-        freeze_layers : Either to freeze previous training knowleadge layers or not
-        multimasks : Either to use multimask labels in training or not , default : binary 0/1 , Multimaks classes include : "classes": [
-                "background",
-                "buildings",
-                "boundary",
-                "close_contact"
-            ]
+        model: Model name. Supported: "ramp".
+        model_home: Directory containing model files required for training.
+        freeze_layers: Whether to freeze pretrained layers.
+        multimasks: Use multimask labels (background, buildings, boundary,
+            close_contact) instead of binary masks.
     Example::
 
         final_accuracy, final_model_path = train(
@@ -48,7 +46,9 @@ def train(
     supported_models = ["ramp"]
 
     # Use the assert keyword to raise an AssertionError if the input model string is not in the list of supported models
-    assert any(model.lower() in supported_model for supported_model in supported_models), "Model is not in the list of supported models "
+    assert any(model.lower() in supported_model for supported_model in supported_models), (
+        "Model is not in the list of supported models "
+    )
 
     # Export the environment variables from the operating system
     os.environ.update(os.environ)
@@ -56,11 +56,17 @@ def train(
         # Add a new environment variable to the operating system
         os.environ["RAMP_HOME"] = model_home
         # Print the environment variables to verify that the new variable was added
-        print("Starting to prepare data for training")
+        log.info("Starting to prepare data for training")
         split_training_2_validation(input_path, output_path, multimasks)
-        cfg = manage_fine_tuning_config(output_path, epoch_size, batch_size, freeze_layers, multimasks)
-        print("Data is ready for training")
+        cfg = manage_fine_tuning_config(
+            output_path,
+            epoch_size,
+            batch_size,
+            freeze_layers,
+            multimasks,
+        )
+        log.info("Data is ready for training")
         run_main_train_code(cfg)
-        print("extracting highest accuracy model")
+        log.info("Extracting highest accuracy model")
         final_accuracy, final_model_path = extract_highest_accuracy_model(output_path)
         return (final_accuracy, final_model_path)

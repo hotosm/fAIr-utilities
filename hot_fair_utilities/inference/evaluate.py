@@ -1,16 +1,14 @@
-# Patched from ramp-code.scripts.calculate_accuracy.iou created for ramp project by carolyn.johnston@dev.global
-
-# Standard library imports
+import logging
 from pathlib import Path
 
-# Third party imports
 import geopandas as gpd
 
+log = logging.getLogger(__name__)
+
 try:
-    # Third party imports
     from ramp.utils.eval_utils import get_iou_accuracy_metrics
 except ImportError:
-    print("Ramp eval metrics are not available, Possibly ramp is not installed")
+    log.warning("Ramp eval metrics are not available, possibly ramp is not installed")
 
 
 def evaluate(test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verbose=False):
@@ -46,14 +44,14 @@ def evaluate(test_path, truth_path, filter_area_m2=None, iou_threshold=0.5, verb
     agg_f1 = 2 * n_truepos / (n_truth + n_detections)
 
     if verbose:
-        print(f"Detections: {n_detections}")
-        print(f"Truth buildings: {n_truth}")
-        print(f"True positives: {n_truepos}")
-        print(f"False positives: {n_falsepos}")
-        print(f"False negatives: {n_falseneg}")
-        print(f"Precision IoU@p: {agg_precision}")
-        print(f"Recall IoU@p: {agg_recall}")
-        print(f"F1 IoU@p: {agg_f1}")
+        log.info("Detections: %d", n_detections)
+        log.info("Truth buildings: %d", n_truth)
+        log.info("True positives: %d", n_truepos)
+        log.info("False positives: %d", n_falsepos)
+        log.info("False negatives: %d", n_falseneg)
+        log.info("Precision IoU@p: %.4f", agg_precision)
+        log.info("Recall IoU@p: %.4f", agg_recall)
+        log.info("F1 IoU@p: %.4f", agg_f1)
 
     return {
         "precision": agg_precision,

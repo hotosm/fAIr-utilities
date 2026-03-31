@@ -1,5 +1,6 @@
 # Standard library imports
 import os
+import shutil
 import time
 import warnings
 
@@ -16,7 +17,10 @@ def main() -> None:
     workspace = os.getcwd()
 
     base_path = f"{workspace}/ramp-data/sample_2"
-    preprocess_output = f"{base_path}/preprocessed"
+    preprocess_output = f"{base_path}/preprocessed_yolo"
+    if os.path.isdir(preprocess_output):
+        shutil.rmtree(preprocess_output)
+
     preprocess_start = time.perf_counter()
     preprocess(
         input_path=f"{base_path}/input",
@@ -30,6 +34,9 @@ def main() -> None:
     print(f"preprocessing took {round(time.perf_counter() - preprocess_start, 2)} seconds")
 
     yolo_data_dir = f"{base_path}/yolo_v2"
+    if os.path.isdir(yolo_data_dir):
+        shutil.rmtree(yolo_data_dir)
+
     conversion_start = time.perf_counter()
     yolo_format(
         input_path=preprocess_output,
@@ -48,7 +55,10 @@ def main() -> None:
     )
     print(output_model_iou_accuracy)
 
-    prediction_output = f"{base_path}/prediction/output"
+    prediction_output = f"{base_path}/prediction/yolo_output"
+    if os.path.isdir(prediction_output):
+        shutil.rmtree(prediction_output)
+
     inference_start = time.perf_counter()
     predict(
         checkpoint_path=output_model_path,

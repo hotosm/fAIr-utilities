@@ -1,6 +1,19 @@
-# Standard library imports
+import logging
 import os
 import shutil
+
+from tensorflow import keras
+
+log = logging.getLogger(__name__)
+
+
+def _export_saved_model_to_h5(saved_model_path: str) -> str:
+    h5_path = f"{saved_model_path}.h5"
+    model = keras.models.load_model(saved_model_path)
+    model.save(h5_path)
+    keras.backend.clear_session()
+    log.info("Exported checkpoint to %s", h5_path)
+    return h5_path
 
 
 def extract_highest_accuracy_model(output_path):
@@ -25,8 +38,8 @@ def extract_highest_accuracy_model(output_path):
             latest_entry = entry
 
     # get the highest accuracy model one
-    latest_entry_path = os.path.join(model_checkpoints, latest_entry)
-    print(latest_entry_path)
+    latest_entry_path = os.path.join(model_checkpoints, latest_entry)  # ty: ignore[no-matching-overload]
+    log.info("Latest checkpoint: %s", latest_entry_path)
     highest_accuracy = 0
     highest_accuracy_entry = None
     for entry in os.listdir(latest_entry_path):
@@ -36,10 +49,14 @@ def extract_highest_accuracy_model(output_path):
         if float(accuracy) * 100 > highest_accuracy:
             highest_accuracy_entry = entry
             highest_accuracy = float(accuracy) * 100
-    print(highest_accuracy_entry)
+    log.info("Highest accuracy model: %s (%.2f%%)", highest_accuracy_entry, highest_accuracy)
     for entry in os.listdir(latest_entry_path):
         # Check if the entry is not the file or directory you want to keep
         if entry != highest_accuracy_entry:
             # If the entry is not the file or directory you want to keep, use the os.remove() method to remove it
             shutil.rmtree(os.path.join(latest_entry_path, entry))
-    return highest_accuracy, os.path.join(latest_entry_path, highest_accuracy_entry)
+    best_saved_model_path = os.path.join(  # ty: ignore[no-matching-overload]
+        latest_entry_path, highest_accuracy_entry
+    )
+    best_h5_path = _export_saved_model_to_h5(best_saved_model_path)
+    return highest_accuracy, best_h5_path

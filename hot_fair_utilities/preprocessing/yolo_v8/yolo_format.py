@@ -3,12 +3,13 @@ import glob
 import os
 import shutil
 
-# Third party imports
 import numpy as np
 import yaml
-from tqdm import tqdm
 
+from ..._logging import get_logger, track
 from .utils import convert_tif_to_jpg, write_yolo_file
+
+log = get_logger(__name__)
 
 
 def yolo_format(
@@ -36,13 +37,13 @@ def yolo_format(
     # Verify the sum of the splits
     assert train_split + val_split + test_split == 1, "The sum of the splits must be equal to 1"
 
-    print(f"Train-val-test split: {train_split}-{val_split}-{test_split}")
+    log.info("Train-val-test split: %s-%s-%s", train_split, val_split, test_split)
 
     # Set the random seed
     np.random.seed(seed)
 
     # Find the files
-    cwps, lwps, base_folders = find_files(input_path)
+    cwps, _lwps, _base_folders = find_files(input_path)
 
     # Shuffle indices
     shuffled_indices = np.random.permutation(len(cwps))
@@ -61,10 +62,7 @@ def yolo_format(
     val_cwps = [cwps[i] for i in val_indices]
     test_cwps = [cwps[i] for i in test_indices]
 
-    # Output the results to verify
-    print(f"\nTrain array size: {len(train_cwps)}")
-    print(f"Validation array size: {len(val_cwps)}")
-    print(f"Test array size: {len(test_cwps)}\n")
+    log.info("Train: %d, Validation: %d, Test: %d", len(train_cwps), len(val_cwps), len(test_cwps))
 
     # Check if the YOLO folder exists, if not create labels, images, and folders
     if os.path.exists(output_path):
@@ -72,32 +70,22 @@ def yolo_format(
 
     os.makedirs(output_path, exist_ok=True)
 
-    # Write the YOLO label files for the training set
-    print("Generating training labels")
-    for train_cwp in tqdm(train_cwps):
+    for train_cwp in track(train_cwps, description="Generating training labels"):
         write_yolo_file(train_cwp, "train", output_path)
 
-    # Write the YOLO label files for the validation set
-    print("Generating validation labels")
-    for val_cwp in tqdm(val_cwps):
+    for val_cwp in track(val_cwps, description="Generating validation labels"):
         write_yolo_file(val_cwp, "val", output_path)
 
-    # Write the YOLO label files for the test set
-    print("Generating test labels")
-    for test_cwp in tqdm(test_cwps):
+    for test_cwp in track(test_cwps, description="Generating test labels"):
         write_yolo_file(test_cwp, "test", output_path)
 
-    # Convert the chip files to JPEG format
-    print("Generating training images")
-    for train_cwp in tqdm(train_cwps):
+    for train_cwp in track(train_cwps, description="Generating training images"):
         convert_tif_to_jpg(train_cwp, "train", output_path)
 
-    print("Generating validation images")
-    for val_cwp in tqdm(val_cwps):
+    for val_cwp in track(val_cwps, description="Generating validation images"):
         convert_tif_to_jpg(val_cwp, "val", output_path)
 
-    print("Generating test images")
-    for test_cwp in tqdm(test_cwps):
+    for test_cwp in track(test_cwps, description="Generating test images"):
         convert_tif_to_jpg(test_cwp, "test", output_path)
 
     attr = {
@@ -108,10 +96,9 @@ def yolo_format(
     }
     # os.makedirs(os.path.join(output_path, "yolo"), exist_ok=True)
 
-    YAML_PATH = os.path.join(output_path, "yolo_dataset.yaml")
-    print(f"Writing the data file with path={YAML_PATH}")
-    # Write the file
-    with open(YAML_PATH, "w") as f:
+    yaml_path = os.path.join(output_path, "yolo_dataset.yaml")
+    log.info("Writing dataset config to %s", yaml_path)
+    with open(yaml_path, "w") as f:
         yaml.dump(attr, f)
 
 

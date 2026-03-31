@@ -114,7 +114,7 @@ def convert_coordinates(coordinates, geo_dict):
         list: The converted coordinates.
 
     Raises:
-        AssertionError: If the maximum coordinate value is greater than 1 or the minimum coordinate value is less than 0.
+        AssertionError: If coordinates are outside the [0, 1] range.
     """
     # Iterate over the outer list
     for i in range(len(coordinates)):
@@ -177,7 +177,7 @@ def write_yolo_file(iwp, folder, output_path, class_index=0):
     geo_dict = get_geo_data(iwp)
 
     # Open the GeoJSON file
-    with open(lwp, "r") as file:
+    with open(lwp) as file:
         data = json.load(file)
 
     # Initialize the polygon count

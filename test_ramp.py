@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -21,19 +22,26 @@ def main() -> None:
     print(f"\nUsing tensorflow version {tf.__version__} with no of gpu : {gpu_count}\n")
 
     base_path = f"{workspace}/ramp-data/sample_2"
-    preprocess_output = f"{base_path}/preprocessed"
+    preprocess_output = f"{base_path}/preprocessed_ramp"
+    if os.path.isdir(preprocess_output):
+        shutil.rmtree(preprocess_output)
+
+    train_output = f"{base_path}/train_ramp"
+    if os.path.isdir(train_output):
+        shutil.rmtree(train_output)
+
     preprocess(
         input_path=f"{base_path}/input",
         output_path=preprocess_output,
         rasterize=True,
         rasterize_options=["binary"],
         georeference_images=True,
-        multimasks=True,
+        multimasks=False,
     )
 
     final_accuracy, final_model_path = train(
         input_path=preprocess_output,
-        output_path=f"{base_path}/train",
+        output_path=train_output,
         epoch_size=1,
         batch_size=2,
         model="ramp",
@@ -41,7 +49,10 @@ def main() -> None:
     )
     print(final_accuracy, final_model_path)
 
-    prediction_output = f"{base_path}/prediction/output"
+    prediction_output = f"{base_path}/prediction/ramp_output"
+    if os.path.isdir(prediction_output):
+        shutil.rmtree(prediction_output)
+
     predict(
         checkpoint_path=final_model_path,
         input_path=f"{base_path}/prediction/input",

@@ -4,7 +4,9 @@ RAMP_CONFIG = {
     "logging": {
         "log_experiment": True,
         "experiment_log_path": "ramp-data/TRAIN/fAIr-experiments.csv",
-        "experiment_notes": "Multi Mask model, batchsize 20, 8 epochs on HOT-OSM datasets Multizoom, finetuning from RAMP saved model",
+        "experiment_notes": (
+            "Multi Mask model, batchsize 20, 8 epochs on HOT-OSM datasets Multizoom, finetuning from RAMP saved model"
+        ),
         "fields_to_log": [
             "experiment_name",
             "experiment_notes",

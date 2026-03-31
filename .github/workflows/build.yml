@@ -22,7 +22,7 @@ jobs:
       - uses: ./.github/actions/setup-gdal
 
       - name: Sync lint dependencies
-        run: uv sync --group lint
+        run: uv sync --frozen --group lint
 
       - name: Run lint
         run: |
@@ -44,10 +44,10 @@ jobs:
       - uses: ./.github/actions/setup-gdal
 
       - name: Sync yolo test dependencies
-        run: uv sync --extra yolo-cpu --group test
+        run: uv sync --frozen --extra yolo-cpu --extra predict --group test
 
       - name: Run yolo test
-        run: uv run --no-sync --extra yolo-cpu python test_yolo.py
+        run: uv run --no-sync --extra yolo-cpu --extra predict python test_yolo.py
 
   test-ramp:
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
           fi
 
       - name: Sync ramp test dependencies
-        run: uv sync --extra ramp --group test
+        run: uv sync --frozen --extra ramp --extra predict --group test
 
       - name: Run ramp test
-        run: RAMP_HOME="$PWD" uv run --no-sync --extra ramp python test_ramp.py
+        run: RAMP_HOME="$PWD" uv run --no-sync --extra ramp --extra predict python test_ramp.py

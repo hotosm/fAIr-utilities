@@ -1,15 +1,15 @@
-# Standard library imports
+import logging
 import os
 import urllib.request
 
-# Third party imports
 import torch
 import ultralytics
 
-# Reader imports
 from hot_fair_utilities.model.yolo import YOLOSegWithPosWeight
 
-from ...utils import (
+log = logging.getLogger(__name__)
+
+from ...utils import (  # noqa: E402
     check4checkpoint,
     compute_iou_chart_from_yolo_results,
     export_model_to_onnx,
@@ -65,20 +65,22 @@ def train(
     pc,
     output_path,
     dataset_yaml_path,
-    gpu=("cuda" if torch.cuda.is_available() else "cpu"),
+    gpu=None,
 ):
+    if gpu is None:
+        gpu = "cuda" if torch.cuda.is_available() else "cpu"
     if not os.path.exists(weights):
         url = "https://github.com/hotosm/fAIr-utilities/raw/refs/heads/master/yolov8s_v2-seg.pt"
         download_path = weights
         urllib.request.urlretrieve(url, download_path)
         weights = download_path
-        print(f"Weights file downloaded to {weights}")
+        log.info("Weights file downloaded to %s", weights)
 
     back = "n" if "yolov8n" in weights else "s" if "yolov8s" in weights else "m" if "yolov8m" in weights else "?"
     data_scn = dataset_yaml_path
     dataset = data_scn.split("/")[-3]
     kwargs = HYPERPARAM_CHANGES
-    print(f"Backbone: {back}, Dataset: {dataset}, Epochs: {epochs}")
+    log.info("Backbone: %s, Dataset: %s, Epochs: %s", back, dataset, epochs)
 
     name = f"yolov8{back}-seg_{dataset}_ep{epochs}_bs{batch_size}"
 

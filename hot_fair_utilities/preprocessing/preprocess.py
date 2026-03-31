@@ -1,7 +1,7 @@
-# Standard library imports
 import os
 
-from ..georeferencing import georeference
+from geomltoolkits import georeference_prediction_tiles
+
 from .clip_labels import clip_labels
 from .fix_labels import fix_labels
 from .reproject_labels import reproject_labels_to_epsg3857
@@ -44,12 +44,13 @@ def preprocess(
         georeference_images: Whether to georeference the OAM images.
         multimasks: Whether to additionally output multimask labels.
 
-        input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
-        input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
+        input_contact_spacing (int, optional): Pixels closer to two polygons than
+            contact_spacing will be labeled with the contact mask.
+        input_boundary_width (int, optional): Width in pixels of boundary inner
+            buffer around building footprints.
 
-        Unit of input_contact_spacing and input_boundary_width is in pixel, we couldn't use meters to maintain consistency based on different zoom level as pixel resolution will be different which is :
-
-        Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
+        Units are in pixels because meter-based spacing would not maintain
+        consistency across zoom levels (pixel resolution varies).
 
     Example::
 
@@ -64,9 +65,12 @@ def preprocess(
     # Check if rasterizing options are valid
     assert epsg in (4326, 3857), "Projection not supported"
     if rasterize:
-        assert rasterize_options is not None and isinstance(rasterize_options, list) and 0 < len(rasterize_options) <= 2 and len(rasterize_options) == len(set(rasterize_options)), (
-            "Please provide a list with rasterizing options"
-        )
+        assert (
+            rasterize_options is not None
+            and isinstance(rasterize_options, list)
+            and 0 < len(rasterize_options) <= 2
+            and len(rasterize_options) == len(set(rasterize_options))
+        ), "Please provide a list with rasterizing options"
 
         for option in rasterize_options:
             assert option in (
@@ -77,7 +81,7 @@ def preprocess(
     os.makedirs(output_path, exist_ok=True)
 
     if georeference_images:
-        georeference(input_path, f"{output_path}/chips", epsg=epsg)
+        georeference_prediction_tiles(input_path, f"{output_path}/chips", crs=str(epsg), clip_bands_to=3)
 
     fix_labels(
         f"{input_path}/labels.geojson",
@@ -94,7 +98,9 @@ def preprocess(
         output_path,
         rasterize,
         rasterize_options,
-        all_geojson_file=(f"{output_path}/corrected_labels.geojson" if epsg == 4326 else f"{output_path}/labels_epsg3857.geojson"),
+        all_geojson_file=(
+            f"{output_path}/corrected_labels.geojson" if epsg == 4326 else f"{output_path}/labels_epsg3857.geojson"
+        ),
         epsg=epsg,
     )
 

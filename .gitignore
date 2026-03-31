@@ -27,3 +27,5 @@ ramp-data/
 .pytest_cache/
 .mypy_cache/
 runs
+# Local uv overrides (GDAL version pinning)
+uv.toml

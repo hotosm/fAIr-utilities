@@ -1,5 +1,4 @@
 # Import the exec function
-from __future__ import print_function
 
 # Standard library imports
 import csv
@@ -59,10 +58,7 @@ def _move_files_for_validation(source_dir: Path, target_dir: Path, val_filenames
 
 
 def split_training_2_validation(input_path, output_path, multimasks=False):
-    """Converts training 2 validation
-
-    Currently supported for ramp , It converts training dataset provided by preprocessing script to validation datastes reuqired by ramp
-    """
+    """Split training data into training and validation sets for ramp."""
 
     # Define the source and destination paths
     src_path = input_path

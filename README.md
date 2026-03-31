@@ -4,7 +4,7 @@ Utilities for AI-assisted mapping workflows in fAIr.
 
 ## Prerequisites
 
-- Linux with GDAL system libraries available
+- GDAL system libraries available (Linux or macOS)
 - [uv](https://docs.astral.sh/uv/)
 - [just](https://github.com/casey/just)
 
@@ -12,6 +12,19 @@ Utilities for AI-assisted mapping workflows in fAIr.
 
 ```bash
 just setup
+```
+
+If GDAL is missing on macOS, install it with Homebrew:
+
+```bash
+brew install gdal
+```
+
+If GDAL is missing on Debian or Ubuntu:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y gdal-bin libgdal-dev
 ```
 
 ## Run sample workflows
@@ -22,6 +35,17 @@ just run yolo
 ```
 
 `just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. 
+
+Ramp training exports the selected best checkpoint as `.h5`, and inference uses that exported checkpoint directly.
+
+## Validation
+
+Run all quality gates and integration checks:
+
+```bash
+just check
+just test-all
+```
 
 ## Docker images
 

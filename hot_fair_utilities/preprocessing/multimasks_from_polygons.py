@@ -16,7 +16,8 @@ from ramp.utils.multimask_utils import df_to_px_mask, multimask_to_sparse_multim
 from solaris.utils.core import _check_rasterio_im_load
 from solaris.utils.geo import get_crs
 from solaris.vector.mask import crs_is_metric
-from tqdm import tqdm
+
+from .._logging import track
 
 
 def get_rasterio_shape_and_transform(image_path):
@@ -34,22 +35,17 @@ def multimasks_from_polygons(
     input_contact_spacing=8,
     input_boundary_width=3,
 ):
-    """
-    Create multichannel building footprint masks from a folder of geojson files.
-    This also requires the path to the matching image chips directory.Unit of input_contact_spacing and input_boundary_width is in pixel which is :
+    """Create multichannel building footprint masks from geojson polygons.
 
-    ## Can not use meters for contact spacing and width because it won't maintain consistency in different zoom levels
-
-    Real-world width (in meters)= Pixel width×Resolution (meters per pixel)
-
+    Units are in pixels because meter-based spacing would not maintain
+    consistency across zoom levels (pixel resolution varies).
 
     Args:
-        in_poly_dir (str): Path to directory containing geojson files.
-        in_chip_dir (str): Path to directory containing image chip files with names matching geojson files.
-        out_mask_dir (str): Path to directory containing output SDT masks.
-
-        input_contact_spacing (int, optional): Pixels that are closer to two different polygons than contact_spacing will be labeled with the contact mask.
-        input_boundary_width (int, optional): Width in pixel of boundary inner buffer around building footprints
+        in_poly_dir: Directory containing geojson label files.
+        in_chip_dir: Directory containing image chips matching geojson files.
+        out_mask_dir: Directory for output SDT masks.
+        input_contact_spacing: Pixel distance threshold for contact mask labeling.
+        input_boundary_width: Pixel width of boundary inner buffer.
 
     Example:
         multimasks_from_polygons(
@@ -64,7 +60,7 @@ def multimasks_from_polygons(
 
     chip_label_pairs = get_tq_chip_label_pairs(in_chip_dir, in_poly_dir)
 
-    chip_paths, label_paths = list(zip(*chip_label_pairs))
+    chip_paths, label_paths = list(zip(*chip_label_pairs, strict=True))
 
     # construct the output mask file names from the chip file names.
     # these will have the same base filenames as the chip files,
@@ -73,15 +69,15 @@ def multimasks_from_polygons(
     mask_paths = [construct_mask_filepath(out_mask_dir, chip_path) for chip_path in chip_paths]
 
     # construct a list of full paths to the mask files
-    json_chip_mask_zips = zip(label_paths, chip_paths, mask_paths)
-    for json_path, chip_path, mask_path in tqdm(json_chip_mask_zips, desc="Multimasks for input"):
+    json_chip_mask_zips = zip(label_paths, chip_paths, mask_paths, strict=True)
+    for json_path, chip_path, mask_path in track(list(json_chip_mask_zips), description="Generating multimasks"):
         # We will run this on very large directories, and some label files might fail to process.
         # We want to be able to resume mask creation from where we left off.
         if Path(mask_path).is_file():
             continue
 
         # workaround for bug in solaris
-        mask_shape, mask_transform = get_rasterio_shape_and_transform(chip_path)
+        mask_shape, _mask_transform = get_rasterio_shape_and_transform(chip_path)
 
         gdf = gpd.read_file(os.path.relpath(json_path))
 
