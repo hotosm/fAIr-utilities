@@ -27,7 +27,7 @@ COPY pyproject.toml uv.lock README.md /app/
 RUN --mount=type=cache,target=/root/.cache/uv \
     bash -euxo pipefail -c ' \
     if [ "$FLAVOR" = "gpu" ]; then EXTRA="ramp-gpu"; else EXTRA="ramp"; fi; \
-    uv sync --frozen --no-dev --extra "$EXTRA" --no-install-project --no-editable \
+    uv sync --frozen --no-dev --extra "$EXTRA" --extra predict --no-install-project --no-editable \
     '
 
 COPY . /app
@@ -35,7 +35,7 @@ COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     bash -euxo pipefail -c ' \
     if [ "$FLAVOR" = "gpu" ]; then EXTRA="ramp-gpu"; else EXTRA="ramp"; fi; \
-    uv sync --frozen --no-dev --extra "$EXTRA" --no-editable \
+    uv sync --frozen --no-dev --extra "$EXTRA" --extra predict --no-editable \
     '
 
 RUN mkdir -p /app/ramp-data/baseline \
