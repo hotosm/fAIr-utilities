@@ -9,7 +9,7 @@ maintainers = [
     { name = "Kshitij Raj Sharma", email = "krschap@proton.me" },
 ]
 dependencies = [
-    "gdal>=3.6,<4",
+    "gdal==3.8.4",
     "geomltoolkits>=2.0.2",
     "geopandas>=0.14,<1 ; python_version == '3.11'",
     "geopandas>=1.0,<2 ; python_version != '3.11'",
@@ -30,7 +30,7 @@ predict = [
 ]
 ramp = [
     "numpy<2 ; python_version == '3.11'",
-    "gdal[numpy]>=3.8,<4 ; python_version == '3.11'",
+    "gdal[numpy]==3.8.4 ; python_version == '3.11'",
     "keras<3 ; python_version == '3.11'",
     "shapely<2 ; python_version == '3.11'",
     "ramp-fair==0.1.2 ; python_version == '3.11'",
@@ -41,7 +41,7 @@ ramp = [
 ]
 ramp-gpu = [
     "numpy<2 ; python_version == '3.11'",
-    "gdal[numpy]>=3.8,<4 ; python_version == '3.11'",
+    "gdal[numpy]==3.8.4 ; python_version == '3.11'",
     "keras<3 ; python_version == '3.11'",
     "shapely<2 ; python_version == '3.11'",
     "ramp-fair==0.1.2 ; python_version == '3.11'",
