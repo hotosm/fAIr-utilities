@@ -9,7 +9,6 @@ maintainers = [
     { name = "Kshitij Raj Sharma", email = "krschap@proton.me" },
 ]
 dependencies = [
-    "gdal==3.8.4",
     "geomltoolkits>=2.0.2",
     "geopandas>=0.14,<1 ; python_version == '3.11'",
     "geopandas>=1.0,<2 ; python_version != '3.11'",

@@ -5,12 +5,13 @@ from pathlib import Path
 
 import geopandas
 import mercantile
-from osgeo import gdal
+import numpy as np
+import rasterio
+from rasterio.features import rasterize as rasterize_shapes
+from rasterio.transform import from_bounds
 from shapely.geometry import box
 
 from .._logging import track
-
-gdal.UseExceptions()
 
 
 def _bounding_box_from_filename(filename: str, epsg: int = 3857) -> tuple[float, float, float, float]:
@@ -95,20 +96,30 @@ def clip_labels(
             for option in rasterize_options:
                 if option == "grayscale":
                     raster_file = f"{output_grayscale_path}/{filename}.tif"
-                    burn_values = [255]
-
-                if option == "binary":
+                    burn_value = 255
+                else:
                     raster_file = f"{output_binary_path}/{filename}.mask.tif"
-                    burn_values = [1]
+                    burn_value = 1
 
-                _ = gdal.Rasterize(
-                    destNameOrDestDS=raster_file,
-                    srcDS=clipped_geojson_file,
-                    format="GTiff",
-                    outputType=gdal.GDT_Byte,
-                    outputBounds=[x_min, y_min, x_max, y_max],
-                    width=256,
-                    height=256,
-                    burnValues=burn_values,
-                )
-                _ = None
+                mask = np.zeros((256, 256), dtype=np.uint8)
+                if not gdf_clipped.empty:
+                    mask = rasterize_shapes(
+                        ((geometry, burn_value) for geometry in gdf_clipped.geometry),
+                        out_shape=mask.shape,
+                        fill=0,
+                        transform=from_bounds(x_min, y_min, x_max, y_max, mask.shape[1], mask.shape[0]),
+                        dtype=mask.dtype,
+                    )
+
+                with rasterio.open(
+                    raster_file,
+                    "w",
+                    driver="GTiff",
+                    width=mask.shape[1],
+                    height=mask.shape[0],
+                    count=1,
+                    dtype=mask.dtype,
+                    crs=f"EPSG:{epsg}",
+                    transform=from_bounds(x_min, y_min, x_max, y_max, mask.shape[1], mask.shape[0]),
+                ) as dataset:
+                    dataset.write(mask, 1)
