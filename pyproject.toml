@@ -1,6 +1,6 @@
 [project]
 name = "hot-fair-utilities"
-version = "3.0.0"
+version = "4.0.0"
 description = "Utilities for AI assisted mapping workflows"
 readme = "README.md"
 requires-python = ">=3.10"

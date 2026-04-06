@@ -1,3 +1,25 @@
+## v4.0.0 (2026-04-06)
+
+### Feat
+
+- **docker**: adds docker image for the ramp and yolo
+
+### Fix
+
+- **docker**: fixes docker install with predict
+- **ci-:-install**: install predict
+- **ci**: pin gdal version
+- **ci**: fixes yolo
+- **ramp-code**: get rid of ramp code git clone , add the split random
+- **ci**: fixes import issues and adds ramp gpu version directly from deps
+- **docs**: fixes extra docs link
+
+### Refactor
+
+- **integration**: integrates fairpredictor
+- **solaris**: get rid of solaris maintained within the repo
+- **dead**: refactors , remove dead codes and init
+
 ## v2.0.12 (2025-04-15)
 
 ### Fix
