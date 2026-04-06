@@ -1,12 +1,15 @@
 # hot_fair_utilities
 
-Utilities for AI-assisted mapping workflows in fAIr.
+Utilities for AI-assisted mapping workflows in [fAIr](https://github.com/hotosm/fAIr) — the Humanitarian OpenStreetMap Team's AI-assisted mapping platform.
+
+This package provides training, inference, and preprocessing tools for building detection models (RAMP and YOLOv8) used in humanitarian mapping — identifying buildings from satellite imagery to support disaster response, development planning, and community mapping.
 
 ## Prerequisites
 
-- GDAL system libraries available (Linux or macOS)
-- [uv](https://docs.astral.sh/uv/)
-- [just](https://github.com/casey/just)
+- Python 3.10+
+- GDAL system libraries (see OS-specific instructions below)
+- [uv](https://docs.astral.sh/uv/) — fast Python package manager
+- [just](https://github.com/casey/just) — command runner
 
 ## Local installation
 
@@ -14,27 +17,36 @@ Utilities for AI-assisted mapping workflows in fAIr.
 just setup
 ```
 
-If GDAL is missing on macOS, install it with Homebrew:
+### Installing GDAL
 
+**macOS:**
 ```bash
 brew install gdal
 ```
 
-If GDAL is missing on Debian or Ubuntu:
-
+**Debian / Ubuntu:**
 ```bash
 sudo apt-get update
 sudo apt-get install -y gdal-bin libgdal-dev
 ```
 
+**Windows (WSL recommended):**
+```bash
+# Inside WSL (Ubuntu)
+sudo apt-get update
+sudo apt-get install -y gdal-bin libgdal-dev
+```
+
+> **Note:** Native Windows is not officially supported due to GDAL dependencies. Use WSL or Docker instead.
+
 ## Run sample workflows
 
 ```bash
-just run ramp
-just run yolo
+just run ramp    # RAMP building detection model
+just run yolo    # YOLOv8 segmentation model
 ```
 
-`just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed. 
+`just run ramp` downloads the baseline checkpoint into `ramp-data/baseline` when needed.
 
 Ramp training exports the selected best checkpoint as `.h5`, and inference uses that exported checkpoint directly.
 
@@ -43,26 +55,31 @@ Ramp training exports the selected best checkpoint as `.h5`, and inference uses 
 Run all quality gates and integration checks:
 
 ```bash
-just check
-just test-all
+just check       # lint + format check
+just test-all    # integration tests
 ```
 
 ## Docker images
 
 Modes and image tags:
 
-- `ramp` + `cpu` -> `fair-utilities:ramp`
-- `ramp` + `gpu` -> `fair-utilities:ramp-gpu`
-- `yolo` + `cpu` -> `fair-utilities:yolo`
-- `yolo` + `gpu` -> `fair-utilities:yolo-gpu`
+| Model | Device | Image tag | Build command |
+|---|---|---|---|
+| RAMP | CPU | `fair-utilities:ramp` | `docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=cpu -t fair-utilities:ramp .` |
+| RAMP | GPU | `fair-utilities:ramp-gpu` | `docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=gpu -t fair-utilities:ramp-gpu .` |
+| YOLOv8 | CPU | `fair-utilities:yolo` | `docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=cpu -t fair-utilities:yolo .` |
+| YOLOv8 | GPU | `fair-utilities:yolo-gpu` | `docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=gpu -t fair-utilities:yolo-gpu .` |
 
-Build commands:
+## Project structure
 
-```bash
-docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=cpu -t fair-utilities:ramp .
-docker build -f docker/Dockerfile.ramp --build-arg FLAVOR=gpu -t fair-utilities:ramp-gpu .
-docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=cpu -t fair-utilities:yolo .
-docker build -f docker/Dockerfile.yolo --build-arg FLAVOR=gpu -t fair-utilities:yolo-gpu .
+```
+hot_fair_utilities/
+├── training/          # Model training pipelines (RAMP + YOLO)
+├── inference/         # Run predictions on satellite imagery
+├── preprocessing/     # Prepare training data from OSM labels
+├── postprocessing/    # Clean up model outputs
+├── model/             # Model loading and configuration
+└── utils.py           # Shared utilities
 ```
 
 ## Notebook test workflow
@@ -73,6 +90,11 @@ Run [Package_Test.ipynb](./Package_Test.ipynb) to validate the package workflow 
 
 See [docs/benchmark/sample-datasets.md](./docs/benchmark/sample-datasets.md) for benchmark dataset details.
 
-## Development notes
+## Contributing
 
-Follow [docs/Version_control.md](./docs/Version_control.md) for release and versioning guidance.
+1. Fork the repo and create a branch from `master`
+2. Install dev dependencies: `just setup`
+3. Run lint and tests: `just check && just test-all`
+4. Submit a PR
+
+See [docs/Version_control.md](./docs/Version_control.md) for release and versioning guidance.
