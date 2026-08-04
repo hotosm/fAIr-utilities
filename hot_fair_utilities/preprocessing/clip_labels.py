@@ -75,17 +75,30 @@ def clip_labels(
     output_geojson_path = f"{output_path}/labels"
     os.makedirs(output_geojson_path, exist_ok=True)
 
+    geojson_file_all_labels = all_geojson_file or f"{output_path}/labels_epsg3857.geojson"
+    gdf_all_labels = geopandas.read_file(os.path.relpath(geojson_file_all_labels))
+    # Optional acceleration: use a spatial index if available.
+    # If geopandas/shapely backend doesn't support it, fall back to full-clip.
+    try:
+        sindex = gdf_all_labels.sindex
+    except Exception:
+        sindex = None
+
     png_files = glob(f"{input_path}/*.png")
     for path in track(png_files, description=f"Clipping labels for {Path(input_path).stem}"):
         filename = Path(path).stem
-        geojson_file_all_labels = all_geojson_file or f"{output_path}/labels_epsg3857.geojson"
         clipped_geojson_file = f"{output_geojson_path}/{filename}.geojson"
 
         x_min, y_min, x_max, y_max = _bounding_box_from_filename(filename, epsg=epsg)
         bounding_box_polygon = box(x_min, y_min, x_max, y_max)
 
-        gdf_all_labels = geopandas.read_file(os.path.relpath(geojson_file_all_labels))
-        gdf_clipped = gdf_all_labels.clip(bounding_box_polygon)
+        if sindex is not None:
+            # Fast pre-filter: only test geometries whose bbox intersects this chip bbox.
+            candidates = list(sindex.intersection(bounding_box_polygon.bounds))
+            gdf_subset = gdf_all_labels.iloc[candidates] if candidates else gdf_all_labels.iloc[0:0]
+            gdf_clipped = gdf_subset.clip(bounding_box_polygon)
+        else:
+            gdf_clipped = gdf_all_labels.clip(bounding_box_polygon)
         if len(gdf_clipped) > 0:
             gdf_clipped.to_file(clipped_geojson_file, driver="GeoJSON")
         else:
