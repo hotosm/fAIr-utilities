@@ -7,6 +7,7 @@ from pathlib import Path
 # Third party imports
 import geopandas as gpd
 import rasterio as rio
+from pyproj.exceptions import ProjError
 from ramp.data_mgmt.chip_label_pairs import (
     construct_mask_filepath,
     get_tq_chip_label_pairs,
@@ -89,7 +90,15 @@ def multimasks_from_polygons(
 
         if get_crs(gdf) != get_crs(reference_im):
             # BUGFIX: if crs's don't match, reproject the geodataframe
-            gdf = gdf.to_crs(get_crs(reference_im))
+            try:
+                gdf = gdf.to_crs(get_crs(reference_im))
+            except ProjError as e:
+                raise ValueError(
+                    "Could not reproject training data to the reference "
+                    f"image's CRS. The reference image at {chip_path!r} "
+                    "may have an invalid or missing coordinate reference "
+                    "system."
+                ) from e
 
         if crs_is_metric(gdf):
             meters = True
