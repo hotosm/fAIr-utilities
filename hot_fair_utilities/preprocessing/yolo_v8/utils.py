@@ -148,6 +148,44 @@ def convert_coordinates(coordinates, geo_dict):
     return coordinates
 
 
+def _geojson_crs(data, default="EPSG:4326"):
+    """Return the CRS of a GeoJSON object.
+
+    GeoJSON (RFC 7946) is WGS84 / EPSG:4326 by default, but tiles produced earlier in the
+    fAIr pipeline can carry a named-CRS member (e.g. EPSG:3857). We honour that member when
+    present and fall back to the spec default otherwise.
+    """
+    try:
+        name = data["crs"]["properties"]["name"]
+    except (KeyError, TypeError):
+        return default
+    if name and "EPSG" in name.upper():
+        code = name.replace("::", ":").split(":")[-1]
+        return f"EPSG:{code}"
+    return name or default
+
+
+def reproject_coordinates(coordinates, src_crs, dst_crs):
+    """Reproject nested polygon coordinates from ``src_crs`` to ``dst_crs``.
+
+    Fixes #48: chip corners (from the GeoTIFF) and label polygon points (from GeoJSON) can be
+    in different CRS. Without this, ``convert_coordinates`` subtracts/divides values from two
+    coordinate systems, producing out-of-range numbers that ``check_and_clamp`` pins to 0/1 —
+    i.e. labels "collapse to wrong pixels". A no-op when the two CRS already match.
+    """
+    if src_crs == dst_crs:
+        return coordinates
+    transformer = Transformer.from_crs(src_crs, dst_crs, always_xy=True)
+    reprojected = []
+    for ring in coordinates:
+        new_ring = []
+        for point in ring:
+            x, y = transformer.transform(point[0], point[1])
+            new_ring.append([x, y])
+        reprojected.append(new_ring)
+    return reprojected
+
+
 def write_yolo_file(iwp, folder, output_path, class_index=0):
     """
     Writes YOLO label file based on the given image with path and class index.
@@ -180,6 +218,9 @@ def write_yolo_file(iwp, folder, output_path, class_index=0):
     with open(lwp) as file:
         data = json.load(file)
 
+    # CRS of the label geometries (fixes #48: may differ from the chip's CRS)
+    label_crs = _geojson_crs(data)
+
     # Initialize the polygon count
     polygon_count = 0
 
@@ -191,6 +232,9 @@ def write_yolo_file(iwp, folder, output_path, class_index=0):
 
             # Get the coordinates of the polygon
             coordinates = feature["geometry"]["coordinates"]
+
+            # Reproject label points into the chip's CRS before normalizing (fixes #48)
+            coordinates = reproject_coordinates(coordinates, label_crs, geo_dict["crs"])
 
             # Convert the coordinates
             new_coordinates = flatten_list(convert_coordinates(coordinates, geo_dict))
